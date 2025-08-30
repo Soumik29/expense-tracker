@@ -1,7 +1,6 @@
 # Expense Tracker
 
-A simple expense tracker project for myself.
----
+A A simple expense tracker project for myself.
 
 ## Features
 - Add a new expense 
@@ -56,7 +55,7 @@ A simple expense tracker project for myself.
   @tailwind components;
   @tailwind utilities;
 ```
-- This imports Tialwinds's styles.
+- This imports Tialainds's styles.
 
 ### Run the project
 
