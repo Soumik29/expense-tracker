@@ -35,6 +35,30 @@ A simple expense tracker project which I'm making for my own sake to keep track 
 - npm create vite@latest expense-tracker 
 - npm install
 
+## Add tailwindcss 
+
+- npm install tailwindcss @tailwindcss/vite
+- npx tailwindcss init -p
+* The -p flag creates both tailwind.config.js and postcss.config.js
+
+## Add Tailwind config 
+
+- open tailwind.config.js file and add:
+```
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts.jsx,tsx}",
+  ],
+```
+- then open src/index.css and repalce everything with:
+
+```
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+```
+- This imports Tialwinds's styles.
+
 ### Run the project
 
 - npm run dev
