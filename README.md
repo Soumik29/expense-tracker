@@ -1,7 +1,6 @@
 # Expense Tracker
 
-A simple expense tracker project which I'm making for my own sake to keep track of my expenses.
-
+A simple expense tracker project for myself.
 ---
 
 ## Features
