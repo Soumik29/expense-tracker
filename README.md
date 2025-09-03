@@ -98,3 +98,6 @@ A A simple expense tracker project for myself.
 
 - This file defines the types for the Expense such as the id should be number, the amount should be number, the description should be of string type and so on.
 
+---
+
+- Happy Coding 😁
