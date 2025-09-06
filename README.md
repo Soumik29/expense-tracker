@@ -72,11 +72,32 @@ A A simple expense tracker project for myself.
 
 ### App.tsx
 
-- App.tsx is the parent component of all other components.
-- Each component is a child of this component.
-- Think of this as the head of a family
-- Our app.tsx contains a heading and then a child component called ExpenseTracker.tsx
+- Root component of ExpenseTracker project
 
 ### ExpenseTracker.tsx
 
 - The ExpenseTracker component handles the main logic of the app. It handles a list of expenses, it has the logic to edit the expenses, it also has the logic to add and delete expenses. It also handles the logic for displaying a modal when a user tries to edit an expense.
+
+### AddExpenseForm.tsx
+
+- AddExpenseForm component handles the logic of adding an expense. It has all the validation logic of the form. None of the fields not allowed to stay empty. 
+
+### ExpenseCard.tsx
+
+- The expense card component shows individual expenses in a card form. It will display details such as the date of the expense made, the category of expense, the expense amount, and the expense description.
+
+## TotalExpenses.tsx
+
+- As the file name says, this component is responsible to calculate the total expense.
+
+### ModalFormExpense.tsx
+
+- This component handles editing of the expenses. When a user edits an expense (pen icon ✏️), the modal form will show up where the user can edits if they made some mistake in the expense.
+
+## types.ts
+
+- This file defines the types for the Expense such as the id should be number, the amount should be number, the description should be of string type and so on.
+
+---
+
+- Happy Coding 😁
