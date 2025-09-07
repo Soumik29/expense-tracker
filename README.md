@@ -3,7 +3,7 @@
 A clean and modern expense tracking application built with React, TypeScript, and Tailwind CSS. This single-page application allows users to add, edit, and delete their daily expenses, with all data saved persistently in the browser.
 
 ![Expense Tracker Screenshot](https://i.imgur.com/your-screenshot-url.png)
-_Note: Replace the URL above with a link to a screenshot of your finished app!_
+_Note: The app is currently in progress so it doesn't have a pic. Thank you_
 
 ---
 
