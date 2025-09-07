@@ -1,74 +1,112 @@
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { type Expense } from "./types.ts";
 
-type deleteExpenseProp = (id: number) => void;
-type editExpenseProp = (expense: Expense) => void;
+// Define the props for a single expense card
+type IndividualExpenseProps = {
+  expense: Expense;
+  onDeleteExpense: (id: number) => void;
+  onEditExpense: (expense: Expense) => void;
+};
 
+// A new component to render each card individually
+// This component manages its own "expanded" state for the description
+const IndividualExpense = ({ expense, onDeleteExpense, onEditExpense }: IndividualExpenseProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isLongDescription = expense.description.length > 100; // Show "Read more" if description is long
+
+  return (
+    <div
+      key={expense.id}
+      className="relative bg-gray-800/80 border border-gray-700 rounded-xl shadow-lg p-5 transition-all duration-300 hover:border-blue-500 hover:shadow-blue-500/20"
+    >
+      <div className="flex justify-between items-start gap-4">
+        {/* Left Side: Category, Description, and Date */}
+        <div className="flex-1">
+          <div className="flex justify-between items-center mb-3">
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
+              {expense.category}
+            </span>
+            <span className="text-3xl font-bold text-green-400">
+              ${expense.amount.toFixed(2)}
+            </span>
+          </div>
+          
+          <p className={`text-gray-300 text-md transition-all duration-300 ${!isExpanded && 'line-clamp-2'}`}>
+            {expense.description}
+          </p>
+
+          {isLongDescription && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-blue-400 hover:text-blue-300 text-sm font-semibold mt-2"
+            >
+              {isExpanded ? "Show less" : "Read more"}
+            </button>
+          )}
+        </div>
+
+        {/* Right Side: Actions & Date */}
+        <div className="flex flex-col items-end justify-between h-full">
+            <div className="flex space-x-2 mb-4">
+                <button
+                onClick={() => onEditExpense(expense)}
+                className="p-2 w-10 h-10 rounded-full bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                <FontAwesomeIcon icon={faPen} />
+                </button>
+                <button
+                onClick={() => onDeleteExpense(expense.id)}
+                className="p-2 w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/40 text-red-400 hover:text-red-300 transition-colors"
+                >
+                <FontAwesomeIcon icon={faTrash} />
+                </button>
+            </div>
+        </div>
+      </div>
+       {/* Footer: Date */}
+       <div className="mt-4 pt-4 border-t border-gray-700 text-right text-sm text-gray-400">
+          <span>{new Date(expense.date).toLocaleDateString()}</span>
+        </div>
+    </div>
+  );
+};
+
+
+// The main component that wraps the list
 const ExpenseCard = (props: {
   expenseList: Expense[];
-  onDeleteExpense: deleteExpenseProp;
-  onEditExpense: editExpenseProp;
+  onDeleteExpense: (id: number) => void;
+  onEditExpense: (expense: Expense) => void;
 }) => {
   const { expenseList, onDeleteExpense, onEditExpense } = props;
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 bg-gradient-to-b from-gray-900 to-gray-800 rounded-2xl shadow-xl h-full">
+    <div className="w-full mx-auto p-6 bg-gray-900/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700 h-full">
       {/* Header */}
-      <div className="sticky top-0 z-1 backdrop-blur p-2">
-        <h1 className="flex items-center gap-2 text-2xl font-bold text-blue-400 mb-4">
-          💸 Expenses
+      <div className="sticky top-0 z-10 p-2 mb-4 backdrop-blur-xl">
+        <h1 className="flex items-center justify-center gap-3 text-3xl font-bold text-white mb-4">
+          💸 Your Expenses
         </h1>
       </div>
 
       {/* Expense List */}
-      <div className="overflow-y-auto overscroll-contain space-y-4">
+      <div className="overflow-y-auto overscroll-contain space-y-5">
         {expenseList.length === 0 ? (
-          <p className="text-center text-gray-400">No expenses to add yet</p>
+          <div className="text-center text-gray-500 py-10">
+            <p className="text-lg">No expenses added yet.</p>
+            <p className="text-sm">Add one to get started!</p>
+          </div>
         ) : (
           expenseList.map((expense) =>
             !Number.isNaN(expense.amount) ? (
-              <div
+              <IndividualExpense
                 key={expense.id}
-                className="relative bg-gray-800/90 backdrop-blur-md border border-gray-700 rounded-2xl shadow-md p-5 hover:shadow-blue-500/20 transition duration-300"
-              >
-                {/* Amount */}
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-2xl font-extrabold text-green-400">
-                    ${expense.amount}
-                  </span>
-                </div>
-
-                {/* Category + Actions */}
-                <div className="flex justify-between items-center mb-2">
-                  <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow">
-                    {expense.category}
-                  </span>
-
-                  <div className="flex space-x-3">
-                    <button
-                      onClick={() => onEditExpense(expense)}
-                      className="p-2 rounded-full bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 hover:text-blue-300 transition"
-                    >
-                      <FontAwesomeIcon icon={faPen} />
-                    </button>
-                    <button
-                      onClick={() => onDeleteExpense(expense.id)}
-                      className="p-2 rounded-full bg-red-500/20 hover:bg-red-500/40 text-red-400 hover:text-red-300 transition"
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Date + Description */}
-                <div className="flex justify-between items-center text-sm text-gray-300">
-                  <span>{new Date(expense.date).toLocaleDateString()}</span>
-                  <span className="italic truncate max-w-[50%]">
-                    {expense.description}
-                  </span>
-                </div>
-              </div>
+                expense={expense}
+                onDeleteExpense={onDeleteExpense}
+                onEditExpense={onEditExpense}
+              />
             ) : null
           )
         )}

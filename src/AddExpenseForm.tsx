@@ -39,19 +39,22 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
   };
 
   return (
-    <div className="h-full w-full max-w-md mx-auto p-6 bg-[#FAF7F3] rounded-lg shadow-md outline outline-black/5">
-      <h2 className="text-xl font-bold mb-2 text-center">Add Expense</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="h-full w-full max-w-md mx-auto p-6 bg-gray-900 rounded-2xl shadow-xl border border-gray-700">
+      <h2 className="text-2xl font-bold mb-6 text-center text-white">
+        Add New Expense
+      </h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label
             htmlFor="category"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-400 mb-2"
           >
-            Category:{" "}
+            Category
           </label>
           <select
             id="category"
             name="Expense Category"
+            className="w-full bg-gray-800 border border-gray-700 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={category}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
               setCategory(e.target.value as ExpenseCategory)
@@ -70,13 +73,13 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
         <div>
           <label
             htmlFor="amount"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-400 mb-2"
           >
             Amount
           </label>
           <input
             type="number"
-            className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-gray-800 border border-gray-700 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             id="amount"
             name="Expense Amount"
             step="0.01"
@@ -85,34 +88,34 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
               setAmount(e.target.value)
             }
             required
+            placeholder="0.00"
           />
         </div>
         <div>
           <label
             htmlFor="desc"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-400 mb-2"
           >
             Description
           </label>
           <textarea
             id="desc"
-            className="w-full border border-gray-300 p-2 rounded-md"
+            className="w-full bg-gray-800 border border-gray-700 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             name="Expense Description"
-            rows={5}
-            cols={33}
+            rows={4}
             value={desc}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
               setDesc(e.target.value)
             }
             required
+            placeholder="e.g., Coffee with friends"
           >
-            Here all the expense description will go.
           </textarea>
         </div>
         <div>
           <label
             htmlFor="date"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-400 mb-2"
           >
             Date
           </label>
@@ -120,6 +123,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
             type="date"
             id="date"
             name="Expense Date"
+            className="w-full bg-gray-800 border border-gray-700 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={date}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setDate(e.target.value)
@@ -129,7 +133,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+          className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
         >
           Add Expense
         </button>
