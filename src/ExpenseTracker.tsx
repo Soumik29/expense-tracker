@@ -7,12 +7,22 @@ import ModalFormExpense from "./ModalFormExpense";
 const ExpenseTracker = () => {
   const [expense, setExpense] = useState<Expense[]>([]);
   const [editExpense, setEditExpense] = useState<Expense | null>(null);
-  const [isOpen, setIsOpen] = useState<boolean>(true);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const addExpense = (expense: Expense) => {
     setExpense((prev) => [...prev, expense]);
   };
   const deleteExpense = (id: number) => {
     setExpense((prev) => prev.filter((expense) => expense.id !== id));
+  };
+
+  const updateExpenses = (expense: Expense) => {
+    setExpense((prev) =>
+      prev.map((expenditure) =>
+        expenditure.id === expense.id
+          ? expense
+          : expenditure
+      )
+    );
   };
 
   return (
@@ -23,7 +33,10 @@ const ExpenseTracker = () => {
           <ExpenseCard
             expenseList={expense}
             onDeleteExpense={deleteExpense}
-            onEditExpense={setEditExpense}
+            onEditExpense={(expense) => {
+              setEditExpense(expense);
+              setIsOpen(true);
+            }}
           />
         </div>
         {expense.length !== 0 ? <TotalExpense totalExp={expense} /> : null}
@@ -33,7 +46,7 @@ const ExpenseTracker = () => {
           open={isOpen}
           close={setIsOpen}
           exp={editExpense}
-          saveExpense={setExpense}
+          onUpdateExpense={updateExpenses}
         />
       ) : null}
     </div>
