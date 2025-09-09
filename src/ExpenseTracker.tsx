@@ -6,9 +6,15 @@ import AddExpenseForm from "./AddExpenseForm";
 import ModalFormExpense from "./ModalFormExpense";
 const ExpenseTracker = () => {
   const savedExpense = localStorage.getItem("expenses");
+  const groupedExpenses: {[key: string]: Expense[]} = {};
+  const getDayKey = (date: Date) => {
+    return date.toISOString().slice(0, 10);
+  }
   const returnSavedExpense = () => {
     if (savedExpense) {
-      return JSON.parse(savedExpense);
+      return JSON.parse(savedExpense).map((expenditure: Expense) => ({
+        ...expenditure, date: new Date(expenditure.date).toISOString().slice(0, 10)
+      }))
     } else {
       return [];
     }
@@ -16,6 +22,14 @@ const ExpenseTracker = () => {
   const [expense, setExpense] = useState<Expense[]>(returnSavedExpense);
   const [editExpense, setEditExpense] = useState<Expense | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  expense.map((exp) => {
+    const expenseDate = getDayKey(new Date(exp.date));
+    if(expenseDate in groupedExpenses){
+      groupedExpenses[expenseDate].push(exp);
+    }else{
+      groupedExpenses[expenseDate] = [exp];
+    }
+  })
   const addExpense = (expense: Expense) => {
     setExpense((prev) => [...prev, expense]);
   };
@@ -40,7 +54,7 @@ const ExpenseTracker = () => {
       <div className="h-full w-full max-w-xl mx-auto space-y-4">
         <div className="overflow-y-auto max-h-115">
           <ExpenseCard
-            expenseList={expense}
+            expenseList={groupedExpenses}
             onDeleteExpense={deleteExpense}
             onEditExpense={(expense) => {
               setEditExpense(expense);
