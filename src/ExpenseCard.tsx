@@ -30,20 +30,29 @@ const ExpenseCard = (props: {
             <p className="text-sm">Add one to get started!</p>
           </div>
         ) : (
-          Object.keys(expenseList).map((expense) => (
-            <div>
-              {expenseList[expense].map((expenses) => (
-                <div>
-                  <IndividualExpense
-                    key={expenses.id}
-                    expense={expenses}
-                    onDeleteExpense={onDeleteExpense}
-                    onEditExpense={onEditExpense}
-                  />
-                </div>
-              ))}
-            </div>
-          ))
+          Object.keys(expenseList).map((expense) => {
+            const isActiveIndex = activeIndex === expense;
+            return (
+              <div>
+                <h2
+                  className="bg-gray-800/50 border-b border-gray-700 rounded-t-xl p-5 cursor-pointer hover:bg-gray-700/40 transition-all"
+                  onClick={() => handleExpandItem(expense)}
+                >
+                  {expense}
+                </h2>
+                {isActiveIndex && expenseList[expense].map((expenses) => (
+                  <div>
+                    <IndividualExpense
+                      key={expenses.id}
+                      expense={expenses}
+                      onDeleteExpense={onDeleteExpense}
+                      onEditExpense={onEditExpense}
+                    />
+                  </div>
+                ))}
+              </div>
+            );
+          })
         )}
       </div>
     </div>
