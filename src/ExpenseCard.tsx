@@ -25,11 +25,10 @@ const ExpenseCard = (props: {
           </div>
         ) : (
           Object.keys(expenseList).map((expense) => (
-            <div>
+            <div key={expense}>
               {expenseList[expense].map((expenses) => (
-                <div>
+                <div key={expenses.id}>
                   <IndividualExpense
-                    key={expenses.id}
                     expense={expenses}
                     onDeleteExpense={onDeleteExpense}
                     onEditExpense={onEditExpense}
