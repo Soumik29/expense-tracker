@@ -8,7 +8,6 @@ import ModalFormExpense from "./ModalFormExpense";
 type groupingMode = "day" | "week" | "month";
 
 const ExpenseTracker = () => {
-  const [groupMode, setGroupMode] = useState<groupingMode>("day");
   const savedExpense = localStorage.getItem("expenses");
   const groupedExpenses: { [key: string]: Expense[] } = {};
 
@@ -48,7 +47,13 @@ const ExpenseTracker = () => {
   const [expense, setExpense] = useState<Expense[]>(returnSavedExpense);
   const [editExpense, setEditExpense] = useState<Expense | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
+  const [groupMode, setGroupMode] = useState<groupingMode>("day");
+  const [activeIndex, setActiveIndex] = useState<string>(""); //This is the date in a string format
+  console.log(activeIndex);
+  //index in this case is the date of the expense
+  const handleExpandItem = (index: string) => {
+    setActiveIndex(activeIndex === index ? "" : index);
+  };
   let expenseDate = "";
   expense.map((exp) => {
     if (groupMode === "day") {
@@ -69,7 +74,11 @@ const ExpenseTracker = () => {
   };
   useEffect(() => {
     localStorage.setItem("expenses", JSON.stringify(expense));
+    setActiveIndex("");
   }, [expense]);
+  useEffect(() => {
+    setActiveIndex("");
+  }, [groupMode]);
   const deleteExpense = (id: number) => {
     setExpense((prev) => prev.filter((expense) => expense.id !== id));
   };
@@ -81,7 +90,7 @@ const ExpenseTracker = () => {
       )
     );
   };
-
+  const expensesToTotal = activeIndex ? groupedExpenses[activeIndex] : expense;
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 items-stretch">
       <AddExpenseForm onAddExpense={addExpense} />
@@ -124,9 +133,13 @@ const ExpenseTracker = () => {
               setEditExpense(expense);
               setIsOpen(true);
             }}
+            expandItem={handleExpandItem}
+            expenseActive={activeIndex}
           />
         </div>
-        {expense.length !== 0 ? <TotalExpense totalExp={expense} /> : null}
+        {expense.length !== 0 ? (
+          <TotalExpense totalExp={expensesToTotal} />
+        ) : null}
       </div>
       {editExpense ? (
         <ModalFormExpense
