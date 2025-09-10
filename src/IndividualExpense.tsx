@@ -19,10 +19,10 @@ const IndividualExpense = ({ expense, onDeleteExpense, onEditExpense }: Individu
   return (
     <div
       key={expense.id}
-      className="relative bg-gray-800/80 border border-gray-700 rounded-xl shadow-lg p-5 transition-all duration-300 hover:border-blue-500 hover:shadow-blue-500/20"
+      className="relative bg-gray-800/10 shadow-lg p-5 transition-all duration-300 hover:border-blue-500 hover:shadow-blue-500/20"
     >
       <div className="flex justify-between items-start gap-4">
-        {/* Left Side: Category, Description, and Date */}
+        {/* Left Side: Category, Description */}
         <div className="flex-1">
           <div className="flex justify-between items-center mb-3">
             <span className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
@@ -66,9 +66,9 @@ const IndividualExpense = ({ expense, onDeleteExpense, onEditExpense }: Individu
         </div>
       </div>
        {/* Footer: Date */}
-       <div className="mt-4 pt-4 border-t border-gray-700 text-right text-sm text-gray-400">
+       {/* <div className="mt-4 pt-4 border-t border-gray-700 text-right text-sm text-gray-400">
           <span>{new Date(expense.date).toLocaleDateString()}</span>
-        </div>
+        </div> */}
     </div>
   );
 };
