@@ -10,13 +10,13 @@ on:
     branches: ["main"]
 
   workflow_dispatch:
-
   schedule:
     - cron: '0 0 * * 0'
     
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     steps:
       - name: Get the code from the repository
       uses: actions/checkout@v4
@@ -26,9 +26,12 @@ jobs:
       with:
         node-version: '20'
         cache: 'npm'
+        
       - name: Install dependencies with npm
       run: npm install
+      
       - name: Run the linter
       run: npm run lint
+      
       - name: Build the application
       run: npm run build
