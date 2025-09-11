@@ -1,37 +1,31 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: Expense Tracker CI
-
 on:
   push: 
     branches: ["main"]
   pull_request:
     branches: ["main"]
-
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 0'
-    
 jobs:
   build:
     runs-on: ubuntu-latest
     
     steps:
       - name: Get the code from the repository
-      uses: actions/checkout@v4
+        uses: actions/checkout@v4
       
       - name: Set up Node.js version 20
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
         
       - name: Install dependencies with npm
-      run: npm install
+        run: npm install
       
       - name: Run the linter
-      run: npm run lint
+        run: npm run lint
       
       - name: Build the application
-      run: npm run build
+        run: npm run build
