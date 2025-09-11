@@ -152,6 +152,6 @@ const ExpenseTracker = () => {
     </div>
   );
 };
-//testing github actions to run checks on this push.
+bad code here
 
 export default ExpenseTracker;
