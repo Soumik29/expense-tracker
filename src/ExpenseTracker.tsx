@@ -4,6 +4,7 @@ import ExpenseCard from "./ExpenseCard";
 import TotalExpense from "./TotalExpense";
 import AddExpenseForm from "./AddExpenseForm";
 import ModalFormExpense from "./ModalFormExpense";
+// import Chart from "chart.js/auto";
 
 type groupingMode = "day" | "week" | "month";
 
@@ -49,7 +50,6 @@ const ExpenseTracker = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [groupMode, setGroupMode] = useState<groupingMode>("day");
   const [activeIndex, setActiveIndex] = useState<string>(""); //This is the date in a string format
-  console.log(activeIndex);
   //index in this case is the date of the expense
   const handleExpandItem = (index: string) => {
     setActiveIndex(activeIndex === index ? "" : index);
