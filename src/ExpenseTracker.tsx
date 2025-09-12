@@ -1,96 +1,23 @@
-import { useState, useEffect } from "react";
-import { type Expense } from "./types";
 import ExpenseCard from "./ExpenseCard";
 import TotalExpense from "./TotalExpense";
 import AddExpenseForm from "./AddExpenseForm";
 import ModalFormExpense from "./ModalFormExpense";
-
-type groupingMode = "day" | "week" | "month";
+import useCrud from "./utils/useCrud";
+import useAccordion from "./utils/useAccordion";
+import useModal from "./utils/useModal";
 
 const ExpenseTracker = () => {
-  const savedExpense = localStorage.getItem("expenses");
-  const groupedExpenses: { [key: string]: Expense[] } = {};
+  const { expense, addExpense, deleteExpense, updateExpenses } = useCrud();
+  const {
+    activeIndex,
+    groupMode,
+    handleGrouping,
+    handleExpandItem,
+    expensesToTotal,
+    groupedExpenses,
+  } = useAccordion(expense);
+  const {onEditExpense, isOpen, editExpense, setIsOpen} = useModal();
 
-  const getDayKey = (date: Date) => {
-    return date.toISOString().slice(0, 10);
-  };
-  const getMonthKey = (date: Date) => {
-    return date.toISOString().slice(0, 7);
-  };
-  const getWeekKey = (date: Date) => {
-    const year = date.getFullYear();
-    // Create a copy of the date to avoid modifying the original
-    const d = new Date(Date.UTC(year, date.getMonth(), date.getDate()));
-    // Set to the nearest Thursday: current date + 4 - current day number
-    // Make Sunday's day number 7
-    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-    // Get first day of year
-    const yearStart = new Date(Date.UTC(year, 0, 1));
-    // Calculate full weeks to nearest Thursday
-    const weekNo = Math.ceil(
-      ((d.valueOf() - yearStart.valueOf()) / 86400000 + 1) / 7
-    );
-    // Return array of year and week number
-    return `${year}-W${weekNo}`;
-  };
-
-  const returnSavedExpense = () => {
-    if (savedExpense) {
-      return JSON.parse(savedExpense).map((expenditure: Expense) => ({
-        ...expenditure,
-        date: new Date(expenditure.date),
-      }));
-    } else {
-      return [];
-    }
-  };
-  const [expense, setExpense] = useState<Expense[]>(returnSavedExpense);
-  const [editExpense, setEditExpense] = useState<Expense | null>(null);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [groupMode, setGroupMode] = useState<groupingMode>("day");
-  const [activeIndex, setActiveIndex] = useState<string>(""); //This is the date in a string format
-  console.log(activeIndex);
-  //index in this case is the date of the expense
-  const handleExpandItem = (index: string) => {
-    setActiveIndex(activeIndex === index ? "" : index);
-  };
-  let expenseDate = "";
-  expense.map((exp) => {
-    if (groupMode === "day") {
-      expenseDate = getDayKey(exp.date);
-    } else if (groupMode === "week") {
-      expenseDate = getWeekKey(exp.date);
-    } else if (groupMode === "month") {
-      expenseDate = getMonthKey(exp.date);
-    }
-    if (expenseDate in groupedExpenses) {
-      groupedExpenses[expenseDate].push(exp);
-    } else {
-      groupedExpenses[expenseDate] = [exp];
-    }
-  });
-  const addExpense = (expense: Expense) => {
-    setExpense((prev) => [...prev, expense]);
-  };
-  useEffect(() => {
-    localStorage.setItem("expenses", JSON.stringify(expense));
-    setActiveIndex("");
-  }, [expense]);
-  useEffect(() => {
-    setActiveIndex("");
-  }, [groupMode]);
-  const deleteExpense = (id: number) => {
-    setExpense((prev) => prev.filter((expense) => expense.id !== id));
-  };
-
-  const updateExpenses = (expense: Expense) => {
-    setExpense((prev) =>
-      prev.map((expenditure) =>
-        expenditure.id === expense.id ? expense : expenditure
-      )
-    );
-  };
-  const expensesToTotal = activeIndex ? groupedExpenses[activeIndex] : expense;
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 items-stretch">
       <AddExpenseForm onAddExpense={addExpense} />
@@ -101,7 +28,7 @@ const ExpenseTracker = () => {
               ? "bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
               : "bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
           }
-          onClick={() => setGroupMode("day")}
+          onClick={() => handleGrouping("day")}
         >
           Day
         </button>
@@ -111,7 +38,7 @@ const ExpenseTracker = () => {
               ? "bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
               : "bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
           }
-          onClick={() => setGroupMode("week")}
+          onClick={() => handleGrouping("week")}
         >
           Week
         </button>
@@ -121,7 +48,7 @@ const ExpenseTracker = () => {
               ? "bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
               : "bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
           }
-          onClick={() => setGroupMode("month")}
+          onClick={() => handleGrouping("month")}
         >
           Month
         </button>
@@ -129,10 +56,7 @@ const ExpenseTracker = () => {
           <ExpenseCard
             expenseList={groupedExpenses}
             onDeleteExpense={deleteExpense}
-            onEditExpense={(expense) => {
-              setEditExpense(expense);
-              setIsOpen(true);
-            }}
+            onEditExpense={onEditExpense}
             expandItem={handleExpandItem}
             expenseActive={activeIndex}
           />
