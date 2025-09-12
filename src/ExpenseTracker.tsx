@@ -2,6 +2,7 @@ import ExpenseCard from "./ExpenseCard";
 import TotalExpense from "./TotalExpense";
 import AddExpenseForm from "./AddExpenseForm";
 import ModalFormExpense from "./ModalFormExpense";
+// import Chart from "chart.js/auto";
 import useCrud from "./utils/useCrud";
 import useAccordion from "./utils/useAccordion";
 import useModal from "./utils/useModal";
