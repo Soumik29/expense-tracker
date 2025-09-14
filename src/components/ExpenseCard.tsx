@@ -1,14 +1,22 @@
 import IndividualExpense from "./IndividualExpense";
-import { type Expense } from "./types";
+import { type Expense } from "../types";
 
-const ExpenseCard = (props: {
+interface expenseCardProps{
   expenseList: { [key: string]: Expense[] };
   onDeleteExpense: (id: number) => void;
   onEditExpense: (expense: Expense) => void;
   expandItem: (index: string) => void;
   expenseActive: string;
-}) => {
-  const { expenseList, onDeleteExpense, onEditExpense, expandItem, expenseActive } = props;
+}
+
+const ExpenseCard = (props: expenseCardProps) => {
+  const {
+    expenseList,
+    onDeleteExpense,
+    onEditExpense,
+    expandItem,
+    expenseActive,
+  } = props;
   return (
     <div className="w-full mx-auto p-6 bg-gray-900/90 backdrop-blur-3xl rounded-2xl shadow-2xl border border-gray-700 h-full">
       {/* Header */}
@@ -36,15 +44,16 @@ const ExpenseCard = (props: {
                 >
                   {expense}
                 </h2>
-                {isActiveIndex && expenseList[expense].map((expenses) => (
-                  <div key={expenses.id}>
-                    <IndividualExpense
-                      expense={expenses}
-                      onDeleteExpense={onDeleteExpense}
-                      onEditExpense={onEditExpense}
-                    />
-                  </div>
-                ))}
+                {isActiveIndex &&
+                  expenseList[expense].map((expenses) => (
+                    <div key={expenses.id}>
+                      <IndividualExpense
+                        expense={expenses}
+                        onDeleteExpense={onDeleteExpense}
+                        onEditExpense={onEditExpense}
+                      />
+                    </div>
+                  ))}
               </div>
             );
           })

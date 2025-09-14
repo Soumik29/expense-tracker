@@ -10,7 +10,7 @@ import {
   Select,
   Textarea,
 } from "@headlessui/react";
-import type { Expense } from "./types";
+import type { Expense } from "../types";
 import { useState } from "react";
 import type { ExpenseCategory } from "./AddExpenseForm";
 
@@ -43,7 +43,10 @@ const ModalFormExpense = ({
       className="relative z-50"
     >
       {/* The backdrop, rendered as a fixed sibling to the panel container */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+        aria-hidden="true"
+      />
 
       {/* Full-screen container to center the panel */}
       <div className="fixed inset-0 flex w-screen items-center justify-center p-4">

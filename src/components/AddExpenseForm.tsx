@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { type Expense } from "./types";
+import { type Expense } from "../types";
 export type ExpenseCategory =
   | "Food"
   | "Groceries"
@@ -109,8 +109,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
             }
             required
             placeholder="e.g., Coffee with friends"
-          >
-          </textarea>
+          ></textarea>
         </div>
         <div>
           <label

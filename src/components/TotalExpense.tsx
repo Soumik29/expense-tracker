@@ -1,4 +1,4 @@
-import type { Expense } from "./types";
+import type { Expense } from "../types";
 
 //This component will be responsible for calculating the total expenses incurred
 const TotalExpense = ({ totalExp }: { totalExp: Expense[] }) => {

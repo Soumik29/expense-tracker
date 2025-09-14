@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { type Expense } from "./types.ts";
+import { type Expense } from "../types.ts";
 
 // Define the props for a single expense card
 type IndividualExpenseProps = {
@@ -12,7 +12,11 @@ type IndividualExpenseProps = {
 
 // A new component to render each card individually
 // This component manages its own "expanded" state for the description
-const IndividualExpense = ({ expense, onDeleteExpense, onEditExpense }: IndividualExpenseProps) => {
+const IndividualExpense = ({
+  expense,
+  onDeleteExpense,
+  onEditExpense,
+}: IndividualExpenseProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isLongDescription = expense.description.length > 100; // Show "Read more" if description is long
 
@@ -32,8 +36,12 @@ const IndividualExpense = ({ expense, onDeleteExpense, onEditExpense }: Individu
               ${expense.amount.toFixed(2)}
             </span>
           </div>
-          
-          <p className={`text-gray-300 text-md transition-all duration-300 ${!isExpanded && 'line-clamp-2'}`}>
+
+          <p
+            className={`text-gray-300 text-md transition-all duration-300 ${
+              !isExpanded && "line-clamp-2"
+            }`}
+          >
             {expense.description}
           </p>
 
@@ -49,24 +57,24 @@ const IndividualExpense = ({ expense, onDeleteExpense, onEditExpense }: Individu
 
         {/* Right Side: Actions & Date */}
         <div className="flex flex-col items-end justify-between h-full">
-            <div className="flex space-x-2 mb-4">
-                <button
-                onClick={() => onEditExpense(expense)}
-                className="p-2 w-10 h-10 rounded-full bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                <FontAwesomeIcon icon={faPen} />
-                </button>
-                <button
-                onClick={() => onDeleteExpense(expense.id)}
-                className="p-2 w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/40 text-red-400 hover:text-red-300 transition-colors"
-                >
-                <FontAwesomeIcon icon={faTrash} />
-                </button>
-            </div>
+          <div className="flex space-x-2 mb-4">
+            <button
+              onClick={() => onEditExpense(expense)}
+              className="p-2 w-10 h-10 rounded-full bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              <FontAwesomeIcon icon={faPen} />
+            </button>
+            <button
+              onClick={() => onDeleteExpense(expense.id)}
+              className="p-2 w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/40 text-red-400 hover:text-red-300 transition-colors"
+            >
+              <FontAwesomeIcon icon={faTrash} />
+            </button>
+          </div>
         </div>
       </div>
-       {/* Footer: Date */}
-       {/* <div className="mt-4 pt-4 border-t border-gray-700 text-right text-sm text-gray-400">
+      {/* Footer: Date */}
+      {/* <div className="mt-4 pt-4 border-t border-gray-700 text-right text-sm text-gray-400">
           <span>{new Date(expense.date).toLocaleDateString()}</span>
         </div> */}
     </div>

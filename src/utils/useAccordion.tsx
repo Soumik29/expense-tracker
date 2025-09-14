@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { Expense } from "../types";
 import useDate from "./useDate";
-type groupingMode = "day" | "week" | "month";
+export type groupingMode = "day" | "week" | "month";
 
 const useAccordion = (expense: Expense[]) => {
   const { getDayKey, getMonthKey, getWeekKey } = useDate();
