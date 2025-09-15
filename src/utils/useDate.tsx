@@ -1,14 +1,14 @@
 const useDate = () => {
   const getDayKey = (date: Date) => {
-    return date.toISOString().slice(0, 10);
+    return new Date(date).toISOString().slice(0, 10);
   };
   const getMonthKey = (date: Date) => {
-    return date.toISOString().slice(0, 7);
+    return new Date(date).toISOString().slice(0, 7);
   };
   const getWeekKey = (date: Date) => {
-    const year = date.getFullYear();
+    const year = new Date(date).getFullYear();
     // Create a copy of the date to avoid modifying the original
-    const d = new Date(Date.UTC(year, date.getMonth(), date.getDate()));
+    const d = new Date(Date.UTC(year, new Date(date).getMonth(), new Date(date).getDate()));
     // Set to the nearest Thursday: current date + 4 - current day number
     // Make Sunday's day number 7
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
