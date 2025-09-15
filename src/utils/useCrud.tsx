@@ -24,60 +24,54 @@ const useCrud = () => {
     };
     fetchExpenses();
   }, []);
-  const addExpense = (expense: Expense) => {
-    const addNewExpense = async () => {
-      try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(expense),
-        });
-        if (!res.ok)
-          throw new Error(
-            `Something went wrong. Please try again! ${res.status}`
-          );
-        const data = await res.json();
-        setExpense((prev) => [...prev, data]);
-      } catch (error) {
-        console.log("Failed to POST the new expense: ", error);
-      }
-    };
-    addNewExpense();
+  const addExpense = async (expense: Expense) => {
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(expense),
+      });
+      if (!res.ok)
+        throw new Error(
+          `Something went wrong. Please try again! ${res.status}`
+        );
+      const data = await res.json();
+      setExpense((prev) => [...prev, data]);
+    } catch (error) {
+      console.log("Failed to POST the new expense: ", error);
+    }
   };
 
   const deleteExpense = (id: number) => {
     setExpense((prev) => prev.filter((expense) => expense.id !== id));
   };
 
-  const updateExpenses = (expense: Expense) => {
-    const updateExpense = async () => {
-      try {
-        const response = await fetch(API_URL, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(expense),
-        });
-        if (!response.ok)
-          throw new Error(`Failed to update expense. ${response.status}`);
-        const data = await response.json();
-        const expenseWithDate = {
-          ...data,
-          date: new Date(data.date),
-        }
-        setExpense((prev) =>
-          prev.map((expenditure) =>
-            expenditure.id === data.id ? expenseWithDate : expenditure
-          )
-        );
-      } catch (err) {
-        console.log("Failed to fetch expenses: ", err);
-      }
-      updateExpense();
-    };
+  const updateExpenses = async (expense: Expense) => {
+    try {
+      const response = await fetch(`${API_URL}/${expense.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(expense),
+      });
+      if (!response.ok)
+        throw new Error(`Failed to update expense. ${response.status}`);
+      const data = await response.json();
+      const expenseWithDate = {
+        ...data,
+        date: new Date(data.date),
+      };
+      setExpense((prev) =>
+        prev.map((expenditure) =>
+          expenditure.id === data.id ? expenseWithDate : expenditure
+        )
+      );
+    } catch (err) {
+      console.log("Failed to fetch expenses: ", err);
+    }
     // setExpense((prev) =>
     //   prev.map((expenditure) =>
     //     expenditure.id === expense.id ? expense : expenditure
