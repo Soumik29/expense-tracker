@@ -44,8 +44,19 @@ const useCrud = () => {
     }
   };
 
-  const deleteExpense = (id: number) => {
-    setExpense((prev) => prev.filter((expense) => expense.id !== id));
+  const deleteExpense = async (id: number) => {
+    try {
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+      });
+      if (res.status == 204) {
+        setExpense((prev) => prev.filter((expense) => expense.id !== id));
+      } else {
+        throw new Error(`Failed to load the data! ${res.status}`);
+      }
+    } catch (err) {
+      console.log("Something went wrong. Failed to Fetch!", err);
+    }
   };
 
   const updateExpenses = async (expense: Expense) => {

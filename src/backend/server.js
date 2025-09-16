@@ -46,6 +46,17 @@ app.put("/expenses/:id", (req, res) => {
   }
 });
 
+app.delete("/expenses/:id", (req, res) => {
+    const expenseID = Number(req.params.id);
+    const expenseIndex = expenses.findIndex((expense) => expense.id === expenseID);
+    if(expenseIndex !== -1){
+      expenses.splice(expenseIndex, 1);
+      res.status(204).send();
+    }else{
+      res.status(404).send("Item not found!");
+    }
+})
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
