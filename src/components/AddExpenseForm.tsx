@@ -19,7 +19,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
   const [date, setDate] = useState("");
   const [desc, setDesc] = useState("");
   const [category, setCategory] = useState<ExpenseCategory>("Food");
-  consol.(category);
+  console.log(category);
   const handleSubmit = (e: React.FormEvent<Element>) => {
     e.preventDefault();
     const amt = Number(amount);
