@@ -6,3 +6,23 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model Expense{
+  id          BigInt         @id         @default(autoincrement())
+  amount      Int            
+  date        DateTime       
+  category    Category       
+  description String?
+}
+
+enum Category{
+  Food
+  Groceries
+  Mobile_Bill
+  Travel
+  Shopping
+  Games
+  Subscription
+  EMI
+}
+
