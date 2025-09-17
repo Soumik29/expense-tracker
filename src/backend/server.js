@@ -1,3 +1,7 @@
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
 const express = require("express");
 const cors = require("cors");
 const app = express();
