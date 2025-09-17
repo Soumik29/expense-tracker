@@ -3,7 +3,7 @@ import { type Expense } from "../types";
 export type ExpenseCategory =
   | "Food"
   | "Groceries"
-  | "Mobile Bill"
+  | "Mobile_Bill"
   | "Travel"
   | "Shopping"
   | "Games"
@@ -63,7 +63,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
           >
             <option value="Groceries">Groceries</option>
             <option value="Food">Food</option>
-            <option value="Mobile Bill">Mobile Bill</option>
+            <option value="Mobile_Bill">Mobile Bill</option>
             <option value="Travel">Travel</option>
             <option value="Shopping">Shopping</option>
             <option value="Games">Games</option>
