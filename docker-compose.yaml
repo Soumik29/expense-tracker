@@ -1,0 +1,18 @@
+services:
+  db:
+    image: mysql:latest
+    restart: always
+    container_name: expense-backend
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@expense-backend:3306/${MYSQL_DATABASE}"
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
