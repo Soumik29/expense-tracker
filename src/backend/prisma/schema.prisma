@@ -9,7 +9,7 @@ datasource db {
 
 model Expense{
   id          BigInt         @id         @default(autoincrement())
-  amount      Int            
+  amount      Decimal                    @db.Decimal(10, 2)    
   date        DateTime       
   category    Category       
   description String?
