@@ -30,7 +30,7 @@ app.get("/expenses", async (req, res) => {
     res.status(200).json(getUserExpenses);
   } catch (err) {
     console.log("Failed to fetch expenses: ", err);
-    res.status(200).send("Failed to fetch expenses");
+    res.status(400).json({error: "Failed to fetch expenses"});
   }
 });
 app.put("/expenses/:id", async (req, res) => {
