@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { type Expense } from "../types";
+import type {newExpense } from "../types";
 export type ExpenseCategory =
   | "Food"
   | "Groceries"
@@ -11,7 +11,7 @@ export type ExpenseCategory =
   | "EMI";
 
 type expenseProps = {
-  onAddExpense: (expense: Expense) => void;
+  onAddExpense: (expense: newExpense) => void;
 };
 
 const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
@@ -30,7 +30,6 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
       date: new Date(`${date}T00:00:00`),
       description: desc,
       category: category,
-      id: Date.now(),
     };
     onAddExpense(expenseData);
     setAmount("");
