@@ -5,3 +5,5 @@ export type Expense = {
     description: string;
     date: Date;
 }
+
+export type newExpense = Omit<Expense, "id">;

@@ -28,7 +28,7 @@ const ExpenseCard = (props: expenseCardProps) => {
 
       {/* Expense List */}
       <div className="overflow-y-auto overscroll-contain space-y-5">
-        {expenseList === null ? (
+        {Object.keys(expenseList).length === null ? (
           <div className="text-center text-gray-500 py-10">
             <p className="text-lg">No expenses added yet.</p>
             <p className="text-sm">Add one to get started!</p>

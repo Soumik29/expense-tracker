@@ -1,26 +1,83 @@
 import { PrismaClient } from "@prisma/client";
 
+const express = require("express");
+const cors = require("cors");
+const app = express();
+app.use(express.json());
+app.use(cors());
+const port = 3000;
 const prisma = new PrismaClient();
-async function main(){
-  const allExpenses = await prisma.Expense.findMany();
-  console.log(allExpenses);
+
+// function bigIntToString(obj){
+//   return JSON.parse(
+//     JSON.stringify(obj, (key, value) => {
+//       typeof value === 'bigint' ? value.toString() : value;
+//     })
+//   );
+// }
+
+async function postExpenses(req, res) {
+  const userExpense = await prisma.expense.create({
+    data: { ...req.body },
+  });
+  res.json(userExpense);
 }
 
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  }).catch(async (e) => {
-    console.log(e);
-    await prisma.$disconnect();
-    process.exit(1);
+app.post("/expenses", postExpenses);
+app.get("/expenses", async (req, res) => {
+  try {
+    const getUserExpenses = await prisma.expense.findMany();
+    res.status(200).json(getUserExpenses);
+  } catch (err) {
+    console.log("Failed to fetch expenses: ", err);
+    res.status(200).send("Failed to fetch expenses");
+  }
 });
+app.put("/expenses/:id", async (req, res) => {
+  try {
+    const expenseIdToUpdate = Number(req.params.id);
+    const { category, amount, date, description } = req.body;
+    const prismaUpdateFunc = await prisma.expense.update({
+      where: { id: expenseIdToUpdate },
+      data: {
+        category,
+        amount,
+        date: new Date(date),
+        description,
+      },
+    });
+    res.status(200).json(prismaUpdateFunc);
+  } catch (err) {
+    console.log("Something went wrong. Couldn't update expense ", err);
+    res.status(400).json({error: "Could not update expense."});
+  }
+});
+app.delete("/expenses/:id", async (req, res) => {
+  const expenseToDeleteId = Number(req.params.id);
+  try{
+    const deleteExpense = await prisma.expense.delete({
+      where: {id: expenseToDeleteId}
+    });
+    res.status(204).json(deleteExpense);
+  }catch(err){
+    console.log("Something went wrong,",err);
+    res.status(400).json({error: "Couldn't delete expense. Expense is not found."});
+  }
+});
+// const prisma = new PrismaClient();
+// async function main(){
+//   const allExpenses = await prisma.expense.findMany();
+//   console.log(allExpenses);
+// }
 
-// const express = require("express");
-// const cors = require("cors");
-// const app = express();
-// app.use(express.json());
-// app.use(cors());
-// const port = 3000;
+// main()
+//   .then(async () => {
+//     await prisma.$disconnect();
+//   }).catch(async (e) => {
+//     console.log(e);
+//     await prisma.$disconnect();
+//     process.exit(1);
+// });
 
 // let expenses = [
 //   {
@@ -74,6 +131,6 @@ main()
 //     }
 // })
 
-// app.listen(port, () => {
-//   console.log(`Example app listening on port ${port}`);
-// });
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});

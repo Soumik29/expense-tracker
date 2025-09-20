@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE `Expense` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `amount` DECIMAL(10, 2) NOT NULL,
     `date` DATETIME(3) NOT NULL,
     `category` ENUM('Food', 'Groceries', 'Mobile_Bill', 'Travel', 'Shopping', 'Games', 'Subscription', 'EMI') NOT NULL,
