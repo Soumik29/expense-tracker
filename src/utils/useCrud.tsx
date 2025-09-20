@@ -1,4 +1,4 @@
-import type { Expense } from "../types";
+import type { Expense, newExpense } from "../types";
 import { useEffect, useState } from "react";
 // import useSaveExpense from "./useSaveExpense";
 
@@ -24,7 +24,7 @@ const useCrud = () => {
     };
     fetchExpenses();
   }, []);
-  const addExpense = async (expense: Expense) => {
+  const addExpense = async (expense: newExpense) => {
     try {
       const res = await fetch(API_URL, {
         method: "POST",
