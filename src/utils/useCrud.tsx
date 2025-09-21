@@ -1,11 +1,11 @@
 import type { Expense, newExpense } from "../types";
 import { useEffect, useState } from "react";
-// import useSaveExpense from "./useSaveExpense";
+
 
 const API_URL = "http://localhost:3000/expenses";
 
 const useCrud = () => {
-  // const getSavedExpense = useSaveExpense();
+  
   const [expense, setExpense] = useState<Expense[]>([]);
   useEffect(() => {
     const fetchExpenses = async () => {

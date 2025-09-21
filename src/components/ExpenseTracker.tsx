@@ -7,6 +7,7 @@ import useCrud from "../utils/useCrud";
 import useAccordion from "../utils/useAccordion";
 import useModal from "../utils/useModal";
 import HandleGrouping from "./HandleGrouping";
+import ExpenseChart from "./ExpenseChart";
 
 const ExpenseTracker = () => {
   const { expense, addExpense, deleteExpense, updateExpenses } = useCrud();
@@ -46,6 +47,7 @@ const ExpenseTracker = () => {
           onUpdateExpense={updateExpenses}
         />
       ) : null}
+      <ExpenseChart />
     </div>
   );
 };
