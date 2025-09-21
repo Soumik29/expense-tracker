@@ -1,9 +1,8 @@
 import { useEffect, useRef } from "react";
-import useCrud from "../utils/useCrud";
 import Chart from "chart.js/auto";
+import type { Expense } from "../types";
 
-const ExpenseChart = () => {
-  const { expense } = useCrud();
+const ExpenseChart = ({expense}: {expense: Expense[]}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {

@@ -47,7 +47,7 @@ const ExpenseTracker = () => {
           onUpdateExpense={updateExpenses}
         />
       ) : null}
-      <ExpenseChart />
+      <ExpenseChart expense={expense}/>
     </div>
   );
 };
