@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -30,7 +31,7 @@ app.get("/expenses", async (req, res) => {
     res.status(200).json(getUserExpenses);
   } catch (err) {
     console.log("Failed to fetch expenses: ", err);
-    res.status(400).json({error: "Failed to fetch expenses"});
+    res.status(400).json({ error: "Failed to fetch expenses" });
   }
 });
 app.put("/expenses/:id", async (req, res) => {
@@ -49,19 +50,39 @@ app.put("/expenses/:id", async (req, res) => {
     res.status(200).json(prismaUpdateFunc);
   } catch (err) {
     console.log("Something went wrong. Couldn't update expense ", err);
-    res.status(400).json({error: "Could not update expense."});
+    res.status(400).json({ error: "Could not update expense." });
   }
 });
 app.delete("/expenses/:id", async (req, res) => {
   const expenseToDeleteId = Number(req.params.id);
-  try{
+  try {
     const deleteExpense = await prisma.expense.delete({
-      where: {id: expenseToDeleteId}
+      where: { id: expenseToDeleteId },
     });
     res.status(204).json(deleteExpense);
-  }catch(err){
-    console.log("Something went wrong,",err);
-    res.status(400).json({error: "Couldn't delete expense. Expense is not found."});
+  } catch (err) {
+    console.log("Something went wrong,", err);
+    res
+      .status(400)
+      .json({ error: "Couldn't delete expense. Expense is not found." });
+  }
+});
+
+app.post("/register", async (req, res) => {
+  try {
+    const { userName, password } = req.body;
+    if(!userName || !password) return res.status(400).json({error: "Username and password required"});
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({
+      data: {
+        userName,
+        password: hashedPassword,
+      },
+    });
+    res.status(201).json(user);
+  } catch(err) {
+    console.log("Registration Failed", err);
+    res.status(500).json({error: "Could not create user"});
   }
 });
 // const prisma = new PrismaClient();
