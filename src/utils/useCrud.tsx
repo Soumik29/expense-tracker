@@ -2,7 +2,7 @@ import type { Expense, newExpense } from "../types";
 import { useEffect, useState } from "react";
 
 const API_URL = "http://localhost:3000/expenses";
-const token = localStorage.getItem("token");
+// const token = localStorage.getItem("token");
 
 const useCrud = () => {
   const [expense, setExpense] = useState<Expense[]>([]);
@@ -31,28 +31,42 @@ const useCrud = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(expense),
       });
-      if (!res.ok)
-        throw new Error(
-          `Something went wrong. Please try again! ${res.status}`
-        );
-      const data = await res.json();
-      setExpense((prev) => [...prev, data]);
+      console.log(res);
+      
+      if (!res.ok) {
+        // Handle validation errors from the server
+        if (res.status === 400) {
+          throw new Error('Validation error occurred');
+        }
+        throw new Error(`Failed to add expense (${res.status})`);
+      }
+      const responseData = await res.json();
+
+      const newExpenseWithData = {
+        ...responseData
+      };
+      
+      setExpense((prev) => [...prev, newExpenseWithData]);
+      return { success: true };
     } catch (error) {
-      console.log("Failed to POST the new expense: ", error);
+      console.error("Failed to add expense:", error);
+      throw error; // Re-throw to be handled by the form
     }
   };
 
   const deleteExpense = async (id: number) => {
     try {
+      // const token = localStorage.getItem("token");
       const res = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        // headers: {
+        //   Authorization: `Bearer ${token}`,
+        // },
+        credentials: "include",
       });
       if (res.status == 204) {
         setExpense((prev) => prev.filter((expense) => expense.id !== id));
@@ -70,8 +84,9 @@ const useCrud = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(expense),
       });
       if (!response.ok)

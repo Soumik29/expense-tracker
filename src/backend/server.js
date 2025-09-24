@@ -9,12 +9,19 @@ import cors from "cors";
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: process.env.CLIENT_ORIGIN,
-    credentials: true,
-  })
-);
+app.use(cors({ origin: true, credentials: true }));
+// const allowCrossOrigin = cors({
+//   origin: process.env.CLIENT_ORIGIN,
+//   credentials: true,
+// });
+
+// app.use(function(req, res, next){
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Methods", "GET, PUT, POST");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//   next();
+// });
+// app.use(allowCrossOrigin);
 const port = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET_KEY;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRE;
@@ -159,24 +166,81 @@ app.use(
 async function postExpenses(req, res) {
   try {
     if (!req.user) {
-      return res.status(401).json({ error: "Unauthorized" });
+      return res
+        .status(401)
+        .json({ error: "Unauthorized: Please log in to add expenses" });
     }
+
     const { category, amount, date, description } = req.body;
-    if (amount == null || !date)
-      return res.status(400).json({ error: "Amount and date are required" });
+
+    // Validate required fields
+    if (amount == null || !date) {
+      return res
+        .status(400)
+        .json({ error: "Amount and date are required fields" });
+    }
+
+    // Validate category against enum values
+    const validCategories = [
+      "Food",
+      "Groceries",
+      "Mobile_Bill",
+      "Travel",
+      "Shopping",
+      "Games",
+      "Subscription",
+      "EMI",
+    ];
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({
+        error: "Invalid category",
+        validCategories,
+        receivedCategory: category,
+      });
+    }
+
+    // Validate amount is a valid number
+    const amountNum = parseFloat(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      return res
+        .status(400)
+        .json({ error: "Amount must be a positive number" });
+    }
+
+    // Validate date format
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      return res
+        .status(400)
+        .json({ error: "Invalid date format. Please use YYYY-MM-DD" });
+    }
+
     const userExpense = await prisma.expense.create({
       data: {
         category,
-        amount: parseFloat(amount),
-        date: new Date(date),
+        amount: amountNum,
+        date: dateObj,
         description: description || null,
         userId: req.user.id,
       },
     });
+
     res.status(201).json(userExpense);
   } catch (err) {
-    console.log("Failed to create expense: ", err);
-    res.status(500).json({ error: "Could not create expense" });
+    console.error("Failed to create expense:", err);
+
+    // Handle Prisma errors
+    if (err.code === "P2002") {
+      return res.status(400).json({
+        error: "Validation error",
+        details: "This expense already exists",
+      });
+    }
+
+    res.status(500).json({
+      error: "Failed to create expense",
+      details: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
   }
 }
 
@@ -185,7 +249,6 @@ app.get("/expenses", requireAuth, async (req, res) => {
   try {
     const getUserExpenses = await prisma.expense.findMany({
       where: { userId: req.user.id },
-      orderBy: { date: "desc" },
     });
     res.status(200).json(getUserExpenses);
   } catch (err) {

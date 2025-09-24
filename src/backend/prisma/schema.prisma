@@ -9,7 +9,7 @@ datasource db {
 
 model Expense{
   id          Int         @id         @default(autoincrement())
-  amount      Float                    @db.Decimal(10, 2)    
+  amount      Decimal                    @db.Decimal(10, 2)    
   date        DateTime       
   category    Category       
   description String?

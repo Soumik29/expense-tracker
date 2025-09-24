@@ -3,7 +3,7 @@ export type Expense = {
     category: "Groceries" | "Food" | "Mobile_Bill" | "Travel" | "Shopping" | "Games" | "Subscription" | "EMI" ;
     amount: number;
     description: string;
-    date: Date;
+    date: string;
 }
 
 export type newExpense = Omit<Expense, "id">;
