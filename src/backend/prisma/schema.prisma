@@ -9,16 +9,21 @@ datasource db {
 
 model Expense{
   id          Int         @id         @default(autoincrement())
-  amount      Decimal                    @db.Decimal(10, 2)    
+  amount      Float                    @db.Decimal(10, 2)    
   date        DateTime       
   category    Category       
   description String?
+  userId       Int
+  user         User       @relation(fields: [userId], references: [id])
 }
 
 model User{
-  id        Int     @id @default(autoincrement())
-  username     String @unique
-  password String
+  id           Int        @id @default(autoincrement())
+  username     String     @unique
+  password     String
+  name         String?
+  createdAt    DateTime   @default(now())
+  expenses     Expense[]
 }
 
 enum Category{

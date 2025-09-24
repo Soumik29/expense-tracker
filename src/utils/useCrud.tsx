@@ -1,16 +1,17 @@
 import type { Expense, newExpense } from "../types";
 import { useEffect, useState } from "react";
 
-
 const API_URL = "http://localhost:3000/expenses";
+const token = localStorage.getItem("token");
 
 const useCrud = () => {
-  
   const [expense, setExpense] = useState<Expense[]>([]);
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const response = await fetch(API_URL);
+        const response = await fetch(API_URL, {
+          credentials: "include",
+        });
         if (!response.ok) throw new Error("Failed to fetch expense");
         const data = await response.json();
         const expensesWithDates = data.map((exp: Expense) => ({
@@ -30,6 +31,7 @@ const useCrud = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(expense),
       });
@@ -48,6 +50,9 @@ const useCrud = () => {
     try {
       const res = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (res.status == 204) {
         setExpense((prev) => prev.filter((expense) => expense.id !== id));
@@ -65,6 +70,7 @@ const useCrud = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(expense),
       });

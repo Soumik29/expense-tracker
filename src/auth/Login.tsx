@@ -10,27 +10,42 @@ const Signin = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<errorsTypes>({});
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const newErrors: {[key: string]: string} = {};
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  const newErrors: errorsTypes = {};
 
-    if(!email){
-      newErrors.email = "Email is required";
-    }else if(!/\S+@\S+\.\S+/.test(email)){
-      newErrors.email = "Enter a valid email address";
-    } 
-    if(!password){
-      newErrors.password = "Password is required";
-    }else if(password.length < 6){
-      newErrors.password = "Password must be at least 6 characters";
-    }
-    setErrors(newErrors);
+  if (!email) {
+    newErrors.email = "Email is required";
+  } else if (!/\S+@\S+\.\S+/.test(email)) {
+    newErrors.email = "Enter a valid email address";
+  }
+  if (!password) {
+    newErrors.password = "Password is required";
+  } else if (password.length < 6) {
+    newErrors.password = "Password must be at least 6 characters";
+  }
 
-    if(Object.keys(newErrors).length === 0){
-      console.log("Form is valid! Ready to send to backend.");
-      // const API_URL = "http://localhost:3000/regsiter";
+  setErrors(newErrors);
+
+  if (Object.keys(newErrors).length === 0) {
+    try {
+      const res = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ username: email, password }),
+      });
+      if (!res.ok) throw new Error("Invalid login");
+
+      const data = await res.json();
+      localStorage.setItem("token", data.token); // save JWT
+      console.log("Logged in, token saved:", data.token);
+    } catch (err) {
+      console.error(err);
+      setErrors({ general: "Login failed. Check your credentials." });
     }
   }
+};
 
   return (
     <>
