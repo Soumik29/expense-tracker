@@ -19,7 +19,6 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
   const [date, setDate] = useState("");
   const [desc, setDesc] = useState("");
   const [category, setCategory] = useState<ExpenseCategory>("Food");
-  console.log(category);
   const handleSubmit = (e: React.FormEvent<Element>) => {
     e.preventDefault();
     const amt = Number(amount);
@@ -27,7 +26,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
     if (!isValid) return "Can't have empty fields";
     const expenseData = {
       amount: parseFloat(amount),
-      date: new Date(`${date}T00:00:00`),
+      date: date,
       description: desc,
       category: category,
     };
@@ -60,8 +59,8 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
               setCategory(e.target.value as ExpenseCategory)
             }
           >
-            <option value="Groceries">Groceries</option>
             <option value="Food">Food</option>
+            <option value="Groceries">Groceries</option>
             <option value="Mobile_Bill">Mobile Bill</option>
             <option value="Travel">Travel</option>
             <option value="Shopping">Shopping</option>
