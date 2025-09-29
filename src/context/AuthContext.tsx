@@ -1,8 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 
+interface User{
+  id: number;
+  username: string;
+  name: string;
+  createAt: string;
+}
+
 interface AuthContextType {
-  user: any; // You can replace `any` with a proper User type once you define it
-  setUser: React.Dispatch<React.SetStateAction<any>>;
+  user: User | null; // You can replace `any` with a proper User type once you define it
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
 }
 
@@ -13,7 +20,7 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
