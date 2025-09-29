@@ -1,6 +1,5 @@
-import React, { createContext, useState, useEffect, type ReactNode } from "react";
-
-interface User{
+import { createContext } from "react";
+export interface User{
   id: number;
   username: string;
   name: string;
@@ -14,42 +13,3 @@ interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const res = await fetch("http://localhost:3000/me", {
-          credentials: "include",
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data); // you might adjust this depending on backend response
-        } else {
-          setUser(null);
-        }
-      } catch (err) {
-        console.error(err);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchUser();
-  }, []);
-
-  return (
-    <AuthContext.Provider value={{ user, setUser, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-
