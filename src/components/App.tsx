@@ -1,5 +1,5 @@
 import ExpenseTracker from "./ExpenseTracker";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../utils/useAuth";
 import Login from "./Login";
 function App() {
   const { user, loading } = useAuth();
