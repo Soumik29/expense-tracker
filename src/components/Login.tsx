@@ -1,5 +1,5 @@
 import React, { useState, type FormEvent } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../utils/useAuth";
 
 const Login: React.FC = () => {
   const { setUser } = useAuth();
@@ -17,7 +17,7 @@ const Login: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // ✅ ensures cookie (JWT) is sent
+        credentials: "include",
         body: JSON.stringify({ username, password }),
       });
 
@@ -28,8 +28,10 @@ const Login: React.FC = () => {
 
       const data = await res.json();
       setUser(data.user); // ✅ saves user in context
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      }
     }
   };
 
