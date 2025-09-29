@@ -6,19 +6,16 @@ const ExpenseChart = ({expense}: {expense: Expense[]}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    console.log(expense);
     // Check if the canvas element is available
     if (!canvasRef.current) {
       return;
     }
-
     // Aggregate expenses by category, just like we planned
     const expensesByCategory = new Map<string, number>();
     expense.forEach((exp) => {
       const currentTotal = expensesByCategory.get(exp.category) || 0;
-      expensesByCategory.set(exp.category, currentTotal + exp.amount);
+      expensesByCategory.set(exp.category, currentTotal + Number(exp.amount));
     });
-
     // Extract labels and data from the Map for the chart
     const labels = Array.from(expensesByCategory.keys());
     const data = Array.from(expensesByCategory.values());
@@ -53,6 +50,7 @@ const ExpenseChart = ({expense}: {expense: Expense[]}) => {
               "rgba(200, 100, 100, 1)",
             ],
             borderWidth: 1,
+            borderRadius: {topLeft: 50}
           },
         ],
       },
