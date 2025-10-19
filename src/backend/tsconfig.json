@@ -4,13 +4,12 @@
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
-    "baseUrl": "./src",
     "paths": {
-      "@config/*": ["config/*"],
-      "@middlewares/*": ["middlewares/*"],
-      "@controllers/*": ["controllers/*"],
-      "@routes/*": ["routes/*"],
-      "@utils/*": ["utils/*"]
+      "@config/*": ["./src/config/*"],
+      "@middlewares/*": ["./src/middlewares/*"],
+      "@controllers/*": ["./src/controllers/*"],
+      "@routes/*": ["./src/routes/*"],
+      "@utils/*": ["./src/utils/*"]
     },
 
     // Environment Settings
