@@ -1,7 +1,7 @@
 import { type Response } from "express";
 
 class Send {
-  static success(res: Response, message = "Login Successful", data: any) {
+  static success(res: Response, message = "Login Successful", data: object) {
     res.status(200).json({
       ok: true,
       message,
@@ -10,29 +10,29 @@ class Send {
     return;
   }
 
-  static error(res: Response, message = "Internal Server Error", data: any) {
+  static error(res: Response, message = "Internal Server Error", data?: null) {
     res.status(500).json({
       ok: false,
       message,
-      data: null,
+      data,
     });
     return;
   }
 
-  static notFound(res: Response, message = "404 Page not Found", data: any) {
+  static notFound(res: Response, message = "404 Page not Found", data: unknown) {
     res.status(404).json({
       ok: false,
       message,
-      data: null,
+      data,
     });
     return;
   }
 
-  static unauthorized(res: Response, message = "unauthorized", data: any) {
+  static unauthorized(res: Response, message = "unauthorized", data: unknown) {
     res.status(401).json({
       ok: false,
       message,
-      data: null,
+      data,
     });
     return;
   }
@@ -46,19 +46,19 @@ class Send {
     return;
   }
 
-  static forbidden(res: Response, data: any, message = "forbidden") {
+  static forbidden(res: Response, data: unknown, message = "forbidden") {
     res.status(403).json({
       ok: false,
-      data: null,
+      data,
       message,
     });
     return;
   }
 
-  static badRequest(res: Response, data: any, message = "bad request") {
+  static badRequest(res: Response, data: unknown, message = "bad request") {
     res.status(400).json({
       ok: false,
-      data: null,
+      data,
       message,
     });
     return;
