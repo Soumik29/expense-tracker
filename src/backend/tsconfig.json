@@ -16,7 +16,11 @@
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "esnext",
-    "types": [],
+    "types": [
+      "node",
+      // "express",
+      // "cors",
+    ],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
