@@ -9,7 +9,8 @@
       "@middlewares/*": ["./src/middlewares/*"],
       "@controllers/*": ["./src/controllers/*"],
       "@routes/*": ["./src/routes/*"],
-      "@utils/*": ["./src/utils/*"]
+      "@utils/*": ["./src/utils/*"],
+      "@validation/*": ["./src/validations/"]
     },
 
     // Environment Settings
