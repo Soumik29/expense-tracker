@@ -10,18 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: true, credentials: true }));
-// const allowCrossOrigin = cors({
-//   origin: process.env.CLIENT_ORIGIN,
-//   credentials: true,
-// });
 
-// app.use(function(req, res, next){
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Methods", "GET, PUT, POST");
-//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-//   next();
-// });
-// app.use(allowCrossOrigin);
 const port = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET_KEY;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRE;
@@ -301,73 +290,6 @@ app.delete("/expenses/:id", requireAuth, async (req, res) => {
       .json({ error: "Couldn't delete expense. Expense is not found." });
   }
 });
-
-// const prisma = new PrismaClient();
-// async function main(){
-//   const allExpenses = await prisma.expense.findMany();
-//   console.log(allExpenses);
-// }
-
-// main()
-//   .then(async () => {
-//     await prisma.$disconnect();
-//   }).catch(async (e) => {
-//     console.log(e);
-//     await prisma.$disconnect();
-//     process.exit(1);
-// });
-
-// let expenses = [
-//   {
-//     id: 1,
-//     category: "Groceries",
-//     amount: 50.25,
-//     description: "Weekly grocery run",
-//     date: "2024-09-15T00:00:00.000Z",
-//   },
-//   {
-//     id: 2,
-//     category: "Food",
-//     amount: 15.5,
-//     description: "Lunch with a friend",
-//     date: "2024-09-14T00:00:00.000Z",
-//   },
-// ];
-
-// app.get("/expenses", (req, res) => {
-//   res.json(expenses);
-// });
-
-// app.post("/expenses", (req, res) => {
-//   const newExpense = { ...req.body, id: Date.now() };
-//   expenses.push(newExpense);
-//   res.status(201).json(newExpense);
-// });
-
-// app.put("/expenses/:id", (req, res) => {
-//   const expenseID = Number(req.params.id);
-//   const updatedExpense = req.body;
-//   const findExpenseToUpdate = expenses.findIndex(
-//     (expense) => expense.id === expenseID
-//   );
-//   if (findExpenseToUpdate !== -1) {
-//     expenses[findExpenseToUpdate] = { ...updatedExpense, id: expenseID };
-//     res.status(200).json(expenses[findExpenseToUpdate]);
-//   } else {
-//     res.status(400).send("Item not found!");
-//   }
-// });
-
-// app.delete("/expenses/:id", (req, res) => {
-//     const expenseID = Number(req.params.id);
-//     const expenseIndex = expenses.findIndex((expense) => expense.id === expenseID);
-//     if(expenseIndex !== -1){
-//       expenses.splice(expenseIndex, 1);
-//       res.status(204).send();
-//     }else{
-//       res.status(404).send("Item not found!");
-//     }
-// })
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

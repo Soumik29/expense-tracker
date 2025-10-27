@@ -1,7 +1,6 @@
 import Send from "@utils/response.utils.js";
 import { prisma } from "../db.js";
 import type { Request, Response } from "express";
-import { send } from "process";
 
 class UserController {
     static getUser = async (req: Request, res: Response) => {

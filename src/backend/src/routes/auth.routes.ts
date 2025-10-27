@@ -34,3 +34,5 @@ class AuthRouter extends BaseRouter {
     ];
   }
 }
+
+export default new AuthRouter().router;

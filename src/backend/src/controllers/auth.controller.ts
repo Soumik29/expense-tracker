@@ -1,17 +1,18 @@
 import Send from "@utils/response.utils.js";
 import { prisma } from "../db.js";
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
 import authSchema from "../validations/auth.schema.js";
 import bcrypt from "bcrypt";
 import {z} from "zod";
-import {verify, sign} from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import authConfig from "@config/auth.config.js";
 
 
 let sec = authConfig.secret as string;
-
+const {sign} = jwt;
 class AuthController{
     static login = async (req: Request, res: Response) => {
+        console.log(req);
         const {email, password} = req.body as z.infer<typeof authSchema.login>;
         try {
             const user = await prisma.user.findUnique({
@@ -67,13 +68,13 @@ class AuthController{
 
     static register = async (req: Request, res: Response) => {
         const {username, email, password, confirmPassword} = req.body as z.infer<typeof authSchema.register>;
-
+        // console.log(username, email, password, confirmPassword)
         try {
             const existingUser = await prisma.user.findUnique({
                 where: {email}
             })
             if (existingUser){
-                Send.error(res, null, "Email is already in use.");
+                return Send.error(res, null, "Email is already in use.");
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);

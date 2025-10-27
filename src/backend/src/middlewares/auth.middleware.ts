@@ -1,12 +1,12 @@
 import authConfig from "@config/auth.config.js";
 import Send from "@utils/response.utils.js";
 import type { NextFunction, Request, Response } from "express";
-import { verify } from "jsonwebtoken";
-
+import jwt from "jsonwebtoken";
+const {verify} = jwt;
 export interface DecodedToken {
   userId: number;
 }
-let sec: string = authConfig.secret as string;
+let secret: string = authConfig.secret as string;
 class AuthMiddleware {
   static authenticateUser = (
     req: Request,
@@ -18,8 +18,8 @@ class AuthMiddleware {
       return Send.unauthorized(res, null);
     }
     try {
-      const decodedToken = verify(token, sec) as DecodedToken;
-      
+      const decodedToken = verify(token, secret) as DecodedToken;
+      console.log(decodedToken);
       (req as any).userId = decodedToken.userId;
       next()
     } catch (err) {
@@ -36,7 +36,7 @@ class AuthMiddleware {
     }
 
     try{
-      const decodedToken = verify(refreshToken, sec) as DecodedToken;
+      const decodedToken = verify(refreshToken, secret) as DecodedToken;
       (req as any).userId = decodedToken.userId;
       next()
     }catch(err){
