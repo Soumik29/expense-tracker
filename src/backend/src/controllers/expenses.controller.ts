@@ -3,14 +3,14 @@ import { prisma } from "../db.js";
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import authConfig from "@config/auth.config.js";
-import { decode } from "punycode";
+
 const { verify } = jwt;
 const secret = authConfig.secret as string;
 interface DecodedToken {
   userId: number;
 }
 class ExpenseController {
-  static userExpense = async (req: Request, res: Response) => {
+  static createExpense = async (req: Request, res: Response) => {
     const token = req.cookies.accessToken;
     if (!token) {
       Send.unauthorized(res, null);
@@ -65,15 +65,15 @@ class ExpenseController {
         },
       });
       return Send.success(res, {
-        category: category,
-        amount: amountNum,
-        date: validateDate,
-        description: description || null,
-        userId: req.body.userId,
+        expense: createExpense
       });
     } catch (error) {
         console.error("Failed to create expense: ", error);
         Send.error(res, null);
     }
   };
+  static updateExpense = async (req: Request, res: Response) => {
+    
+  }
 }
+export default ExpenseController;
