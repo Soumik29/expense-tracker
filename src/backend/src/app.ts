@@ -4,6 +4,7 @@ import cors from "cors";
 import authRoutes from "@routes/auth.routes.js";
 import appConfig from "@config/app.config.js";
 import userRoutes from "@routes/user.routes.js";
+import ExpenseController from "@controllers/expenses.controller.js";
 
 class App{
     private app: Express;
@@ -18,7 +19,7 @@ class App{
         this.app.use(cookieParser());
         this.app.use(cors({
             origin: [
-                'http://localhost:3000'
+                'http://localhost:5173'
             ],
             methods: ['GET', 'POST', 'DELETE', 'PUT'],
             credentials: true
@@ -28,6 +29,7 @@ class App{
     private initRoutes(){
         this.app.use("/api/auth", authRoutes);
         this.app.use("/api/user", userRoutes);
+        // this.app.use("/api/expense", ExpenseController)
     }
 
     public start(){

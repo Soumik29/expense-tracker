@@ -13,12 +13,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await fetch("http://localhost:3000/me", {
+        const res = await fetch("http://localhost:3000/api/user/info", {
+          method: "GET",
           credentials: "include",
         });
+        console.log(res);
         if (res.ok) {
           const data = await res.json();
-          setUser(data); // you might adjust this depending on backend response
+          setUser(data);
+          
         } else {
           setUser(null);
         }

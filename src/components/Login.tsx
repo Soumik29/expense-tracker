@@ -3,7 +3,7 @@ import { useAuth } from "../utils/useAuth";
 
 const Login: React.FC = () => {
   const { setUser } = useAuth();
-  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
 
@@ -12,15 +12,14 @@ const Login: React.FC = () => {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:3000/login", {
+      const res = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json; charset=utf-8",
         },
         credentials: "include",
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
-
       if (!res.ok) {
         const errData = await res.json();
         throw new Error(errData.error || "Login failed");
@@ -48,11 +47,11 @@ const Login: React.FC = () => {
         )}
 
         <div className="mb-4">
-          <label className="block mb-1">Username</label>
+          <label className="block mb-1">Email</label>
           <input
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none"
             required
           />

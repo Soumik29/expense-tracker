@@ -6,6 +6,7 @@ class ValidateMiddleware {
   static validateBody(schema: ZodType) {
     return (req: Request, res: Response, next: NextFunction) => {
       try {
+        console.log(req.body);
         schema.parse(req.body);
         next();
       } catch (err) {

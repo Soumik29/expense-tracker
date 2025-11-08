@@ -73,7 +73,18 @@ class ExpenseController {
     }
   };
   static updateExpense = async (req: Request, res: Response) => {
-    
+    const token = req.cookies.accessToken;
+    if(!token){
+      Send.unauthorized(res, null);  
+    }
+    try{
+      const decoded = verify(token, secret) as DecodedToken;
+      const expenseId = req.params.expenseId;
+      console.log(expenseId);
+    } catch (error){
+      console.error("Couldn't update expense invalid token!", error);
+      Send.error(res, null);
+    }
   }
 }
 export default ExpenseController;
