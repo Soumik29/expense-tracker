@@ -73,6 +73,7 @@ class AuthController{
             const existingUser = await prisma.user.findUnique({
                 where: {email}
             })
+            console.log(existingUser);
             if (existingUser){
                 return Send.error(res, null, "Email is already in use.");
             }
