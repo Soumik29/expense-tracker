@@ -7,7 +7,7 @@ export interface User{
 }
 
 interface AuthContextType {
-  user: User | null; // You can replace `any` with a proper User type once you define it
+  user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
 }

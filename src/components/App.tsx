@@ -1,6 +1,6 @@
 import ExpenseTracker from "./ExpenseTracker";
 import { useAuth } from "../utils/useAuth";
-import Login from "./Login";
+import Register from "../auth/Register";
 function App() {
   const { user, loading } = useAuth();
 
@@ -17,7 +17,7 @@ function App() {
           </main>
         </div>
       ) : (
-        <Login />
+        <Register />
       )}
     </>
   );

@@ -26,7 +26,7 @@ const Login: React.FC = () => {
       }
 
       const data = await res.json();
-      setUser(data.user); // ✅ saves user in context
+      setUser(data.user);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
