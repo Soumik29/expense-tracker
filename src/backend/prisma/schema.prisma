@@ -8,13 +8,15 @@ datasource db {
 }
 
 model Expense{
-  id          Int         @id         @default(autoincrement())
-  amount      Decimal                    @db.Decimal(10, 2)    
-  date        DateTime       
-  category    Category       
-  description String?
-  userId       Int
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              Int             @id         @default(autoincrement())
+  amount          Decimal         @db.Decimal(10, 2)    
+  date            DateTime       
+  category        Category       
+  description     String?
+  userId          Int
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isRecurring     Boolean         @default(false)
+  paymentMethod   PaymentMethod   @default(CASH)
 }
 
 model User{
@@ -37,5 +39,12 @@ enum Category{
   Games
   Subscription
   EMI
+}
+
+enum PaymentMethod{
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  UPI
 }
 
