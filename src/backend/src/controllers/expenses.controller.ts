@@ -18,7 +18,7 @@ class ExpenseController {
     try {
       const decodedToken = verify(token, secret) as DecodedToken;
       (req as any).userId = decodedToken;
-      const { amount, date, category, description } = req.body;
+      const { amount, date, category, description, isRecurring, paymentMethod } = req.body;
       if (amount == null || !date) {
         Send.badRequest(res, { message: "Amount and Date needs to be filled" });
       }
@@ -62,6 +62,8 @@ class ExpenseController {
           date: validateDate,
           description: description || null,
           userId: req.body.userId,
+          isRecurring: isRecurring || false,
+          paymentMethod: paymentMethod || "CASH",
         },
       });
       return Send.success(res, {

@@ -12,6 +12,8 @@ export type ExpenseCategory =
   | "Subscription"
   | "EMI";
 
+export type PaymentMethod = "CASH" | "CREDIT_CARD" | "DEBIT_CARD" | "UPI";
+
 type expenseProps = {
   onAddExpense: (expense: newExpense) => void;
 };
@@ -22,19 +24,23 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
   const [desc, setDesc] = useState("");
   const [category, setCategory] = useState<ExpenseCategory>("Food");
   const [showToast, setShowToast] = useState<boolean>(false);
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH");
   const amt = Number(amount);
   const isValid = amount.trim() !== "" && !Number.isNaN(amt) && date !== "";
   console.log(isValid);
   const handleSubmit = (e: React.FormEvent<Element>) => {
     e.preventDefault();
     if (!isValid) {
-      return "Can't have empty fields";
+      return;
     }
     const expenseData = {
       amount: parseFloat(amount),
       date: date,
       description: desc,
       category: category,
+      isRecurring: isRecurring,
+      paymentMethod: paymentMethod
     };
     onAddExpense(expenseData);
     setAmount("");
@@ -51,6 +57,8 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
     setDate(new Date().toISOString().slice(0, 10));
     setDesc("");
     setCategory("Food");
+    setPaymentMethod("CASH");
+    setIsRecurring(false);
   };
 
   return (
@@ -59,6 +67,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
         Add New Expense
       </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/**Category Data */}
         <div>
           <label
             htmlFor="category"
@@ -85,6 +94,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
             <option value="EMI">EMI</option>
           </select>
         </div>
+        {/**Amount Data */}
         <div>
           <label
             htmlFor="amount"
@@ -106,6 +116,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
             placeholder="0.00"
           />
         </div>
+        {/**Description Data*/}
         <div>
           <label
             htmlFor="desc"
@@ -126,6 +137,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
             placeholder="e.g., Coffee with friends"
           ></textarea>
         </div>
+        {/**Date */}
         <div>
           <label
             htmlFor="date"
@@ -143,6 +155,47 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
               setDate(e.target.value)
             }
             required
+          />
+        </div>
+        {/**Payment Method */}
+        <div>
+          <label
+            htmlFor="paymentMethod"
+            className="block text-sm font-medium text-gray-400 mb-2"
+          >
+            Payment Method
+          </label>
+          <select
+            id="paymentMethod"
+            className="w-full bg-gray-800 border border-gray-700 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={paymentMethod}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              setPaymentMethod(e.target.value as PaymentMethod)
+            }
+          >
+            <option value="CASH">CASH</option>
+            <option value="CREDIT_CARD">Credit Card</option>
+            <option value="DEBIT_CARD">Debit Card</option>
+            <option value="UPI">UPI</option>
+          </select>
+        </div>
+        {/**Recurring Checkbox */}
+        <div className="flex items-center">
+          <label
+            htmlFor="isRecurring"
+            className="ml-2 text-sm font-medium text-gray-400"
+          >
+            Recurring Expense
+          </label>
+          <input
+            type="checkbox"
+            id="isRecurring"
+            name="Expense Date"
+            className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-700 rounded focus:ring-blue-500 focus:ring-2"
+            checked={isRecurring}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setIsRecurring(e.target.checked)
+            }
           />
         </div>
         <div className="flex ">

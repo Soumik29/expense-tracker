@@ -4,6 +4,8 @@ export type Expense = {
     amount: number;
     description: string;
     date: string;
+    isRecurring: Boolean;
+    paymentMethod: "CASH" | "CREDIT_CARD" | "DEBIT_CARD" | "UPI";
 }
 
 export type newExpense = Omit<Expense, "id">;

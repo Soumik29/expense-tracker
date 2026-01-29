@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { 
+  faPen, 
+  faTrash, 
+  faRepeat, 
+  faCreditCard, 
+  faMoneyBill, 
+  faMobileScreen 
+} from "@fortawesome/free-solid-svg-icons";
 import { type Expense } from "../types.ts";
+
 
 // Define the props for a single expense card
 type IndividualExpenseProps = {
@@ -19,6 +27,14 @@ const IndividualExpense = ({
 }: IndividualExpenseProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isLongDescription = expense.description.length > 100; // Show "Read more" if description is long
+
+  const getPaymentIcon = (method: string) => {
+    switch(method) {
+      case "CREDIT_CARD":
+      case "DEBIT_CARD":
+        return faCreditCard;
+    }
+  }
 
   return (
     <div
