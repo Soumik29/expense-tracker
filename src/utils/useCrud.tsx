@@ -1,11 +1,11 @@
 import type { Expense, newExpense } from "../types";
 import { useEffect, useState } from "react";
 
-const API_URL = "http://localhost:3000/expenses";
-// const token = localStorage.getItem("token");
+const API_URL = "http://localhost:3000/api/expenses";
 
 const useCrud = () => {
   const [expense, setExpense] = useState<Expense[]>([]);
+
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
@@ -13,11 +13,18 @@ const useCrud = () => {
           credentials: "include",
         });
         if (!response.ok) throw new Error("Failed to fetch expense");
-        const data = await response.json();
-        const expensesWithDates = data.map((exp: Expense) => ({
+        
+        const jsonResponse = await response.json();
+        
+        // Ensure we are getting an array. If backend sends { data: [...] } vs { data: { expenses: [...] } }
+        // Adjust this line if your GET endpoint also nests data, but usually it's direct in data for lists.
+        const expenseData = Array.isArray(jsonResponse.data) ? jsonResponse.data : []; 
+        
+        const expensesWithDates = expenseData.map((exp: any) => ({
           ...exp,
           date: new Date(exp.date),
         }));
+        
         setExpense(expensesWithDates);
       } catch (error) {
         console.log("Error fetching expenses: ", error);
@@ -25,7 +32,8 @@ const useCrud = () => {
     };
     fetchExpenses();
   }, []);
-  const addExpense = async (expense: newExpense) => {
+
+  const addExpense = async (newExpenseData: newExpense) => {
     try {
       const res = await fetch(API_URL, {
         method: "POST",
@@ -33,83 +41,92 @@ const useCrud = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(expense),
+        body: JSON.stringify(newExpenseData),
       });
-      console.log(res);
-      
+
       if (!res.ok) {
-        // Handle validation errors from the server
         if (res.status === 400) {
           throw new Error('Validation error occurred');
         }
         throw new Error(`Failed to add expense (${res.status})`);
       }
-      const responseData = await res.json();
 
-      const newExpenseWithData = {
-        ...responseData
+      const jsonResponse = await res.json();
+
+      // === FIX IS HERE ===
+      // Access .data.expense because your controller returns { expense: createExpense }
+      const createdExpense = jsonResponse.data.expense; 
+
+      if (!createdExpense) {
+        console.error("Unexpected response structure:", jsonResponse);
+        return;
+      }
+
+      const newExpenseWithFormattedDate = {
+        ...createdExpense,
+        date: new Date(createdExpense.date)
       };
+
+      setExpense((prev) => [...prev, newExpenseWithFormattedDate]);
       
-      setExpense((prev) => [...prev, newExpenseWithData]);
       return { success: true };
     } catch (error) {
       console.error("Failed to add expense:", error);
-      throw error; // Re-throw to be handled by the form
+      throw error;
     }
   };
 
   const deleteExpense = async (id: number) => {
     try {
-      // const token = localStorage.getItem("token");
       const res = await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
-        // headers: {
-        //   Authorization: `Bearer ${token}`,
-        // },
         credentials: "include",
       });
-      if (res.status == 204) {
+      if (res.status === 204 || res.status === 200) {
         setExpense((prev) => prev.filter((expense) => expense.id !== id));
       } else {
-        throw new Error(`Failed to load the data! ${res.status}`);
+        throw new Error(`Failed to delete data! ${res.status}`);
       }
     } catch (err) {
       console.log("Something went wrong. Failed to Fetch!", err);
     }
   };
 
-  const updateExpenses = async (expense: Expense) => {
+  const updateExpenses = async (expenseToUpdate: Expense) => {
     try {
-      const response = await fetch(`${API_URL}/${expense.id}`, {
+      const response = await fetch(`${API_URL}/${expenseToUpdate.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          // Authorization: `Bearer ${token}`,
         },
         credentials: "include",
-        body: JSON.stringify(expense),
+        body: JSON.stringify(expenseToUpdate),
       });
+      
       if (!response.ok)
         throw new Error(`Failed to update expense. ${response.status}`);
-      const data = await response.json();
+      
+      const jsonResponse = await response.json();
+      
+      // Check if update returns the same nested structure or just the object
+      // Assuming it might be consistent with create:
+      const updatedData = jsonResponse.data.expense || jsonResponse.data;
+
       const expenseWithDate = {
-        ...data,
-        date: new Date(data.date),
+        ...updatedData,
+        date: new Date(updatedData.date),
       };
+
       setExpense((prev) =>
         prev.map((expenditure) =>
-          expenditure.id === data.id ? expenseWithDate : expenditure
+          expenditure.id === updatedData.id ? expenseWithDate : expenditure
         )
       );
     } catch (err) {
-      console.log("Failed to fetch expenses: ", err);
+      console.log("Failed to update expenses: ", err);
     }
-    // setExpense((prev) =>
-    //   prev.map((expenditure) =>
-    //     expenditure.id === expense.id ? expense : expenditure
-    //   )
-    // );
   };
+
   return { expense, addExpense, deleteExpense, updateExpenses };
 };
 

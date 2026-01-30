@@ -1,133 +1,121 @@
 import React, { useState } from "react";
-// import {hashSync} from "bcrypt";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../utils/useAuth";
 
-interface errorsTypes{
-  [key: string]: string;
-}
-
-const Signin = () => {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<errorsTypes>({});
+  const [error, setError] = useState("");
+  
+  const navigate = useNavigate();
+  const { setUser } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  const newErrors: errorsTypes = {};
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
 
-  if (!email) {
-    newErrors.email = "Email is required";
-  } else if (!/\S+@\S+\.\S+/.test(email)) {
-    newErrors.email = "Enter a valid email address";
-  }
-  if (!password) {
-    newErrors.password = "Password is required";
-  } else if (password.length < 6) {
-    newErrors.password = "Password must be at least 6 characters";
-  }
-
-  setErrors(newErrors);
-
-  if (Object.keys(newErrors).length === 0) {
     try {
-      const res = await fetch("http://localhost:3000/login", {
+      const res = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ username: email, password }),
+        headers: { 
+            "Content-Type": "application/json" 
+        },
+        credentials: "include", // IMPORTANT: This allows the browser to save the cookie sent by backend
+        body: JSON.stringify({ email, password }), // Backend expects 'email', not 'username'
       });
-      if (!res.ok) throw new Error("Invalid login");
 
       const data = await res.json();
-      localStorage.setItem("token", data.token); // save JWT
-      console.log("Logged in, token saved:", data.token);
-    } catch (err) {
+
+      if (!res.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      console.log("Login success:", data);
+      
+      
+      setUser(data.data); 
+      
+  
+      navigate("/");
+
+    } catch (err: any) {
       console.error(err);
-      setErrors({ general: "Login failed. Check your credentials." });
+      setError(err.message || "Invalid email or password");
     }
-  }
-};
+  };
 
   return (
-    <>
-      <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            alt="Budget Tracker"
-            src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-            className="mx-auto h-10 w-auto"
-          />
-          <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
-            Sign in to your account
-          </h2>
-        </div>
-
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm/6 font-medium text-gray-100"
-              >
-                Email address
-              </label>
-              <div className="mt-2">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
-                />
-                {errors.email && <p className="text-red-400 text-sm">{errors.email}</p>}
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm/6 font-medium text-gray-100"
-                >
-                  Password
-                </label>
-                <div className="text-sm">
-                  <a
-                    href="#"
-                    className="font-semibold text-indigo-400 hover:text-indigo-300"
-                  >
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
-              <div className="mt-2">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
-                />
-                {errors.password && <p className="text-red-400 text-sm">{errors.password}</p>}
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-              >
-                Sign in
-              </button>
-            </div>
-          </form>
-        </div>
+    <div className="flex min-h-screen flex-col justify-center px-6 py-12 bg-gray-900 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-white">
+          Sign in to your account
+        </h2>
       </div>
-    </>
+
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm bg-gray-800 p-8 rounded-lg shadow-lg">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          
+          {error && (
+            <div className="p-3 text-sm text-red-200 bg-red-900/50 border border-red-500 rounded text-center">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-200">
+              Email address
+            </label>
+            <div className="mt-2">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="block w-full rounded-md bg-gray-700 border border-gray-600 px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-200">
+                Password
+              </label>
+            </div>
+            <div className="mt-2">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="block w-full rounded-md bg-gray-700 border border-gray-600 px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
+            >
+              Sign in
+            </button>
+          </div>
+        </form>
+
+        <p className="mt-10 text-center text-sm text-gray-400">
+          Not a member?{" "}
+          <Link to="/register" className="font-semibold leading-6 text-blue-400 hover:text-blue-300">
+            Register now
+          </Link>
+        </p>
+      </div>
+    </div>
   );
 };
 
-export default Signin;
+export default Login;
