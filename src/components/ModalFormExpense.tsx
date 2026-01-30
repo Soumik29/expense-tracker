@@ -12,7 +12,7 @@ import {
 } from "@headlessui/react";
 import type { Expense } from "../types";
 import { useState } from "react";
-import type { ExpenseCategory } from "./AddExpenseForm";
+import type { ExpenseCategory, PaymentMethod } from "./AddExpenseForm";
 
 interface modalClose {
   close: (boo: boolean) => void;
@@ -95,12 +95,33 @@ const ModalFormExpense = ({
                 {/* Corrected values to match the ExpenseCategory type */}
                 <option value="Food">Food</option>
                 <option value="Groceries">Groceries</option>
-                <option value="Mobile Bill">Mobile Bill</option>
+                <option value="Mobile_Bill">Mobile Bill</option>
                 <option value="Shopping">Shopping</option>
                 <option value="Games">Games</option>
                 <option value="Subscription">Subscription</option>
                 <option value="Travel">Travel</option>
                 <option value="EMI">EMI</option>
+              </Select>
+            </div>
+
+            <div>
+              <Label className="block text-sm font-medium text-gray-300 mb-2">
+                Payment Method
+              </Label>
+              <Select
+                className="w-full appearance-none rounded-lg border border-gray-600 bg-gray-800 text-white p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                value={tempExpValues.paymentMethod}
+                onChange={(e) =>
+                  setTempExpValues((prev) => ({
+                    ...prev,
+                    paymentMethod: e.target.value as PaymentMethod,
+                  }))
+                }
+              >
+                <option value="CASH">Cash</option>
+                <option value="CREDIT_CARD">Credit Card</option>
+                <option value="DEBIT_CARD">Debit Card</option>
+                <option value="UPI">UPI</option>
               </Select>
             </div>
 
@@ -140,6 +161,26 @@ const ModalFormExpense = ({
                   }))
                 }
               />
+            </div>
+            <div className="flex items-center gap-3 mt-2">
+              <Input
+                type="checkbox"
+                id="isRecurringEdit"
+                className="w-5 h-5 rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900"
+                checked={tempExpValues.isRecurring}
+                onChange={(e) =>
+                  setTempExpValues((prev) => ({
+                    ...prev,
+                    isRecurring: e.target.checked,
+                  }))
+                }
+              />
+              <Label
+                htmlFor="isRecurringEdit"
+                className="text-sm font-medium text-gray-300 cursor-pointer"
+              >
+                Recurring Expense?
+              </Label>
             </div>
           </Field>
 

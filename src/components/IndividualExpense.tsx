@@ -1,15 +1,14 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { 
-  faPen, 
-  faTrash, 
-  faRepeat, 
-  faCreditCard, 
-  faMoneyBill, 
-  faMobileScreen 
+import {
+  faPen,
+  faTrash,
+  faRepeat,
+  faCreditCard,
+  faMoneyBill,
+  faMobileScreen,
 } from "@fortawesome/free-solid-svg-icons";
 import { type Expense } from "../types.ts";
-
 
 // Define the props for a single expense card
 type IndividualExpenseProps = {
@@ -26,15 +25,27 @@ const IndividualExpense = ({
   onEditExpense,
 }: IndividualExpenseProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const isLongDescription = expense.description.length > 100; // Show "Read more" if description is long
+  const isLongDescription = expense.description.length > 100;
 
   const getPaymentIcon = (method: string) => {
-    switch(method) {
+    switch (method) {
       case "CREDIT_CARD":
       case "DEBIT_CARD":
         return faCreditCard;
+      case "UPI":
+        return faMobileScreen;
+      case "CASH":
+      default:
+        return faMoneyBill;
     }
-  }
+  };
+
+  const formatPaymentMethod = (method: string) => {
+    return method
+      .replace(/_/g, " ")
+      .toLowerCase()
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  };
 
   return (
     <div
@@ -48,6 +59,18 @@ const IndividualExpense = ({
             <span className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
               {expense.category}
             </span>
+            <span className="bg-gray-700 text-gray-300 px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1">
+              <FontAwesomeIcon icon={getPaymentIcon(expense.paymentMethod)} />
+              {formatPaymentMethod(expense.paymentMethod)}
+            </span>
+            {expense.isRecurring && (
+              <span className="bg-purple-900/50 text-purple-300 px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 border border-purple-500/30">
+                <FontAwesomeIcon icon={faRepeat} />
+                Recurring
+              </span>
+            )}
+          </div>
+          <div className="mb-2">
             <span className="text-3xl font-bold text-green-400">
               ${Number(expense.amount).toFixed(2)}
             </span>
