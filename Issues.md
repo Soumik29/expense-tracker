@@ -41,3 +41,12 @@ export default defineConfig({
     },
   },
 })
+```
+### Option 2: Fix Fetch URL in Frontend
+Ensure the fetch call in src/components/Login.tsx uses the correct backend URL:
+```typescript
+const res = await fetch("http://localhost:3000/login", { 
+  method: "POST",
+  // ... rest of config
+});
+```
