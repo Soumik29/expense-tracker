@@ -4,7 +4,8 @@ import cors from "cors";
 import authRoutes from "@routes/auth.routes.js";
 import appConfig from "@config/app.config.js";
 import userRoutes from "@routes/user.routes.js";
-import ExpenseController from "@controllers/expenses.controller.js";
+// FIX 1: Import the Router, not the Controller
+import expenseRoutes from "@routes/expense.routes.js"; 
 
 class App{
     private app: Express;
@@ -29,7 +30,9 @@ class App{
     private initRoutes(){
         this.app.use("/api/auth", authRoutes);
         this.app.use("/api/user", userRoutes);
-        // this.app.use("/api/expense", ExpenseController)
+        
+        // FIX 2: Register the router at the correct PLURAL path
+        this.app.use("/api/expenses", expenseRoutes); 
     }
 
     public start(){

@@ -46,13 +46,13 @@ class AuthController{
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 maxAge: 24 * 60 * 60 * 1000,
-                sameSite: "strict",
+                sameSite: "lax",
             });
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 maxAge: 24 * 60 * 60 * 1000,
-                sameSite: "strict",
+                sameSite: "lax",
             });
 
             return Send.success(res, {
@@ -143,7 +143,7 @@ class AuthController{
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 maxAge: 15 * 60 * 1000, //15 minutes
-                sameSite: "strict"
+                sameSite: "lax"
             })
 
             return Send.success(res, {message: "Access token refreshed successfully"});

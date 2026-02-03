@@ -4,89 +4,126 @@ import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import authConfig from "@config/auth.config.js";
 
-const { verify } = jwt;
-const secret = authConfig.secret as string;
-interface DecodedToken {
-  userId: number;
-}
+// Helper to get User ID from request (since middleware attaches it)
+const getUserId = (req: Request): number | null => {
+  const direct = (req as any).userId;
+  if (typeof direct === "number") return direct;
+  if (typeof direct?.userId === "number") return direct.userId;
+  const fromUser = (req as any).user?.userId;
+  if (typeof fromUser === "number") return fromUser;
+  return null;
+};
+
 class ExpenseController {
-  static createExpense = async (req: Request, res: Response) => {
-    const token = req.cookies.accessToken;
-    if (!token) {
-      Send.unauthorized(res, null);
-    }
+  // 1. GET ALL EXPENSES
+  static getExpenses = async (req: Request, res: Response) => {
     try {
-      const decodedToken = verify(token, secret) as DecodedToken;
-      (req as any).userId = decodedToken;
+      const userId = getUserId(req);
+      if (!userId) return Send.unauthorized(res, null);
+
+      const expenses = await prisma.expense.findMany({
+        where: { userId: userId },
+        orderBy: { date: 'desc' }
+      });
+
+      return Send.success(res, expenses);
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+      return Send.error(res, null, "Failed to fetch expenses");
+    }
+  };
+
+  // 2. CREATE EXPENSE
+  static createExpense = async (req: Request, res: Response) => {
+    try {
+      const userId = getUserId(req);
+      if (!userId) return Send.unauthorized(res, null);
+
       const { amount, date, category, description, isRecurring, paymentMethod } = req.body;
-      if (amount == null || !date) {
-        Send.badRequest(res, { message: "Amount and Date needs to be filled" });
-      }
-      const validCategories = [
-        "Food",
-        "Groceries",
-        "Mobile_Bill",
-        "Travel",
-        "Shopping",
-        "Games",
-        "Subscription",
-        "EMI",
-      ];
-      if (!validCategories.includes(category)) {
-        return Send.badRequest(res, {
-          error: "Invalid Category",
-          validCategories: validCategories,
-          receivedCategory: category,
-        });
-      }
 
-      const amountNum = Number(amount);
-      if (!amountNum || amountNum <= 0) {
-        return Send.badRequest(res, {
-          message: "Amount can't be empty or a negative number",
-          receivedAmount: amountNum,
-        });
-      }
-
-      const validateDate = new Date(date);
-      if (isNaN(validateDate.getTime())) {
-        return Send.badRequest(res, {
-          message: "Invalid date format. Please use YYYY-MM-DD",
-        });
+      // Basic Validation
+      if (!amount || !date || !category) {
+        return Send.badRequest(res, { message: "Amount, Date, and Category are required" });
       }
 
       const createExpense = await prisma.expense.create({
         data: {
           category,
-          amount: amountNum,
-          date: validateDate,
-          description: description || null,
-          userId: req.body.userId,
+          amount: Number(amount),
+          date: new Date(date),
+          description: description || "",
+          userId: userId,
           isRecurring: isRecurring || false,
           paymentMethod: paymentMethod || "CASH",
         },
       });
-      return Send.success(res, {
-        expense: createExpense
-      });
+
+      // Frontend expects { data: { expense: ... } }
+      return Send.success(res, { expense: createExpense });
     } catch (error) {
-        console.error("Failed to create expense: ", error);
-        Send.error(res, null);
+      console.error("Failed to create expense: ", error);
+      return Send.error(res, null, "Failed to create expense");
     }
   };
+
+  // 3. DELETE EXPENSE
+  static deleteExpense = async (req: Request, res: Response) => {
+    try {
+      const userId = getUserId(req);
+      const { expenseId } = req.params;
+
+      if (!userId) return Send.unauthorized(res, null);
+
+      // Verify ownership before deleting
+      const expense = await prisma.expense.findUnique({ where: { id: Number(expenseId) } });
+      if (!expense || expense.userId !== userId) {
+        return Send.forbidden(res, null, "You are not authorized to delete this expense");
+      }
+
+      await prisma.expense.delete({
+        where: { id: Number(expenseId) },
+      });
+
+      return res.status(204).send(); // 204 No Content is standard for delete
+    } catch (error) {
+      console.error("Failed to delete expense:", error);
+      return Send.error(res, null, "Failed to delete expense");
+    }
+  };
+
+  // 4. UPDATE EXPENSE
   static updateExpense = async (req: Request, res: Response) => {
-    const token = req.cookies.accessToken;
-    if(!token){
-      Send.unauthorized(res, null);  
+    try {
+      const userId = getUserId(req);
+      const { expenseId } = req.params;
+      const { amount, date, category, description, isRecurring, paymentMethod } = req.body;
+
+      if (!userId) return Send.unauthorized(res, null);
+
+      // Verify ownership
+      const existing = await prisma.expense.findUnique({ where: { id: Number(expenseId) } });
+      if (!existing || existing.userId !== userId) {
+        return Send.forbidden(res, null, "Not authorized to update this expense");
+      }
+
+      const updatedExpense = await prisma.expense.update({
+        where: { id: Number(expenseId) },
+        data: {
+          amount: Number(amount),
+          date: new Date(date),
+          category,
+          description,
+          isRecurring: isRecurring || false,
+          paymentMethod: paymentMethod || "CASH"
+        },
+      });
+
+      return Send.success(res, { expense: updatedExpense });
+    } catch (error) {
+      console.error("Failed to update expense:", error);
+      return Send.error(res, null);
     }
-    try{
-      const decoded = verify(token, secret) as DecodedToken;
-      const expenseId = req.params.expenseId;
-      console.log(expenseId);
-    } catch (error){
-      console.error("Couldn't update expense invalid token!", error);
-      Send.error(res, null);
-    }
-  }
+  };
 }
+
 export default ExpenseController;

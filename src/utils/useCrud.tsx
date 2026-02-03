@@ -1,6 +1,7 @@
 import type { Expense, newExpense } from "../types";
 import { useEffect, useState } from "react";
 
+// FIX 1: Update URL to include '/api' (matching your auth routes)
 const API_URL = "http://localhost:3000/api/expenses";
 
 const useCrud = () => {
@@ -22,12 +23,12 @@ const useCrud = () => {
         
         const expensesWithDates = expenseData.map((exp: any) => ({
           ...exp,
-          date: new Date(exp.date),
+          date: new Date(exp.date), // Convert string date to Date object
         }));
-        
+
         setExpense(expensesWithDates);
       } catch (error) {
-        console.log("Error fetching expenses: ", error);
+        console.error("Error fetching expenses: ", error);
       }
     };
     fetchExpenses();
@@ -45,30 +46,28 @@ const useCrud = () => {
       });
 
       if (!res.ok) {
-        if (res.status === 400) {
-          throw new Error('Validation error occurred');
-        }
-        throw new Error(`Failed to add expense (${res.status})`);
+        if (res.status === 400) throw new Error("Validation error occurred");
+        const errorText = await res.text();
+        throw new Error(`Failed to add expense (${res.status}): ${errorText}`);
       }
 
       const jsonResponse = await res.json();
 
-      // === FIX IS HERE ===
-      // Access .data.expense because your controller returns { expense: createExpense }
-      const createdExpense = jsonResponse.data.expense; 
+      // FIX 3: Unwrap the nested expense object
+      // Backend Controller sends: Send.success(res, { expense: createExpense })
+      // So we must access: jsonResponse.data.expense
+      const createdExpense = jsonResponse.data?.expense || jsonResponse.data;
 
       if (!createdExpense) {
-        console.error("Unexpected response structure:", jsonResponse);
-        return;
+        throw new Error("Server response missing expense data");
       }
 
       const newExpenseWithFormattedDate = {
         ...createdExpense,
-        date: new Date(createdExpense.date)
+        date: new Date(createdExpense.date),
       };
 
       setExpense((prev) => [...prev, newExpenseWithFormattedDate]);
-      
       return { success: true };
     } catch (error) {
       console.error("Failed to add expense:", error);
@@ -85,7 +84,8 @@ const useCrud = () => {
       if (res.status === 204 || res.status === 200) {
         setExpense((prev) => prev.filter((expense) => expense.id !== id));
       } else {
-        throw new Error(`Failed to delete data! ${res.status}`);
+        const err = await res.text();
+        throw new Error(`Failed to delete data! ${res.status}: ${err}`);
       }
     } catch (err) {
       console.log("Something went wrong. Failed to Fetch!", err);
@@ -102,15 +102,13 @@ const useCrud = () => {
         credentials: "include",
         body: JSON.stringify(expenseToUpdate),
       });
-      
       if (!response.ok)
         throw new Error(`Failed to update expense. ${response.status}`);
-      
+
       const jsonResponse = await response.json();
-      
-      // Check if update returns the same nested structure or just the object
-      // Assuming it might be consistent with create:
-      const updatedData = jsonResponse.data.expense || jsonResponse.data;
+
+      // FIX 4: Handle wrapper for updates too
+      const updatedData = jsonResponse.data?.expense || jsonResponse.data;
 
       const expenseWithDate = {
         ...updatedData,
@@ -119,11 +117,11 @@ const useCrud = () => {
 
       setExpense((prev) =>
         prev.map((expenditure) =>
-          expenditure.id === updatedData.id ? expenseWithDate : expenditure
-        )
+          expenditure.id === updatedData.id ? expenseWithDate : expenditure,
+        ),
       );
     } catch (err) {
-      console.log("Failed to update expenses: ", err);
+      console.log("Failed to fetch expenses: ", err);
     }
   };
 
