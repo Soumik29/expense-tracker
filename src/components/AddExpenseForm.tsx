@@ -28,7 +28,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH");
   const amt = Number(amount);
   const isValid = amount.trim() !== "" && !Number.isNaN(amt) && date !== "";
-  console.log(isValid);
+  // console.log(isValid);
   const handleSubmit = (e: React.FormEvent<Element>) => {
     e.preventDefault();
     if (!isValid) {
