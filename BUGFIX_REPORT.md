@@ -385,6 +385,79 @@ try {
 
 ---
 
+# Part 3: Bug Fix - Backend Not Loading Environment Variables
+
+## Problem
+
+Login requests were returning `500 Internal Server Error` with an empty response body. The error in the browser console was:
+
+```
+API Error [/auth/login]: SyntaxError: JSON.parse: unexpected end of data
+```
+
+---
+
+## Root Cause
+
+The `.env` file was located in the **project root**, but the backend runs from `src/backend/`. The `dotenv` package loads `.env` from the current working directory, so the backend couldn't find the environment variables.
+
+When `AUTH_SECRET` is `undefined`, `jwt.sign()` crashes with:
+
+```
+Error: secretOrPrivateKey must have a value
+```
+
+This caused the 500 error with an empty response body.
+
+---
+
+## The Fix
+
+**File:** `src/backend/src/index.ts`
+
+### Before
+
+```typescript
+import "tsconfig-paths/register.js";
+import "dotenv/config";
+
+import App from "./app.js";
+const app = new App();
+
+app.start();
+```
+
+### After
+
+```typescript
+import "tsconfig-paths/register.js";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// ES Module fix for __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from project root (two levels up from src/backend/src)
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+
+import App from "./app.js";
+const app = new App();
+
+app.start();
+```
+
+---
+
+## Why This Works
+
+1. **ES Modules don't have `__dirname`** - We recreate it using `fileURLToPath` and `import.meta.url`
+2. **Explicit path to .env** - Instead of relying on CWD, we calculate the absolute path to the root `.env`
+3. **Path resolution** - `../../../.env` goes from `src/backend/src/` up to the project root
+
+---
+
 # Quick Reference: All New Files
 
 ```
@@ -407,9 +480,9 @@ src/
 - [ ] App shows spinner while checking auth status on initial load
 - [ ] Expenses load correctly after login
 - [ ] Adding an expense works
-- [ ] Deleting an expense works (the bug fix!)
+- [ ] Deleting an expense works (Part 2 bug fix)
 - [ ] Updating an expense works
-      | `src/services/api.ts` | Added 204 status handling before JSON parsing |
+- [ ] Backend loads environment variables correctly (Part 3 bug fix)
 
 ---
 
