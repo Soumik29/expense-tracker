@@ -31,29 +31,49 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col justify-center px-6 py-12 bg-gray-900 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-white">
-          Sign in to your account
+    <div className="flex min-h-screen flex-col justify-center px-6 py-12 bg-neutral-50">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center mb-8">
+          <div className="w-12 h-12 bg-neutral-900 rounded-xl flex items-center justify-center">
+            <svg
+              className="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+        </div>
+        <h2 className="text-center text-2xl font-semibold tracking-tight text-neutral-900">
+          Welcome back
         </h2>
+        <p className="mt-2 text-center text-sm text-neutral-500">
+          Sign in to your account to continue
+        </p>
       </div>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm bg-gray-800 p-8 rounded-lg shadow-lg">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="p-3 text-sm text-red-200 bg-red-900/50 border border-red-500 rounded text-center">
-              {error}
-            </div>
-          )}
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white px-8 py-10 rounded-2xl border border-neutral-200">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-4 text-sm text-neutral-900 bg-neutral-100 border border-neutral-200 rounded-xl text-center">
+                {error}
+              </div>
+            )}
 
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-200"
-            >
-              Email address
-            </label>
-            <div className="mt-2">
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-neutral-700 mb-2"
+              >
+                Email address
+              </label>
               <input
                 id="email"
                 name="email"
@@ -61,21 +81,18 @@ const Login = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full rounded-md bg-gray-700 border border-gray-600 px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                className="block w-full rounded-xl bg-white border border-neutral-200 px-4 py-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                placeholder="you@example.com"
               />
             </div>
-          </div>
 
-          <div>
-            <div className="flex items-center justify-between">
+            <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-200"
+                className="block text-sm font-medium text-neutral-700 mb-2"
               >
                 Password
               </label>
-            </div>
-            <div className="mt-2">
               <input
                 id="password"
                 name="password"
@@ -83,27 +100,28 @@ const Login = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full rounded-md bg-gray-700 border border-gray-600 px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                className="block w-full rounded-xl bg-white border border-neutral-200 px-4 py-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                placeholder="••••••••"
               />
             </div>
-          </div>
 
-          <div>
-            <LoadingButton type="submit" loading={loading}>
-              Sign in
-            </LoadingButton>
-          </div>
-        </form>
+            <div className="pt-2">
+              <LoadingButton type="submit" loading={loading}>
+                Sign in
+              </LoadingButton>
+            </div>
+          </form>
 
-        <p className="mt-10 text-center text-sm text-gray-400">
-          Not a member?{" "}
-          <Link
-            to="/register"
-            className="font-semibold leading-6 text-blue-400 hover:text-blue-300"
-          >
-            Register now
-          </Link>
-        </p>
+          <p className="mt-8 text-center text-sm text-neutral-500">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="font-medium text-neutral-900 hover:text-neutral-600 underline underline-offset-2"
+            >
+              Create one
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

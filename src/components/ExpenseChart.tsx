@@ -19,8 +19,8 @@ const ExpenseChart = ({ expense }: { expense: Expense[] }) => {
     const dataMap = new Map<string, number>();
 
     expense.forEach((exp) => {
-      let key: string = viewBy === "category" ? exp.category : exp.paymentMethod;
-
+      let key: string =
+        viewBy === "category" ? exp.category : exp.paymentMethod;
 
       if (viewBy === "payment") {
         key = key
@@ -36,37 +36,22 @@ const ExpenseChart = ({ expense }: { expense: Expense[] }) => {
     const labels = Array.from(dataMap.keys());
     const data = Array.from(dataMap.values());
 
-    // Create Chart
+    // Create Chart with monochrome theme
     chartInstanceRef.current = new Chart(canvasRef.current, {
       type: "bar",
       data: {
         labels: labels,
         datasets: [
           {
-            label: viewBy === "category" ? "Expenses by Category" : "Expenses by Payment Method",
+            label:
+              viewBy === "category"
+                ? "Expenses by Category"
+                : "Expenses by Payment Method",
             data: data,
-            backgroundColor: [
-              "rgba(255, 99, 132, 0.6)",
-              "rgba(54, 162, 235, 0.6)",
-              "rgba(255, 206, 86, 0.6)",
-              "rgba(75, 192, 192, 0.6)",
-              "rgba(153, 102, 255, 0.6)",
-              "rgba(255, 159, 64, 0.6)",
-              "rgba(100, 200, 100, 0.6)",
-              "rgba(200, 100, 100, 0.6)",
-            ],
-            borderColor: [
-              "rgba(255, 99, 132, 1)",
-              "rgba(54, 162, 235, 1)",
-              "rgba(255, 206, 86, 1)",
-              "rgba(75, 192, 192, 1)",
-              "rgba(153, 102, 255, 1)",
-              "rgba(255, 159, 64, 1)",
-              "rgba(100, 200, 100, 1)",
-              "rgba(200, 100, 100, 1)",
-            ],
-            borderWidth: 1,
-            borderRadius: { topLeft: 10, topRight: 10 }, // Rounded bars
+            backgroundColor: "rgba(23, 23, 23, 0.9)",
+            borderColor: "rgba(23, 23, 23, 1)",
+            borderWidth: 0,
+            borderRadius: 8,
           },
         ],
       },
@@ -75,17 +60,23 @@ const ExpenseChart = ({ expense }: { expense: Expense[] }) => {
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            display: false, // Hide legend for cleaner look
+            display: false,
           },
         },
         scales: {
           y: {
             beginAtZero: true,
             grid: {
-              color: "rgba(255, 255, 255, 0.1)", // Light grid lines for dark mode
+              color: "rgba(0, 0, 0, 0.06)",
             },
             ticks: {
-              color: "#9ca3af", // Gray text
+              color: "#737373",
+              font: {
+                family: "system-ui",
+              },
+            },
+            border: {
+              display: false,
             },
           },
           x: {
@@ -93,7 +84,13 @@ const ExpenseChart = ({ expense }: { expense: Expense[] }) => {
               display: false,
             },
             ticks: {
-              color: "#9ca3af",
+              color: "#737373",
+              font: {
+                family: "system-ui",
+              },
+            },
+            border: {
+              display: false,
             },
           },
         },
@@ -109,28 +106,35 @@ const ExpenseChart = ({ expense }: { expense: Expense[] }) => {
   }, [expense, viewBy]); // Re-run when expenses or view mode changes
 
   return (
-    <div className="w-full max-w-xl mx-auto p-6 bg-gray-900 rounded-2xl shadow-xl border border-gray-700">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-white">Analysis</h2>
-        
+    <div className="w-full bg-white rounded-2xl border border-neutral-200 p-8">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h2 className="text-xl font-semibold text-neutral-900 tracking-tight">
+            Analysis
+          </h2>
+          <p className="text-sm text-neutral-500 mt-1">
+            Visualize your spending
+          </p>
+        </div>
+
         {/* Toggle Switch */}
-        <div className="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
+        <div className="flex p-1 bg-neutral-100 rounded-xl">
           <button
             onClick={() => setViewBy("category")}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+            className={`px-4 py-2 text-xs font-medium rounded-lg transition-all ${
               viewBy === "category"
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-400 hover:text-white"
+                ? "bg-white text-neutral-900 shadow-sm"
+                : "text-neutral-500 hover:text-neutral-900"
             }`}
           >
             Category
           </button>
           <button
             onClick={() => setViewBy("payment")}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+            className={`px-4 py-2 text-xs font-medium rounded-lg transition-all ${
               viewBy === "payment"
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-400 hover:text-white"
+                ? "bg-white text-neutral-900 shadow-sm"
+                : "text-neutral-500 hover:text-neutral-900"
             }`}
           >
             Payment

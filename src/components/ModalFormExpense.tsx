@@ -44,29 +44,29 @@ const ModalFormExpense = ({
     >
       {/* The backdrop, rendered as a fixed sibling to the panel container */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
         aria-hidden="true"
       />
 
       {/* Full-screen container to center the panel */}
       <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-md rounded-2xl bg-gray-900/80 backdrop-blur-xl border border-gray-700 p-8 shadow-2xl transition-all duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0">
-          <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-white">
-            ✏️ Edit Expense
+        <DialogPanel className="w-full max-w-md rounded-2xl bg-white border border-neutral-200 p-8 shadow-2xl transition-all duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0">
+          <DialogTitle className="text-xl font-semibold text-neutral-900 tracking-tight">
+            Edit Expense
           </DialogTitle>
-          <Description className="text-gray-400 mt-1 mb-6">
+          <Description className="text-neutral-500 text-sm mt-1 mb-8">
             Update your expense details below.
           </Description>
 
           <Field as="form" className="space-y-5">
             {/* Amount */}
             <div>
-              <Label className="block text-sm font-medium text-gray-300 mb-2">
+              <Label className="block text-sm font-medium text-neutral-700 mb-2">
                 Amount
               </Label>
               <Input
                 type="number"
-                className="w-full rounded-lg border border-gray-600 bg-gray-800 text-white p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full rounded-xl border border-neutral-200 bg-white text-neutral-900 px-4 py-3 focus:ring-2 focus:ring-neutral-900 focus:border-transparent focus:outline-none transition-all"
                 value={tempExpValues.amount}
                 onChange={(e) =>
                   setTempExpValues((prev) => ({
@@ -79,11 +79,11 @@ const ModalFormExpense = ({
 
             {/* Category */}
             <div>
-              <Label className="block text-sm font-medium text-gray-300 mb-2">
+              <Label className="block text-sm font-medium text-neutral-700 mb-2">
                 Category
               </Label>
               <Select
-                className="w-full appearance-none rounded-lg border border-gray-600 bg-gray-800 text-white p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full appearance-none rounded-xl border border-neutral-200 bg-white text-neutral-900 px-4 py-3 focus:ring-2 focus:ring-neutral-900 focus:border-transparent focus:outline-none transition-all"
                 value={tempExpValues.category}
                 onChange={(e) =>
                   setTempExpValues((prev) => ({
@@ -92,7 +92,6 @@ const ModalFormExpense = ({
                   }))
                 }
               >
-                {/* Corrected values to match the ExpenseCategory type */}
                 <option value="Food">Food</option>
                 <option value="Groceries">Groceries</option>
                 <option value="Mobile_Bill">Mobile Bill</option>
@@ -105,11 +104,11 @@ const ModalFormExpense = ({
             </div>
 
             <div>
-              <Label className="block text-sm font-medium text-gray-300 mb-2">
+              <Label className="block text-sm font-medium text-neutral-700 mb-2">
                 Payment Method
               </Label>
               <Select
-                className="w-full appearance-none rounded-lg border border-gray-600 bg-gray-800 text-white p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full appearance-none rounded-xl border border-neutral-200 bg-white text-neutral-900 px-4 py-3 focus:ring-2 focus:ring-neutral-900 focus:border-transparent focus:outline-none transition-all"
                 value={tempExpValues.paymentMethod}
                 onChange={(e) =>
                   setTempExpValues((prev) => ({
@@ -127,12 +126,12 @@ const ModalFormExpense = ({
 
             {/* Description */}
             <div>
-              <Label className="block text-sm font-medium text-gray-300 mb-2">
+              <Label className="block text-sm font-medium text-neutral-700 mb-2">
                 Description
               </Label>
               <Textarea
                 rows={3}
-                className="w-full rounded-lg border border-gray-600 bg-gray-800 text-white p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full rounded-xl border border-neutral-200 bg-white text-neutral-900 px-4 py-3 focus:ring-2 focus:ring-neutral-900 focus:border-transparent focus:outline-none transition-all resize-none"
                 value={tempExpValues.description}
                 onChange={(e) =>
                   setTempExpValues((prev) => ({
@@ -145,12 +144,12 @@ const ModalFormExpense = ({
 
             {/* Date */}
             <div>
-              <Label className="block text-sm font-medium text-gray-300 mb-2">
+              <Label className="block text-sm font-medium text-neutral-700 mb-2">
                 Date
               </Label>
               <Input
                 type="date"
-                className="w-full rounded-lg border border-gray-600 bg-gray-800 text-white p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full rounded-xl border border-neutral-200 bg-white text-neutral-900 px-4 py-3 focus:ring-2 focus:ring-neutral-900 focus:border-transparent focus:outline-none transition-all"
                 value={`${new Date(tempExpValues.date)
                   .toISOString()
                   .slice(0, 10)}`}
@@ -162,11 +161,11 @@ const ModalFormExpense = ({
                 }
               />
             </div>
-            <div className="flex items-center gap-3 mt-2">
+            <div className="flex items-center gap-3">
               <Input
                 type="checkbox"
                 id="isRecurringEdit"
-                className="w-5 h-5 rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900"
+                className="w-5 h-5 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900 cursor-pointer"
                 checked={tempExpValues.isRecurring}
                 onChange={(e) =>
                   setTempExpValues((prev) => ({
@@ -177,23 +176,23 @@ const ModalFormExpense = ({
               />
               <Label
                 htmlFor="isRecurringEdit"
-                className="text-sm font-medium text-gray-300 cursor-pointer"
+                className="text-sm font-medium text-neutral-700 cursor-pointer"
               >
-                Recurring Expense?
+                Recurring Expense
               </Label>
             </div>
           </Field>
 
           {/* Buttons */}
-          <div className="mt-8 flex justify-end gap-4">
+          <div className="mt-8 flex gap-4">
             <Button
-              className="rounded-lg bg-gray-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+              className="flex-1 rounded-xl bg-white border border-neutral-200 px-5 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 transition-all"
               onClick={handleClose}
             >
               Cancel
             </Button>
             <Button
-              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+              className="flex-1 rounded-xl bg-neutral-900 px-5 py-3 text-sm font-medium text-white hover:bg-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2 transition-all"
               onClick={() => {
                 onUpdateExpense(tempExpValues);
                 close(false);

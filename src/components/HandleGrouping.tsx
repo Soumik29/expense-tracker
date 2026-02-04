@@ -7,33 +7,33 @@ interface handleGroupingProps {
 const HandleGrouping = (props: handleGroupingProps) => {
   const { groupMode, handleGrouping } = props;
   return (
-    <div>
+    <div className="flex gap-2 p-1 bg-neutral-100 rounded-xl w-fit">
       <button
-        className={
+        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
           groupMode === "day"
-            ? "bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
-            : "bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
-        }
+            ? "bg-white text-neutral-900 shadow-sm"
+            : "text-neutral-500 hover:text-neutral-900"
+        }`}
         onClick={() => handleGrouping("day")}
       >
         Day
       </button>
       <button
-        className={
+        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
           groupMode === "week"
-            ? "bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
-            : "bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
-        }
+            ? "bg-white text-neutral-900 shadow-sm"
+            : "text-neutral-500 hover:text-neutral-900"
+        }`}
         onClick={() => handleGrouping("week")}
       >
         Week
       </button>
       <button
-        className={
+        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
           groupMode === "month"
-            ? "bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
-            : "bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600"
-        }
+            ? "bg-white text-neutral-900 shadow-sm"
+            : "text-neutral-500 hover:text-neutral-900"
+        }`}
         onClick={() => handleGrouping("month")}
       >
         Month

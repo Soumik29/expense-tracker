@@ -1,7 +1,7 @@
 import IndividualExpense from "./IndividualExpense";
 import { type Expense } from "../types";
 
-interface expenseCardProps{
+interface expenseCardProps {
   expenseList: { [key: string]: Expense[] };
   onDeleteExpense: (id: number) => void;
   onEditExpense: (expense: Expense) => void;
@@ -18,42 +18,82 @@ const ExpenseCard = (props: expenseCardProps) => {
     expenseActive,
   } = props;
   return (
-    <div className="w-full mx-auto p-6 bg-gray-900/90 backdrop-blur-3xl rounded-2xl shadow-2xl border border-gray-700 h-full">
+    <div className="w-full bg-white rounded-2xl border border-neutral-200 p-8">
       {/* Header */}
-      <div className="sticky top-0 z-10 p-2 mb-4 backdrop-blur-xl">
-        <h1 className="flex items-center justify-center gap-3 text-3xl font-bold text-white mb-4">
-          💸 Your Expenses
+      <div className="mb-8">
+        <h1 className="text-xl font-semibold text-neutral-900 tracking-tight">
+          Your Expenses
         </h1>
+        <p className="text-sm text-neutral-500 mt-1">
+          Track and manage your spending
+        </p>
       </div>
 
       {/* Expense List */}
-      <div className="overflow-y-auto overscroll-contain space-y-5">
-        {Object.keys(expenseList).length === null ? (
-          <div className="text-center text-gray-500 py-10">
-            <p className="text-lg">No expenses added yet.</p>
-            <p className="text-sm">Add one to get started!</p>
+      <div className="space-y-4">
+        {Object.keys(expenseList).length === 0 ? (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-neutral-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+            </div>
+            <p className="text-neutral-600 font-medium">No expenses yet</p>
+            <p className="text-sm text-neutral-400 mt-1">
+              Add one to get started
+            </p>
           </div>
         ) : (
           Object.keys(expenseList).map((expense) => {
             const isActiveIndex = expenseActive === expense;
             return (
-              <div key={expense}>
+              <div
+                key={expense}
+                className="border border-neutral-200 rounded-xl overflow-hidden"
+              >
                 <h2
-                  className="bg-gray-800/50 border-b border-gray-700 rounded-t-xl p-5 cursor-pointer hover:bg-gray-700/40 transition-all"
+                  className="bg-neutral-50 px-5 py-4 cursor-pointer hover:bg-neutral-100 transition-colors flex items-center justify-between"
                   onClick={() => expandItem(expense)}
                 >
-                  {expense}
+                  <span className="font-medium text-neutral-900">
+                    {expense}
+                  </span>
+                  <svg
+                    className={`w-5 h-5 text-neutral-400 transition-transform ${isActiveIndex ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
                 </h2>
-                {isActiveIndex &&
-                  expenseList[expense].map((expenses) => (
-                    <div key={expenses.id}>
+                {isActiveIndex && (
+                  <div className="divide-y divide-neutral-100">
+                    {expenseList[expense].map((expenses) => (
                       <IndividualExpense
+                        key={expenses.id}
                         expense={expenses}
                         onDeleteExpense={onDeleteExpense}
                         onEditExpense={onEditExpense}
                       />
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })
