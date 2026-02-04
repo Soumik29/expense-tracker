@@ -1,9 +1,8 @@
 import { createContext } from "react";
-export interface User{
+export interface User {
   id: number;
   username: string;
-  name: string;
-  createAt: string;
+  email: string;
 }
 
 interface AuthContextType {
@@ -12,4 +11,6 @@ interface AuthContextType {
   loading: boolean;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);

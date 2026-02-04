@@ -1,6 +1,6 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { AuthContext, type User } from "./AuthContext";
-
+import { authService } from "../services/auth.service";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -13,18 +13,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await fetch("http://localhost:3000/api/user/info", {
-          method: "GET",
-          credentials: "include",
-        });
-        // console.log(res);
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data);
-          
-        } else {
-          setUser(null);
-        }
+        const currentUser = await authService.getCurrentUser();
+        setUser(currentUser);
       } catch (err) {
         console.error(err);
         setUser(null);
@@ -41,5 +31,3 @@ export function AuthProvider({ children }: AuthProviderProps) {
     </AuthContext.Provider>
   );
 }
-
-

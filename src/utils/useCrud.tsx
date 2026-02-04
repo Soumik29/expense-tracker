@@ -1,34 +1,28 @@
 import type { Expense, newExpense } from "../types";
 import { useEffect, useState } from "react";
-
-// FIX 1: Update URL to include '/api' (matching your auth routes)
-const API_URL = "http://localhost:3000/api/expenses";
+import { expenseService } from "../services/expense.service";
 
 const useCrud = () => {
   const [expense, setExpense] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const response = await fetch(API_URL, {
-          credentials: "include",
-        });
-        if (!response.ok) throw new Error("Failed to fetch expense");
-        
-        const jsonResponse = await response.json();
-        
-        // Ensure we are getting an array. If backend sends { data: [...] } vs { data: { expenses: [...] } }
-        // Adjust this line if your GET endpoint also nests data, but usually it's direct in data for lists.
-        const expenseData = Array.isArray(jsonResponse.data) ? jsonResponse.data : []; 
-        
-        const expensesWithDates = expenseData.map((exp: any) => ({
-          ...exp,
-          date: new Date(exp.date), // Convert string date to Date object
-        }));
-
-        setExpense(expensesWithDates);
-      } catch (error) {
-        console.error("Error fetching expenses: ", error);
+        setLoading(true);
+        const expenses = await expenseService.getAll();
+        setExpense(
+          expenses.map((exp) => ({
+            ...exp,
+            date: new Date(exp.date),
+          })) as any,
+        );
+      } catch (err: any) {
+        console.error("Error fetching expenses: ", err);
+        setError(err.message || "Failed to fetch expenses");
+      } finally {
+        setLoading(false);
       }
     };
     fetchExpenses();
@@ -36,96 +30,49 @@ const useCrud = () => {
 
   const addExpense = async (newExpenseData: newExpense) => {
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(newExpenseData),
-      });
-
-      if (!res.ok) {
-        if (res.status === 400) throw new Error("Validation error occurred");
-        const errorText = await res.text();
-        throw new Error(`Failed to add expense (${res.status}): ${errorText}`);
-      }
-
-      const jsonResponse = await res.json();
-
-      // FIX 3: Unwrap the nested expense object
-      // Backend Controller sends: Send.success(res, { expense: createExpense })
-      // So we must access: jsonResponse.data.expense
-      const createdExpense = jsonResponse.data?.expense || jsonResponse.data;
-
-      if (!createdExpense) {
-        throw new Error("Server response missing expense data");
-      }
-
+      const createdExpense = await expenseService.create(newExpenseData);
       const newExpenseWithFormattedDate = {
         ...createdExpense,
         date: new Date(createdExpense.date),
       };
-
-      setExpense((prev) => [...prev, newExpenseWithFormattedDate]);
+      setExpense((prev) => [...prev, newExpenseWithFormattedDate as any]);
       return { success: true };
-    } catch (error) {
-      console.error("Failed to add expense:", error);
-      throw error;
+    } catch (err: any) {
+      console.error("Failed to add expense:", err);
+      throw err;
     }
   };
 
   const deleteExpense = async (id: number) => {
     try {
-      const res = await fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (res.status === 204 || res.status === 200) {
-        setExpense((prev) => prev.filter((expense) => expense.id !== id));
-      } else {
-        const err = await res.text();
-        throw new Error(`Failed to delete data! ${res.status}: ${err}`);
-      }
+      await expenseService.delete(id);
+      setExpense((prev) => prev.filter((expense) => expense.id !== id));
     } catch (err) {
-      console.log("Something went wrong. Failed to Fetch!", err);
+      console.log("Something went wrong. Failed to delete!", err);
     }
   };
 
   const updateExpenses = async (expenseToUpdate: Expense) => {
     try {
-      const response = await fetch(`${API_URL}/${expenseToUpdate.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(expenseToUpdate),
-      });
-      if (!response.ok)
-        throw new Error(`Failed to update expense. ${response.status}`);
-
-      const jsonResponse = await response.json();
-
-      // FIX 4: Handle wrapper for updates too
-      const updatedData = jsonResponse.data?.expense || jsonResponse.data;
-
+      const updatedExpense = await expenseService.update(expenseToUpdate);
       const expenseWithDate = {
-        ...updatedData,
-        date: new Date(updatedData.date),
+        ...updatedExpense,
+        date: new Date(updatedExpense.date),
       };
 
       setExpense((prev) =>
         prev.map((expenditure) =>
-          expenditure.id === updatedData.id ? expenseWithDate : expenditure,
+          expenditure.id === updatedExpense.id
+            ? (expenseWithDate as any)
+            : expenditure,
         ),
       );
     } catch (err) {
-      console.log("Failed to fetch expenses: ", err);
+      console.log("Failed to update expense: ", err);
     }
   };
 
-  return { expense, addExpense, deleteExpense, updateExpenses };
+  return { expense, addExpense, deleteExpense, updateExpenses, loading, error };
 };
 
 export default useCrud;

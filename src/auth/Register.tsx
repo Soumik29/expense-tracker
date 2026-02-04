@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../utils/useAuth";
+import { authService } from "../services/auth.service";
+import { LoadingButton } from "../components/LoadingButton";
 
 const Register = () => {
   const { setUser } = useAuth();
@@ -11,6 +13,7 @@ const Register = () => {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [formError, setFormError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -21,42 +24,23 @@ const Register = () => {
       return;
     }
 
+    setLoading(true);
+
     try {
-      const res = await fetch("http://localhost:3000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-        },
-        credentials: "include",
-        // FIX 1: Send confirmPassword because Zod schema requires it
-        body: JSON.stringify({ username, email, password, confirmPassword }),
+      const userData = await authService.register({
+        username,
+        email,
+        password,
+        confirmPassword,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        // FIX 2: Check 'message' or 'errors', not 'error'
-        // If it's a validation error, data.errors contains the details
-        const errorMessage = data.message || "Registration failed";
-        
-        if (data.errors) {
-            // Optional: Log strict validation errors to console to help debugging
-            console.error("Validation Errors:", data.errors);
-            // Grab the first validation error to show user
-            const firstField = Object.keys(data.errors)[0];
-            throw new Error(data.errors[firstField][0]);
-        }
-        
-        throw new Error(errorMessage);
-      }
-
-      console.log("Registration success:", data);
-      setUser(data.data);
+      setUser(userData);
       navigate("/");
-
     } catch (err: any) {
       console.error(err);
-      setFormError(err.message);
+      setFormError(err.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,7 +51,7 @@ const Register = () => {
           <h2 className="text-2xl font-bold mb-4 text-center">
             Create an Account
           </h2>
-          
+
           {formError && (
             <div className="mb-4 p-3 bg-red-500/20 border border-red-500 rounded text-red-200 text-sm text-center">
               {formError}
@@ -118,12 +102,9 @@ const Register = () => {
               required
             />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 transition rounded p-2 font-semibold mt-2"
-          >
+          <LoadingButton type="submit" loading={loading}>
             Register
-          </button>
+          </LoadingButton>
         </form>
       </div>
     </div>
