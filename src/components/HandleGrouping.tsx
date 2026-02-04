@@ -7,12 +7,12 @@ interface handleGroupingProps {
 const HandleGrouping = (props: handleGroupingProps) => {
   const { groupMode, handleGrouping } = props;
   return (
-    <div className="flex gap-2 p-1 bg-neutral-100 rounded-xl w-fit">
+    <div className="flex gap-2 p-1 bg-zinc-100 rounded-xl w-fit">
       <button
         className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
           groupMode === "day"
-            ? "bg-white text-neutral-900 shadow-sm"
-            : "text-neutral-500 hover:text-neutral-900"
+            ? "bg-white text-zinc-900 shadow-sm"
+            : "text-zinc-500 hover:text-zinc-900"
         }`}
         onClick={() => handleGrouping("day")}
       >
@@ -21,8 +21,8 @@ const HandleGrouping = (props: handleGroupingProps) => {
       <button
         className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
           groupMode === "week"
-            ? "bg-white text-neutral-900 shadow-sm"
-            : "text-neutral-500 hover:text-neutral-900"
+            ? "bg-white text-zinc-900 shadow-sm"
+            : "text-zinc-500 hover:text-zinc-900"
         }`}
         onClick={() => handleGrouping("week")}
       >
@@ -31,8 +31,8 @@ const HandleGrouping = (props: handleGroupingProps) => {
       <button
         className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
           groupMode === "month"
-            ? "bg-white text-neutral-900 shadow-sm"
-            : "text-neutral-500 hover:text-neutral-900"
+            ? "bg-white text-zinc-900 shadow-sm"
+            : "text-zinc-500 hover:text-zinc-900"
         }`}
         onClick={() => handleGrouping("month")}
       >

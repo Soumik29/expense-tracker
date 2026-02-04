@@ -10,8 +10,8 @@ const App = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
-        <Spinner size="lg" className="text-neutral-900" />
+      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
+        <Spinner size="lg" className="text-zinc-900" />
       </div>
     );
   }

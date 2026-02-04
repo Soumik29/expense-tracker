@@ -45,10 +45,10 @@ const Register = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col justify-center px-6 py-12 bg-neutral-50">
+    <div className="flex min-h-screen flex-col justify-center px-6 py-12 bg-zinc-50">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center mb-8">
-          <div className="w-12 h-12 bg-neutral-900 rounded-xl flex items-center justify-center">
+          <div className="w-12 h-12 bg-zinc-900 rounded-xl flex items-center justify-center">
             <svg
               className="w-6 h-6 text-white"
               fill="none"
@@ -64,31 +64,31 @@ const Register = () => {
             </svg>
           </div>
         </div>
-        <h2 className="text-center text-2xl font-semibold tracking-tight text-neutral-900">
+        <h2 className="text-center text-2xl font-semibold tracking-tight text-zinc-900">
           Create an account
         </h2>
-        <p className="mt-2 text-center text-sm text-neutral-500">
+        <p className="mt-2 text-center text-sm text-zinc-500">
           Start tracking your expenses today
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white px-8 py-10 rounded-2xl border border-neutral-200">
+        <div className="bg-white px-8 py-10 rounded-2xl border border-zinc-200">
           <form onSubmit={handleSubmit} className="space-y-5">
             {formError && (
-              <div className="p-4 text-sm text-neutral-900 bg-neutral-100 border border-neutral-200 rounded-xl text-center">
+              <div className="p-4 text-sm text-zinc-900 bg-zinc-100 border border-zinc-200 rounded-xl text-center">
                 {formError}
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-sm font-medium text-zinc-700 mb-2">
                 Username
               </label>
               <input
                 type="text"
                 placeholder="Min 6 characters"
-                className="w-full rounded-xl bg-white border border-neutral-200 px-4 py-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -96,13 +96,13 @@ const Register = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-sm font-medium text-zinc-700 mb-2">
                 Email
               </label>
               <input
                 type="email"
                 placeholder="you@example.com"
-                className="w-full rounded-xl bg-white border border-neutral-200 px-4 py-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -110,13 +110,13 @@ const Register = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-sm font-medium text-zinc-700 mb-2">
                 Password
               </label>
               <input
                 type="password"
                 placeholder="Min 8 chars, 1 uppercase, 1 number, 1 special"
-                className="w-full rounded-xl bg-white border border-neutral-200 px-4 py-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -124,13 +124,13 @@ const Register = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
+              <label className="block text-sm font-medium text-zinc-700 mb-2">
                 Confirm Password
               </label>
               <input
                 type="password"
                 placeholder="••••••••"
-                className="w-full rounded-xl bg-white border border-neutral-200 px-4 py-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                className="w-full rounded-xl bg-white border border-zinc-200 px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
@@ -144,11 +144,11 @@ const Register = () => {
             </div>
           </form>
 
-          <p className="mt-8 text-center text-sm text-neutral-500">
+          <p className="mt-8 text-center text-sm text-zinc-500">
             Already have an account?{" "}
             <Link
               to="/login"
-              className="font-medium text-neutral-900 hover:text-neutral-600 underline underline-offset-2"
+              className="font-medium text-zinc-900 hover:text-zinc-600 underline underline-offset-2"
             >
               Sign in
             </Link>

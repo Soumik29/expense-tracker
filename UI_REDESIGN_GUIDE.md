@@ -672,3 +672,85 @@ Use find-and-replace:
 | Overall Feel | Gaming/Tech           | Professional/Clean |
 
 This minimalist approach creates a more timeless, professional look that's easier on the eyes and puts the focus on the content rather than the decoration.
+
+---
+
+## Tailwind CSS v4 Compatibility Fix
+
+### The Problem
+
+After implementing the UI redesign with `neutral-*` color classes, the login form and other components became invisible (white screen). This happened because **Tailwind CSS v4** uses a different color system than v3.
+
+### Root Cause
+
+- Tailwind v4 doesn't include `neutral` as a built-in color palette
+- The `neutral-*` classes were not generating any CSS
+- Result: Elements had no background/text colors applied
+
+### The Solution
+
+Changed all `neutral-*` color classes to `zinc-*`, which is a built-in color in Tailwind v4.
+
+**PowerShell command used:**
+
+```powershell
+Get-ChildItem -Recurse -Filter "*.tsx" | ForEach-Object {
+  (Get-Content $_.FullName) -replace 'neutral-', 'zinc-' | Set-Content $_.FullName
+}
+```
+
+### Color Mapping
+
+| Neutral (v3) | Zinc (v4) | Hex Value |
+| ------------ | --------- | --------- |
+| neutral-50   | zinc-50   | #fafafa   |
+| neutral-100  | zinc-100  | #f4f4f5   |
+| neutral-200  | zinc-200  | #e4e4e7   |
+| neutral-300  | zinc-300  | #d4d4d8   |
+| neutral-400  | zinc-400  | #a1a1aa   |
+| neutral-500  | zinc-500  | #71717a   |
+| neutral-600  | zinc-600  | #52525b   |
+| neutral-700  | zinc-700  | #3f3f46   |
+| neutral-800  | zinc-800  | #27272a   |
+| neutral-900  | zinc-900  | #18181b   |
+| neutral-950  | zinc-950  | #09090b   |
+
+### Files Affected
+
+All 12 component files were updated:
+
+- `src/auth/Login.tsx`
+- `src/auth/Register.tsx`
+- `src/components/AddExpenseForm.tsx`
+- `src/components/App.tsx`
+- `src/components/ExpenseCard.tsx`
+- `src/components/ExpenseChart.tsx`
+- `src/components/ExpenseTracker.tsx`
+- `src/components/HandleGrouping.tsx`
+- `src/components/IndividualExpense.tsx`
+- `src/components/LoadingButton.tsx`
+- `src/components/ModalFormExpense.tsx`
+- `src/components/TotalExpense.tsx`
+
+### Tailwind v4 Built-in Color Palettes
+
+For future reference, Tailwind v4 includes these color palettes by default:
+
+- `slate` - Cool gray with blue undertones
+- `gray` - Pure gray
+- `zinc` - Gray with slight warmth (used in this project)
+- `stone` - Warm gray with brown undertones
+- `red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, `rose`
+
+### Key Takeaway
+
+When using Tailwind CSS v4, always verify your color palette is supported. If using custom colors, define them in `index.css` using the `@theme` directive:
+
+```css
+@import "tailwindcss";
+
+@theme {
+  --color-custom-50: #fafafa;
+  --color-custom-900: #171717;
+}
+```

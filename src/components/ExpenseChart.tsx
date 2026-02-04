@@ -106,25 +106,25 @@ const ExpenseChart = ({ expense }: { expense: Expense[] }) => {
   }, [expense, viewBy]); // Re-run when expenses or view mode changes
 
   return (
-    <div className="w-full bg-white rounded-2xl border border-neutral-200 p-8">
+    <div className="w-full bg-white rounded-2xl border border-zinc-200 p-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-xl font-semibold text-neutral-900 tracking-tight">
+          <h2 className="text-xl font-semibold text-zinc-900 tracking-tight">
             Analysis
           </h2>
-          <p className="text-sm text-neutral-500 mt-1">
+          <p className="text-sm text-zinc-500 mt-1">
             Visualize your spending
           </p>
         </div>
 
         {/* Toggle Switch */}
-        <div className="flex p-1 bg-neutral-100 rounded-xl">
+        <div className="flex p-1 bg-zinc-100 rounded-xl">
           <button
             onClick={() => setViewBy("category")}
             className={`px-4 py-2 text-xs font-medium rounded-lg transition-all ${
               viewBy === "category"
-                ? "bg-white text-neutral-900 shadow-sm"
-                : "text-neutral-500 hover:text-neutral-900"
+                ? "bg-white text-zinc-900 shadow-sm"
+                : "text-zinc-500 hover:text-zinc-900"
             }`}
           >
             Category
@@ -133,8 +133,8 @@ const ExpenseChart = ({ expense }: { expense: Expense[] }) => {
             onClick={() => setViewBy("payment")}
             className={`px-4 py-2 text-xs font-medium rounded-lg transition-all ${
               viewBy === "payment"
-                ? "bg-white text-neutral-900 shadow-sm"
-                : "text-neutral-500 hover:text-neutral-900"
+                ? "bg-white text-zinc-900 shadow-sm"
+                : "text-zinc-500 hover:text-zinc-900"
             }`}
           >
             Payment

@@ -50,23 +50,23 @@ const ModalFormExpense = ({
 
       {/* Full-screen container to center the panel */}
       <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-md rounded-2xl bg-white border border-neutral-200 p-8 shadow-2xl transition-all duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0">
-          <DialogTitle className="text-xl font-semibold text-neutral-900 tracking-tight">
+        <DialogPanel className="w-full max-w-md rounded-2xl bg-white border border-zinc-200 p-8 shadow-2xl transition-all duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0">
+          <DialogTitle className="text-xl font-semibold text-zinc-900 tracking-tight">
             Edit Expense
           </DialogTitle>
-          <Description className="text-neutral-500 text-sm mt-1 mb-8">
+          <Description className="text-zinc-500 text-sm mt-1 mb-8">
             Update your expense details below.
           </Description>
 
           <Field as="form" className="space-y-5">
             {/* Amount */}
             <div>
-              <Label className="block text-sm font-medium text-neutral-700 mb-2">
+              <Label className="block text-sm font-medium text-zinc-700 mb-2">
                 Amount
               </Label>
               <Input
                 type="number"
-                className="w-full rounded-xl border border-neutral-200 bg-white text-neutral-900 px-4 py-3 focus:ring-2 focus:ring-neutral-900 focus:border-transparent focus:outline-none transition-all"
+                className="w-full rounded-xl border border-zinc-200 bg-white text-zinc-900 px-4 py-3 focus:ring-2 focus:ring-zinc-900 focus:border-transparent focus:outline-none transition-all"
                 value={tempExpValues.amount}
                 onChange={(e) =>
                   setTempExpValues((prev) => ({
@@ -79,11 +79,11 @@ const ModalFormExpense = ({
 
             {/* Category */}
             <div>
-              <Label className="block text-sm font-medium text-neutral-700 mb-2">
+              <Label className="block text-sm font-medium text-zinc-700 mb-2">
                 Category
               </Label>
               <Select
-                className="w-full appearance-none rounded-xl border border-neutral-200 bg-white text-neutral-900 px-4 py-3 focus:ring-2 focus:ring-neutral-900 focus:border-transparent focus:outline-none transition-all"
+                className="w-full appearance-none rounded-xl border border-zinc-200 bg-white text-zinc-900 px-4 py-3 focus:ring-2 focus:ring-zinc-900 focus:border-transparent focus:outline-none transition-all"
                 value={tempExpValues.category}
                 onChange={(e) =>
                   setTempExpValues((prev) => ({
@@ -104,11 +104,11 @@ const ModalFormExpense = ({
             </div>
 
             <div>
-              <Label className="block text-sm font-medium text-neutral-700 mb-2">
+              <Label className="block text-sm font-medium text-zinc-700 mb-2">
                 Payment Method
               </Label>
               <Select
-                className="w-full appearance-none rounded-xl border border-neutral-200 bg-white text-neutral-900 px-4 py-3 focus:ring-2 focus:ring-neutral-900 focus:border-transparent focus:outline-none transition-all"
+                className="w-full appearance-none rounded-xl border border-zinc-200 bg-white text-zinc-900 px-4 py-3 focus:ring-2 focus:ring-zinc-900 focus:border-transparent focus:outline-none transition-all"
                 value={tempExpValues.paymentMethod}
                 onChange={(e) =>
                   setTempExpValues((prev) => ({
@@ -126,12 +126,12 @@ const ModalFormExpense = ({
 
             {/* Description */}
             <div>
-              <Label className="block text-sm font-medium text-neutral-700 mb-2">
+              <Label className="block text-sm font-medium text-zinc-700 mb-2">
                 Description
               </Label>
               <Textarea
                 rows={3}
-                className="w-full rounded-xl border border-neutral-200 bg-white text-neutral-900 px-4 py-3 focus:ring-2 focus:ring-neutral-900 focus:border-transparent focus:outline-none transition-all resize-none"
+                className="w-full rounded-xl border border-zinc-200 bg-white text-zinc-900 px-4 py-3 focus:ring-2 focus:ring-zinc-900 focus:border-transparent focus:outline-none transition-all resize-none"
                 value={tempExpValues.description}
                 onChange={(e) =>
                   setTempExpValues((prev) => ({
@@ -144,12 +144,12 @@ const ModalFormExpense = ({
 
             {/* Date */}
             <div>
-              <Label className="block text-sm font-medium text-neutral-700 mb-2">
+              <Label className="block text-sm font-medium text-zinc-700 mb-2">
                 Date
               </Label>
               <Input
                 type="date"
-                className="w-full rounded-xl border border-neutral-200 bg-white text-neutral-900 px-4 py-3 focus:ring-2 focus:ring-neutral-900 focus:border-transparent focus:outline-none transition-all"
+                className="w-full rounded-xl border border-zinc-200 bg-white text-zinc-900 px-4 py-3 focus:ring-2 focus:ring-zinc-900 focus:border-transparent focus:outline-none transition-all"
                 value={`${new Date(tempExpValues.date)
                   .toISOString()
                   .slice(0, 10)}`}
@@ -165,7 +165,7 @@ const ModalFormExpense = ({
               <Input
                 type="checkbox"
                 id="isRecurringEdit"
-                className="w-5 h-5 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900 cursor-pointer"
+                className="w-5 h-5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 cursor-pointer"
                 checked={tempExpValues.isRecurring}
                 onChange={(e) =>
                   setTempExpValues((prev) => ({
@@ -176,7 +176,7 @@ const ModalFormExpense = ({
               />
               <Label
                 htmlFor="isRecurringEdit"
-                className="text-sm font-medium text-neutral-700 cursor-pointer"
+                className="text-sm font-medium text-zinc-700 cursor-pointer"
               >
                 Recurring Expense
               </Label>
@@ -186,13 +186,13 @@ const ModalFormExpense = ({
           {/* Buttons */}
           <div className="mt-8 flex gap-4">
             <Button
-              className="flex-1 rounded-xl bg-white border border-neutral-200 px-5 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 transition-all"
+              className="flex-1 rounded-xl bg-white border border-zinc-200 px-5 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 transition-all"
               onClick={handleClose}
             >
               Cancel
             </Button>
             <Button
-              className="flex-1 rounded-xl bg-neutral-900 px-5 py-3 text-sm font-medium text-white hover:bg-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2 transition-all"
+              className="flex-1 rounded-xl bg-zinc-900 px-5 py-3 text-sm font-medium text-white hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 transition-all"
               onClick={() => {
                 onUpdateExpense(tempExpValues);
                 close(false);
