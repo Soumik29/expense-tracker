@@ -842,3 +842,489 @@ Here's a complete `package.json` scripts section:
 5. **Create master `start` script** that runs everything
 
 Now you can start your entire development stack with just `npm start`! 🚀
+
+---
+
+# Part 5: Logout Feature Implementation
+
+**Date:** February 4, 2026  
+**Status:** ✅ Implemented
+
+## Overview
+
+Added a logout feature with a beautiful header/navbar that displays user information and provides a logout button.
+
+---
+
+## Changes Made
+
+### 1. Updated AuthContext Interface
+
+**File:** `src/context/AuthContext.tsx`
+
+Added `logout` function to the context type:
+
+```typescript
+interface AuthContextType {
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  loading: boolean;
+  logout: () => Promise<void>; // ✅ Added
+}
+```
+
+---
+
+### 2. Implemented Logout in AuthProvider
+
+**File:** `src/context/AuthProvider.tsx`
+
+Added the logout function implementation:
+
+```typescript
+import { useState, useEffect, useCallback, type ReactNode } from "react";
+
+// ... inside AuthProvider component:
+
+const logout = useCallback(async () => {
+  try {
+    await authService.logout();
+    setUser(null);
+  } catch (err) {
+    console.error("Logout failed:", err);
+    // Still clear user on frontend even if backend fails
+    setUser(null);
+  }
+}, []);
+
+return (
+  <AuthContext.Provider value={{ user, setUser, loading, logout }}>
+    {children}
+  </AuthContext.Provider>
+);
+```
+
+---
+
+### 3. Added Header with Logout Button
+
+**File:** `src/components/ExpenseTracker.tsx`
+
+Added a responsive header with:
+
+- App logo and title
+- User avatar (gradient circle with first letter of username)
+- Username and email display
+- Logout button with hover effects
+
+```tsx
+import { useAuth } from "../utils/useAuth";
+import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
+
+const ExpenseTracker = () => {
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900">
+      {/* Header/Navbar */}
+      <header className="bg-gray-800 border-b border-gray-700 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Logo & Title */}
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg">
+              {/* SVG icon */}
+            </div>
+            <h1 className="text-xl font-bold text-white">Expense Tracker</h1>
+          </div>
+
+          {/* User Info & Logout */}
+          <div className="flex items-center gap-4">
+            {user && (
+              <div className="flex items-center gap-3">
+                {/* User details */}
+                <div className="hidden sm:block text-right">
+                  <p className="text-sm font-medium text-white">
+                    {user.username}
+                  </p>
+                  <p className="text-xs text-gray-400">{user.email}</p>
+                </div>
+
+                {/* Avatar */}
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">
+                    {user.username.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+
+                {/* Logout button */}
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-red-600 text-gray-300 hover:text-white rounded-lg transition-all duration-200"
+                >
+                  <ArrowRightStartOnRectangleIcon className="w-5 h-5" />
+                  <span className="hidden sm:inline text-sm font-medium">
+                    Logout
+                  </span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 items-stretch">
+        {/* ... rest of the component */}
+      </div>
+    </div>
+  );
+};
+```
+
+---
+
+## Features
+
+| Feature                | Description                                  |
+| ---------------------- | -------------------------------------------- |
+| 🎨 **Gradient Avatar** | Displays user's initial in a colorful circle |
+| 📱 **Responsive**      | Hides text on mobile, shows icon only        |
+| 🔴 **Hover Effect**    | Logout button turns red on hover             |
+| 🔒 **Reliable**        | Clears session even if backend logout fails  |
+| ⚡ **Fast**            | Uses `useCallback` for optimized re-renders  |
+
+---
+
+## 📚 Tutorial: How to Add Logout Functionality to a React App
+
+This tutorial explains how to implement a complete logout feature with React Context API.
+
+### Prerequisites
+
+- React app with authentication already set up
+- React Context for managing auth state
+- Backend API with a logout endpoint
+
+---
+
+### Step 1: Understand the Auth Flow
+
+Before implementing logout, understand how auth works:
+
+```
+Login → Store user in Context → Protected routes check Context → Logout clears Context
+```
+
+The logout process needs to:
+
+1. Call backend to invalidate session/token
+2. Clear user state in React
+3. Redirect to login page (handled by routing logic)
+
+---
+
+### Step 2: Create the Auth Service Function
+
+**File:** `services/auth.service.ts`
+
+First, ensure you have a logout function in your auth service:
+
+```typescript
+export const authService = {
+  // ... other methods
+
+  async logout(): Promise<void> {
+    await api.post("/auth/logout", {});
+  },
+};
+```
+
+This calls your backend to:
+
+- Clear HTTP-only cookies (if using cookies)
+- Invalidate tokens (if using JWT blacklist)
+- End the session
+
+---
+
+### Step 3: Add Logout to Context Interface
+
+**File:** `context/AuthContext.tsx`
+
+Add the logout function type to your context:
+
+```typescript
+interface AuthContextType {
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  loading: boolean;
+  logout: () => Promise<void>; // Add this
+}
+```
+
+**Why `Promise<void>`?**
+
+- Logout is async (calls backend)
+- Components can `await` the logout if needed
+- Allows for loading states during logout
+
+---
+
+### Step 4: Implement Logout in Provider
+
+**File:** `context/AuthProvider.tsx`
+
+Add the logout function implementation:
+
+```typescript
+import { useState, useEffect, useCallback, type ReactNode } from "react";
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // ... useEffect for fetching user
+
+  // Logout function
+  const logout = useCallback(async () => {
+    try {
+      await authService.logout();
+      setUser(null);
+    } catch (err) {
+      console.error("Logout failed:", err);
+      // IMPORTANT: Still clear user even if backend fails
+      setUser(null);
+    }
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, setUser, loading, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+```
+
+**Key Points:**
+
+- Use `useCallback` to prevent unnecessary re-renders
+- Always clear user state, even if backend call fails
+- This ensures users can always "escape" to login page
+
+---
+
+### Step 5: Create a Logout Button Component (Optional)
+
+You can create a reusable logout button:
+
+```tsx
+// components/LogoutButton.tsx
+import { useAuth } from "../utils/useAuth";
+import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
+
+interface LogoutButtonProps {
+  showText?: boolean;
+  className?: string;
+}
+
+export function LogoutButton({
+  showText = true,
+  className = "",
+}: LogoutButtonProps) {
+  const { logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await logout();
+    // No need to setIsLoggingOut(false) - component will unmount
+  };
+
+  return (
+    <button
+      onClick={handleLogout}
+      disabled={isLoggingOut}
+      className={`flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-red-600 
+        text-gray-300 hover:text-white rounded-lg transition-all duration-200 
+        disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+    >
+      {isLoggingOut ? (
+        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+            fill="none"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          />
+        </svg>
+      ) : (
+        <ArrowRightStartOnRectangleIcon className="w-5 h-5" />
+      )}
+      {showText && (
+        <span className="text-sm font-medium">
+          {isLoggingOut ? "Logging out..." : "Logout"}
+        </span>
+      )}
+    </button>
+  );
+}
+```
+
+---
+
+### Step 6: Add to Your UI
+
+Use the logout in any component:
+
+```tsx
+// Simple usage
+const { logout } = useAuth();
+
+<button onClick={logout}>Logout</button>
+
+// Or with the reusable component
+<LogoutButton />
+<LogoutButton showText={false} /> {/* Icon only */}
+```
+
+---
+
+### Step 7: Create a Header/Navbar
+
+For a complete solution, add a header with user info:
+
+```tsx
+<header className="bg-gray-800 px-6 py-4">
+  <div className="flex items-center justify-between">
+    {/* Logo */}
+    <h1 className="text-xl font-bold text-white">My App</h1>
+
+    {/* User Section */}
+    {user && (
+      <div className="flex items-center gap-3">
+        {/* Avatar */}
+        <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+          <span className="text-white font-bold">
+            {user.username.charAt(0).toUpperCase()}
+          </span>
+        </div>
+
+        {/* User Info */}
+        <div className="text-right">
+          <p className="text-white font-medium">{user.username}</p>
+          <p className="text-gray-400 text-sm">{user.email}</p>
+        </div>
+
+        {/* Logout */}
+        <LogoutButton />
+      </div>
+    )}
+  </div>
+</header>
+```
+
+---
+
+### Step 8: Handle Redirect After Logout
+
+The redirect happens automatically if you have protected routes:
+
+```tsx
+// App.tsx
+const { user } = useAuth();
+
+return (
+  <Routes>
+    <Route
+      path="/"
+      element={user ? <Dashboard /> : <Navigate to="/login" replace />}
+    />
+    <Route path="/login" element={<Login />} />
+  </Routes>
+);
+```
+
+When `logout()` sets `user` to `null`:
+
+1. Component re-renders
+2. `user` is now `null`
+3. Route redirects to `/login`
+
+No manual redirect needed!
+
+---
+
+### Common Patterns
+
+#### Pattern 1: Logout with Confirmation
+
+```tsx
+const handleLogout = async () => {
+  const confirmed = window.confirm("Are you sure you want to logout?");
+  if (confirmed) {
+    await logout();
+  }
+};
+```
+
+#### Pattern 2: Logout All Devices
+
+```typescript
+// auth.service.ts
+async logoutAll(): Promise<void> {
+  await api.post("/auth/logout-all", {});
+}
+```
+
+#### Pattern 3: Auto-logout on Token Expiry
+
+```typescript
+// In your API interceptor
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      // Token expired - auto logout
+      await authService.logout();
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  },
+);
+```
+
+---
+
+### Troubleshooting
+
+| Issue                                     | Solution                                            |
+| ----------------------------------------- | --------------------------------------------------- |
+| Logout doesn't redirect                   | Check if your routes properly check `user` state    |
+| Backend 401 on logout                     | Token might be expired - still clear frontend state |
+| `useAuth` is undefined                    | Make sure component is inside `AuthProvider`        |
+| Logout button re-renders other components | Use `useCallback` for the logout function           |
+| User data persists after logout           | Clear any localStorage/sessionStorage too           |
+
+---
+
+### Summary
+
+1. **Add logout to auth service** - Call backend endpoint
+2. **Add logout to context interface** - Type safety
+3. **Implement logout in provider** - Use `useCallback`, always clear state
+4. **Create UI** - Button with loading state and hover effects
+5. **Handle redirect** - Let protected routes do this automatically
+
+Now your users can safely logout! 🔐
