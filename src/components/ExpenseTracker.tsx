@@ -2,10 +2,12 @@ import ExpenseCard from "./ExpenseCard";
 import TotalExpense from "./TotalExpense";
 import AddExpenseForm from "./AddExpenseForm";
 import ModalFormExpense from "./ModalFormExpense";
+import SearchFilter from "./SearchFilter";
 // import Chart from "chart.js/auto";
 import useCrud from "../utils/useCrud";
 import useAccordion from "../utils/useAccordion";
 import useModal from "../utils/useModal";
+import useFilter from "../utils/useFilter";
 import HandleGrouping from "./HandleGrouping";
 import ExpenseChart from "./ExpenseChart";
 import { useAuth } from "../utils/useAuth";
@@ -14,6 +16,22 @@ import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
 const ExpenseTracker = () => {
   const { user, logout } = useAuth();
   const { expense, addExpense, deleteExpense, updateExpenses } = useCrud();
+
+  // Filter hook - filters the raw expenses
+  const {
+    filters,
+    filteredExpenses,
+    setSearchQuery,
+    setCategory,
+    setPaymentMethod,
+    setDateRange,
+    setAmountRange,
+    setIsRecurring,
+    resetFilters,
+    hasActiveFilters,
+  } = useFilter(expense);
+
+  // Accordion hook - groups the filtered expenses
   const {
     activeIndex,
     groupMode,
@@ -21,7 +39,8 @@ const ExpenseTracker = () => {
     handleExpandItem,
     expensesToTotal,
     groupedExpenses,
-  } = useAccordion(expense);
+  } = useAccordion(filteredExpenses);
+
   const { onEditExpense, isOpen, editExpense, setIsOpen } = useModal();
 
   const handleLogout = async () => {
@@ -86,6 +105,25 @@ const ExpenseTracker = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-8 py-12">
+        {/* Search and Filter Section */}
+        <div className="mb-8">
+          <SearchFilter
+            filters={filters}
+            filterActions={{
+              setSearchQuery,
+              setCategory,
+              setPaymentMethod,
+              setDateRange,
+              setAmountRange,
+              setIsRecurring,
+              resetFilters,
+              hasActiveFilters,
+            }}
+            resultCount={filteredExpenses.length}
+            totalCount={expense.length}
+          />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           <AddExpenseForm onAddExpense={addExpense} />
           <div className="space-y-6">
@@ -102,7 +140,7 @@ const ExpenseTracker = () => {
                 expenseActive={activeIndex}
               />
             </div>
-            {expense.length !== 0 ? (
+            {filteredExpenses.length !== 0 ? (
               <TotalExpense totalExp={expensesToTotal} />
             ) : null}
           </div>
@@ -114,7 +152,7 @@ const ExpenseTracker = () => {
               onUpdateExpense={updateExpenses}
             />
           ) : null}
-          <ExpenseChart expense={expense} />
+          <ExpenseChart expense={filteredExpenses} />
         </div>
       </main>
     </div>
