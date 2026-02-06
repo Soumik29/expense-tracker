@@ -76,17 +76,21 @@ const ExpenseTracker = () => {
           <div className="flex items-center gap-6">
             {user && (
               <div className="flex items-center gap-4">
-                <div className="hidden sm:block text-right">
-                  <p className="text-sm font-medium text-zinc-900">
-                    {user.username}
-                  </p>
-                  <p className="text-xs text-zinc-500">{user.email}</p>
-                </div>
-                <div className="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center">
-                  <span className="text-white font-medium text-sm">
-                    {user.username.charAt(0).toUpperCase()}
-                  </span>
-                </div>
+                {user.username && (
+                  <>
+                    <div className="hidden sm:block text-right">
+                      <p className="text-sm font-medium text-zinc-900">
+                        {user.username}
+                      </p>
+                      <p className="text-xs text-zinc-500">{user.email}</p>
+                    </div>
+                    <div className="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center">
+                      <span className="text-white font-medium text-sm">
+                        {user.username.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  </>
+                )}
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 px-4 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 text-zinc-600 rounded-xl transition-all duration-200 cursor-pointer"

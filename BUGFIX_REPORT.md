@@ -1,7 +1,89 @@
 # Project Improvements & Bug Fix Report
 
-**Date:** February 3, 2026  
+**Date:** February 3, 2026 (Updated: February 6, 2026)  
 **Status:** ✅ All Changes Implemented
+
+---
+
+# Part 0: Recent Bug Fixes
+
+## Fixed: user.username is undefined TypeError
+
+**Date:** February 6, 2026  
+**File:** `src/components/ExpenseTracker.tsx`
+
+**Error Message:**
+
+```
+Uncaught TypeError: can't access property "charAt", user.username is undefined
+    ExpenseTracker ExpenseTracker.tsx:87
+```
+
+**Problem:** The component checked if `user` exists but didn't verify that `user.username` was defined before calling `.charAt(0)`. This can happen when:
+
+- The API returns a user object with missing/null fields
+- The user data is partially loaded
+- Backend response structure changed
+
+### Before (Broken)
+
+```tsx
+{
+  user && (
+    <div className="flex items-center gap-4">
+      <div className="hidden sm:block text-right">
+        <p className="text-sm font-medium text-zinc-900">{user.username}</p>
+        <p className="text-xs text-zinc-500">{user.email}</p>
+      </div>
+      <div className="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center">
+        <span className="text-white font-medium text-sm">
+          {user.username.charAt(0).toUpperCase()} // ❌ Crashes if username is
+          undefined
+        </span>
+      </div>
+    </div>
+  );
+}
+```
+
+### After (Fixed)
+
+```tsx
+{user && (
+  <div className="flex items-center gap-4">
+    {user.username && (  // ✅ Only wrap username-dependent elements
+      <>
+        <div className="hidden sm:block text-right">
+          <p className="text-sm font-medium text-zinc-900">{user.username}</p>
+          <p className="text-xs text-zinc-500">{user.email}</p>
+        </div>
+        <div className="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center">
+          <span className="text-white font-medium text-sm">
+            {user.username.charAt(0).toUpperCase()}
+          </span>
+        </div>
+      </>
+    )}
+    {/* ✅ Logout button is OUTSIDE the username check - always visible when user exists */}
+    <button onClick={handleLogout} ...>
+      Logout
+    </button>
+  </div>
+)}
+```
+
+### Key Fixes
+
+1. **Separated concerns** - Username display is wrapped in its own check
+2. **Logout button always visible** - Only requires `user` to exist, not `user.username`
+3. **Used React Fragment** (`<>...</>`) to group username-dependent elements
+
+### Prevention Tips
+
+- Always use optional chaining when accessing nested properties
+- Add null checks for all required fields before rendering
+- **Don't wrap unrelated UI elements in the same conditional** - logout doesn't depend on username
+- Consider using TypeScript strict null checks
 
 ---
 
