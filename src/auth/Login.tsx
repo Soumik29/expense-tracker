@@ -22,9 +22,11 @@ const Login = () => {
       const userData = await authService.login({ email, password });
       setUser(userData);
       navigate("/");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || "Invalid email or password");
+      setError(
+        err instanceof Error ? err.message : "Invalid email or password",
+      );
     } finally {
       setLoading(false);
     }

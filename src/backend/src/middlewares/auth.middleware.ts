@@ -2,16 +2,16 @@ import authConfig from "@config/auth.config.js";
 import Send from "@utils/response.utils.js";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-const {verify} = jwt;
+const { verify } = jwt;
 export interface DecodedToken {
   userId: number;
 }
-let secret: string = authConfig.secret as string;
+const secret: string = authConfig.secret as string;
 class AuthMiddleware {
   static authenticateUser = (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     const token = req.cookies.accessToken;
     if (!token) {
@@ -20,31 +20,36 @@ class AuthMiddleware {
     try {
       const decodedToken = verify(token, secret) as DecodedToken;
       console.log(decodedToken);
-      (req as any).userId = decodedToken.userId;
-      next()
+      (req as Request & { userId: number }).userId = decodedToken.userId;
+      next();
     } catch (err) {
       console.error("Authentication Failed:", err);
       Send.unauthorized(res, null);
     }
   };
 
-  static refreshTokenValidation = (req: Request, res: Response, next: NextFunction) => {
-    const refreshToken =  req.cookies.refreshToken;
+  static refreshTokenValidation = (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const refreshToken = req.cookies.refreshToken;
 
-    if (!refreshToken){
-      return Send.unauthorized(res, {message: "No refresh token provided"});
+    if (!refreshToken) {
+      return Send.unauthorized(res, { message: "No refresh token provided" });
     }
 
-    try{
+    try {
       const decodedToken = verify(refreshToken, secret) as DecodedToken;
-      (req as any).userId = decodedToken.userId;
-      next()
-    }catch(err){
+      (req as Request & { userId: number }).userId = decodedToken.userId;
+      next();
+    } catch (err) {
       console.log("Authentication Failed", err);
-      Send.unauthorized(res, {message: "Invalid or refresh token is expired"})
+      Send.unauthorized(res, {
+        message: "Invalid or refresh token is expired",
+      });
     }
-  }
+  };
 }
 
 export default AuthMiddleware;
-

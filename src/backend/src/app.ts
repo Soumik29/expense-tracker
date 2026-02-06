@@ -46,7 +46,7 @@ class App {
 
   private initRoutes() {
     // Health check endpoint for deployment
-    this.app.get("/api/health", (req, res) => {
+    this.app.get("/api/health", (_req, res) => {
       res
         .status(200)
         .json({ status: "ok", timestamp: new Date().toISOString() });
@@ -60,12 +60,8 @@ class App {
   }
 
   public start() {
-    let { port, host } = appConfig;
-    if (host !== undefined) {
-      host = host;
-    } else {
-      host = "localhost";
-    }
+    const { port } = appConfig;
+    const host = appConfig.host ?? "localhost";
     this.app.listen(port, host, () => {
       console.log(`Server is running on http://${host}:${port}`);
     });

@@ -36,9 +36,9 @@ const Register = () => {
 
       setUser(userData);
       navigate("/");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setFormError(err.message || "Registration failed");
+      setFormError(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setLoading(false);
     }

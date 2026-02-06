@@ -1,15 +1,21 @@
 import Send from "@utils/response.utils.js";
 import { prisma } from "../db.js";
 import type { Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import authConfig from "@config/auth.config.js";
+
+// Extended request type with userId attached by auth middleware
+interface AuthenticatedRequest extends Request {
+  userId?: number | { userId: number };
+  user?: { userId: number };
+}
 
 // Helper to get User ID from request (since middleware attaches it)
 const getUserId = (req: Request): number | null => {
-  const direct = (req as any).userId;
+  const authReq = req as AuthenticatedRequest;
+  const direct = authReq.userId;
   if (typeof direct === "number") return direct;
-  if (typeof direct?.userId === "number") return direct.userId;
-  const fromUser = (req as any).user?.userId;
+  if (typeof direct === "object" && typeof direct?.userId === "number")
+    return direct.userId;
+  const fromUser = authReq.user?.userId;
   if (typeof fromUser === "number") return fromUser;
   return null;
 };
@@ -23,7 +29,7 @@ class ExpenseController {
 
       const expenses = await prisma.expense.findMany({
         where: { userId: userId },
-        orderBy: { date: 'desc' }
+        orderBy: { date: "desc" },
       });
 
       return Send.success(res, expenses);
@@ -39,11 +45,20 @@ class ExpenseController {
       const userId = getUserId(req);
       if (!userId) return Send.unauthorized(res, null);
 
-      const { amount, date, category, description, isRecurring, paymentMethod } = req.body;
+      const {
+        amount,
+        date,
+        category,
+        description,
+        isRecurring,
+        paymentMethod,
+      } = req.body;
 
       // Basic Validation
       if (!amount || !date || !category) {
-        return Send.badRequest(res, { message: "Amount, Date, and Category are required" });
+        return Send.badRequest(res, {
+          message: "Amount, Date, and Category are required",
+        });
       }
 
       const createExpense = await prisma.expense.create({
@@ -75,9 +90,15 @@ class ExpenseController {
       if (!userId) return Send.unauthorized(res, null);
 
       // Verify ownership before deleting
-      const expense = await prisma.expense.findUnique({ where: { id: Number(expenseId) } });
+      const expense = await prisma.expense.findUnique({
+        where: { id: Number(expenseId) },
+      });
       if (!expense || expense.userId !== userId) {
-        return Send.forbidden(res, null, "You are not authorized to delete this expense");
+        return Send.forbidden(
+          res,
+          null,
+          "You are not authorized to delete this expense",
+        );
       }
 
       await prisma.expense.delete({
@@ -96,14 +117,27 @@ class ExpenseController {
     try {
       const userId = getUserId(req);
       const { expenseId } = req.params;
-      const { amount, date, category, description, isRecurring, paymentMethod } = req.body;
+      const {
+        amount,
+        date,
+        category,
+        description,
+        isRecurring,
+        paymentMethod,
+      } = req.body;
 
       if (!userId) return Send.unauthorized(res, null);
 
       // Verify ownership
-      const existing = await prisma.expense.findUnique({ where: { id: Number(expenseId) } });
+      const existing = await prisma.expense.findUnique({
+        where: { id: Number(expenseId) },
+      });
       if (!existing || existing.userId !== userId) {
-        return Send.forbidden(res, null, "Not authorized to update this expense");
+        return Send.forbidden(
+          res,
+          null,
+          "Not authorized to update this expense",
+        );
       }
 
       const updatedExpense = await prisma.expense.update({
@@ -114,7 +148,7 @@ class ExpenseController {
           category,
           description,
           isRecurring: isRecurring || false,
-          paymentMethod: paymentMethod || "CASH"
+          paymentMethod: paymentMethod || "CASH",
         },
       });
 
