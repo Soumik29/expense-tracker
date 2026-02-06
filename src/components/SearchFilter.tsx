@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FilterState, FilterActions } from "../utils/useFilter";
 import type { Category, PaymentMethod } from "../types";
+import DateRangeFilter from "./DateRangeFilter";
 import {
   MagnifyingGlassIcon,
   FunnelIcon,
@@ -165,6 +166,13 @@ const SearchFilter = ({
           <ChevronDownIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
         </div>
 
+        {/* Date Range Filter */}
+        <DateRangeFilter
+          startDate={filters.dateRange.start}
+          endDate={filters.dateRange.end}
+          onDateChange={setDateRange}
+        />
+
         {/* Advanced Filters Toggle */}
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
@@ -181,32 +189,6 @@ const SearchFilter = ({
       {/* Advanced Filters */}
       {showAdvanced && (
         <div className="pt-4 border-t border-zinc-200 space-y-4">
-          {/* Date Range */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-700">
-              Date Range
-            </label>
-            <div className="flex gap-3 items-center">
-              <input
-                type="date"
-                value={filters.dateRange.start}
-                onChange={(e) =>
-                  setDateRange(e.target.value, filters.dateRange.end)
-                }
-                className="flex-1 px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent"
-              />
-              <span className="text-zinc-400">to</span>
-              <input
-                type="date"
-                value={filters.dateRange.end}
-                onChange={(e) =>
-                  setDateRange(filters.dateRange.start, e.target.value)
-                }
-                className="flex-1 px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent"
-              />
-            </div>
-          </div>
-
           {/* Amount Range */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-700">
