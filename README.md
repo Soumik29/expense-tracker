@@ -187,6 +187,18 @@ expense-tracker/
 
 ---
 
+## � Deployment
+
+Want to deploy this app for free? Check out the comprehensive deployment guide:
+
+📖 **[Deployment Guide](./DEPLOYMENT_GUIDE.md)** - Step-by-step instructions for deploying to:
+
+- **Vercel** (Frontend)
+- **Render** (Backend)
+- **PlanetScale** (MySQL Database)
+
+---
+
 ## 📚 Documentation
 
 For detailed feature documentation, see:
@@ -194,6 +206,7 @@ For detailed feature documentation, see:
 - [Bug Fix Report](./BUGFIX_REPORT.md) - Architecture improvements and bug fixes
 - [Search & Filter Feature](./SEARCH_FILTER_FEATURE.md) - Implementation tutorial
 - [Date Range Filter](./DATE_RANGE_FILTER_FEATURE.md) - Date presets implementation
+- [Deployment Guide](./DEPLOYMENT_GUIDE.md) - Free hosting deployment tutorial
 
 ---
 
