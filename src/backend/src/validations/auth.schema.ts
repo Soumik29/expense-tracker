@@ -14,13 +14,13 @@ const userSchema = z
   .max(20, "Username must not exceed 20 characters");
 
 const login = z.object({
-    email: z.email().trim().min(1, "Email is required"),
+    email: z.string().trim().email("Invalid email format").min(1, "Email is required"),
     password: z.string().min(1, "Password is required"),
 });
 
 const register = z.object({
     username: userSchema,
-    email: z.email({pattern: z.regexes.rfc5322Email}),
+    email: z.string().trim().email("Invalid email format"),
     password: passwordSchema,
     confirmPassword: z.string().min(1, "Password is required")
 }).refine((data) => data.password === data.confirmPassword, {

@@ -1,11 +1,12 @@
 import Send from "@utils/response.utils.js";
 import { prisma } from "../db.js";
 import type { Request, Response } from "express";
+import type { AuthenticatedRequest } from "../types/express.js";
 
 class UserController {
   static getUser = async (req: Request, res: Response) => {
     try {
-      const userId = (req as Request & { userId?: number }).userId;
+      const userId = (req as AuthenticatedRequest).userId;
       const user = await prisma.user.findUnique({
         where: { id: userId },
         select: {
