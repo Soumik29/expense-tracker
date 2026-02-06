@@ -1,5 +1,5 @@
 const appConfig = {
-    host: process.env.Host,
+    host: process.env.HOST,
     port: Number(process.env.PORT)
 };
 

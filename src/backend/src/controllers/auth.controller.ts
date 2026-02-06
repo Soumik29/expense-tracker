@@ -4,34 +4,34 @@ import type { Request, Response } from "express";
 import authSchema from "../validations/auth.schema.js";
 import bcrypt from "bcrypt";
 import { z } from "zod";
-import jwt from "jsonwebtoken";
+import jwt, { type SignOptions } from "jsonwebtoken";
 import authConfig from "@config/auth.config.js";
 
 const sec = authConfig.secret as string;
 const { sign } = jwt;
 class AuthController {
   static login = async (req: Request, res: Response) => {
-    console.log(req);
     const { email, password } = req.body as z.infer<typeof authSchema.login>;
     try {
       const user = await prisma.user.findUnique({
         where: { email },
       });
       if (!user) {
-        return Send.error(res, null, "Invalid Credentials");
+        return Send.unauthorized(res, null, "Invalid Credentials");
       }
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        return Send.error(res, null, "Incorrect Password");
+        return Send.unauthorized(res, null, "Incorrect Password");
       }
 
       const accessToken = sign({ userId: user.id }, sec, {
-        expiresIn: authConfig.secret_expries_in as string,
-      });
+        expiresIn: authConfig.secret_expries_in,
+      } as SignOptions);
 
-      const refreshToken = sign({ userId: user.id }, sec, {
-        expiresIn: authConfig.refreshToken_expries_in as string,
-      });
+      const refreshTokenSecret = authConfig.refreshToken as string;
+      const refreshToken = sign({ userId: user.id }, refreshTokenSecret, {
+        expiresIn: authConfig.refreshToken_expries_in,
+      } as SignOptions);
       await prisma.user.update({
         where: { email },
         data: { refreshToken },
@@ -101,8 +101,7 @@ class AuthController {
 
   static logout = async (req: Request, res: Response) => {
     try {
-      const userId = (req as Request & { user?: { userId: number } }).user
-        ?.userId;
+      const userId = (req as Request & { userId?: number }).userId;
       if (userId) {
         await prisma.user.update({
           where: { id: userId },
@@ -124,7 +123,7 @@ class AuthController {
       const refreshToken = req.cookies.refreshToken;
 
       const user = await prisma.user.findUnique({
-        where: { id: userId },
+        where: { id: userId! },
       });
 
       if (!user || !user.refreshToken) {
@@ -136,8 +135,8 @@ class AuthController {
       }
 
       const newAccessToken = sign({ userId: user.id }, sec, {
-        expiresIn: authConfig.secret_expries_in as string,
-      });
+        expiresIn: authConfig.secret_expries_in,
+      } as SignOptions);
 
       res.cookie("accessToken", newAccessToken, {
         httpOnly: true,

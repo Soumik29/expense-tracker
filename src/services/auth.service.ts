@@ -53,7 +53,7 @@ export const authService = {
 
   async refreshToken(): Promise<boolean> {
     try {
-      await api.post("/auth/refresh", {});
+      await api.post("/auth/refresh-token", {});
       return true;
     } catch {
       return false;

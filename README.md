@@ -122,7 +122,7 @@ Follow these instructions to run the project locally.
 
 ```sh
 # From project root
-npm run dev:all
+npm run dev:full
 ```
 
 **Option 2: Run separately**

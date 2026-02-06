@@ -11,7 +11,7 @@
     "dev:full": "concurrently -n \"frontend,backend\" -c \"cyan,yellow\" \"npm run dev:frontend\" \"npm run dev:backend\"",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "start": "npm run docker:up && timeout /t 5 && npm run dev:full",
+    "start": "npm run docker:up && npx wait-on tcp:3306 -t 30000 && npm run dev:full",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"

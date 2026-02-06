@@ -7,7 +7,7 @@ class UserController {
     try {
       const userId = (req as Request & { userId?: number }).userId;
       const user = await prisma.user.findUnique({
-        where: { id: userId },
+        where: { id: userId! },
         select: {
           id: true,
           username: true,

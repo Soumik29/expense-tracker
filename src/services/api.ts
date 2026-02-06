@@ -33,7 +33,7 @@ class ApiService {
       },
     };
 
-    if (body) {
+    if (body !== undefined) {
       config.body = JSON.stringify(body);
     }
 

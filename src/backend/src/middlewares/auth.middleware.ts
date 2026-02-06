@@ -19,12 +19,11 @@ class AuthMiddleware {
     }
     try {
       const decodedToken = verify(token, secret) as DecodedToken;
-      console.log(decodedToken);
       (req as Request & { userId: number }).userId = decodedToken.userId;
       next();
     } catch (err) {
       console.error("Authentication Failed:", err);
-      Send.unauthorized(res, null);
+      return Send.unauthorized(res, null);
     }
   };
 
@@ -40,12 +39,13 @@ class AuthMiddleware {
     }
 
     try {
-      const decodedToken = verify(refreshToken, secret) as DecodedToken;
+      const refreshTokenSecret = authConfig.refreshToken as string;
+      const decodedToken = verify(refreshToken, refreshTokenSecret) as DecodedToken;
       (req as Request & { userId: number }).userId = decodedToken.userId;
       next();
     } catch (err) {
       console.log("Authentication Failed", err);
-      Send.unauthorized(res, {
+      return Send.unauthorized(res, {
         message: "Invalid or refresh token is expired",
       });
     }

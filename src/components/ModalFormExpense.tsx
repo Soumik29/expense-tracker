@@ -10,9 +10,8 @@ import {
   Select,
   Textarea,
 } from "@headlessui/react";
-import type { Expense } from "../types";
+import type { Expense, Category, PaymentMethod } from "../types";
 import { useState } from "react";
-import type { ExpenseCategory, PaymentMethod } from "./AddExpenseForm";
 
 interface modalClose {
   close: (boo: boolean) => void;
@@ -88,7 +87,7 @@ const ModalFormExpense = ({
                 onChange={(e) =>
                   setTempExpValues((prev) => ({
                     ...prev,
-                    category: e.target.value as ExpenseCategory,
+                    category: e.target.value as Category,
                   }))
                 }
               >
