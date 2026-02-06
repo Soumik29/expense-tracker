@@ -1,6 +1,7 @@
 import Send from "@utils/response.utils.js";
 import { prisma } from "../db.js";
 import type { Request, Response } from "express";
+import type { AuthenticatedRequest } from "../types/express.js";
 import authSchema from "../validations/auth.schema.js";
 import bcrypt from "bcrypt";
 import { z } from "zod";
@@ -101,7 +102,7 @@ class AuthController {
 
   static logout = async (req: Request, res: Response) => {
     try {
-      const userId = (req as Request & { userId?: number }).userId;
+      const userId = (req as AuthenticatedRequest).userId;
       if (userId) {
         await prisma.user.update({
           where: { id: userId },
@@ -119,11 +120,11 @@ class AuthController {
 
   static refreshToken = async (req: Request, res: Response) => {
     try {
-      const userId = (req as Request & { userId?: number }).userId;
+      const userId = (req as AuthenticatedRequest).userId;
       const refreshToken = req.cookies.refreshToken;
 
       const user = await prisma.user.findUnique({
-        where: { id: userId! },
+        where: { id: userId },
       });
 
       if (!user || !user.refreshToken) {
