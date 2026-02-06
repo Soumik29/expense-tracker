@@ -6,6 +6,12 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite",
+    "dev:frontend": "vite",
+    "dev:backend": "cd src/backend && npm run dev",
+    "dev:full": "concurrently -n \"frontend,backend\" -c \"cyan,yellow\" \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "start": "npm run docker:up && npx wait-on tcp:3306 -t 30000 && npm run dev:full",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -17,11 +23,13 @@
     "@fortawesome/react-fontawesome": "^3.1.0",
     "@headlessui/react": "^2.2.7",
     "@heroicons/react": "^2.2.0",
-    "@prisma/client": "^6.16.2",
+    "@prisma/client": "^6.18.0",
     "@tailwindcss/vite": "^4.1.12",
     "chart.js": "^4.5.0",
+    "dotenv": "^17.2.3",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
     "@cubejs-client/core": "^0.31.0",
@@ -30,6 +38,7 @@
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^9.2.1",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
@@ -38,6 +47,7 @@
     "tailwindcss": "^4.1.12",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "wait-on": "^9.0.3"
   }
 }

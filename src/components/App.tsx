@@ -1,26 +1,40 @@
-import ExpenseTracker from "./ExpenseTracker";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Register from "../auth/Register";
+import Login from "../auth/Login";
+import ExpenseTracker from "./ExpenseTracker"; // Your Dashboard
 import { useAuth } from "../utils/useAuth";
-import Login from "./Login";
-function App() {
+import { Spinner } from "./Spinner";
+
+const App = () => {
   const { user, loading } = useAuth();
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
+        <Spinner size="lg" className="text-zinc-900" />
+      </div>
+    );
+  }
+
   return (
-    <>
-      {user ? (
-        <div className="bg-gradient-to-br from-gray-900 to-black min-h-dvh w-full text-white">
-          <header className="py-8">
-            <h1 className="text-4xl font-bold text-center">Expense Tracker</h1>
-          </header>
-          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <ExpenseTracker />
-          </main>
-        </div>
-      ) : (
-        <Login />
-      )}
-    </>
+    <Routes>
+      {/* Protected Route: If logged in, show Tracker, else go to Login */}
+      <Route
+        path="/"
+        element={user ? <ExpenseTracker /> : <Navigate to="/login" replace />}
+      />
+
+      {/* Public Routes */}
+      <Route
+        path="/login"
+        element={!user ? <Login /> : <Navigate to="/" replace />}
+      />
+      <Route
+        path="/register"
+        element={!user ? <Register /> : <Navigate to="/" replace />}
+      />
+    </Routes>
   );
-}
+};
 
 export default App;

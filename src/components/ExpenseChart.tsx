@@ -1,81 +1,148 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
 import type { Expense } from "../types";
 
-const ExpenseChart = ({expense}: {expense: Expense[]}) => {
+const ExpenseChart = ({ expense }: { expense: Expense[] }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const chartInstanceRef = useRef<Chart | null>(null); // Keep track of chart instance
+  const [viewBy, setViewBy] = useState<"category" | "payment">("category");
 
   useEffect(() => {
-    // Check if the canvas element is available
-    if (!canvasRef.current) {
-      return;
-    }
-    // Aggregate expenses by category, just like we planned
-    const expensesByCategory = new Map<string, number>();
-    expense.forEach((exp) => {
-      const currentTotal = expensesByCategory.get(exp.category) || 0;
-      expensesByCategory.set(exp.category, currentTotal + Number(exp.amount));
-    });
-    // Extract labels and data from the Map for the chart
-    const labels = Array.from(expensesByCategory.keys());
-    const data = Array.from(expensesByCategory.values());
+    if (!canvasRef.current) return;
 
-    // Create the chart
-    const myChart = new Chart(canvasRef.current, {
+    // Destroy previous chart instance if it exists to prevent "Canvas is already in use" error
+    if (chartInstanceRef.current) {
+      chartInstanceRef.current.destroy();
+    }
+
+    // Aggregate Data
+    const dataMap = new Map<string, number>();
+
+    expense.forEach((exp) => {
+      let key: string =
+        viewBy === "category" ? exp.category : exp.paymentMethod;
+
+      if (viewBy === "payment") {
+        key = key
+          .replace(/_/g, " ")
+          .toLowerCase()
+          .replace(/\b\w/g, (c) => c.toUpperCase());
+      }
+
+      const currentTotal = dataMap.get(key) || 0;
+      dataMap.set(key, currentTotal + Number(exp.amount));
+    });
+
+    const labels = Array.from(dataMap.keys());
+    const data = Array.from(dataMap.values());
+
+    // Create Chart with monochrome theme
+    chartInstanceRef.current = new Chart(canvasRef.current, {
       type: "bar",
       data: {
         labels: labels,
         datasets: [
           {
-            label: "Expenses by Category",
+            label:
+              viewBy === "category"
+                ? "Expenses by Category"
+                : "Expenses by Payment Method",
             data: data,
-            backgroundColor: [
-              "rgba(255, 99, 132, 0.6)",
-              "rgba(54, 162, 235, 0.6)",
-              "rgba(255, 206, 86, 0.6)",
-              "rgba(75, 192, 192, 0.6)",
-              "rgba(153, 102, 255, 0.6)",
-              "rgba(255, 159, 64, 0.6)",
-              "rgba(100, 200, 100, 0.6)",
-              "rgba(200, 100, 100, 0.6)",
-            ],
-            borderColor: [
-              "rgba(255, 99, 132, 1)",
-              "rgba(54, 162, 235, 1)",
-              "rgba(255, 206, 86, 1)",
-              "rgba(75, 192, 192, 1)",
-              "rgba(153, 102, 255, 1)",
-              "rgba(255, 159, 64, 1)",
-              "rgba(100, 200, 100, 1)",
-              "rgba(200, 100, 100, 1)",
-            ],
-            borderWidth: 1,
-            borderRadius: {topLeft: 50}
+            backgroundColor: "rgba(23, 23, 23, 0.9)",
+            borderColor: "rgba(23, 23, 23, 1)",
+            borderWidth: 0,
+            borderRadius: 8,
           },
         ],
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
         scales: {
           y: {
             beginAtZero: true,
+            grid: {
+              color: "rgba(0, 0, 0, 0.06)",
+            },
+            ticks: {
+              color: "#737373",
+              font: {
+                family: "system-ui",
+              },
+            },
+            border: {
+              display: false,
+            },
+          },
+          x: {
+            grid: {
+              display: false,
+            },
+            ticks: {
+              color: "#737373",
+              font: {
+                family: "system-ui",
+              },
+            },
+            border: {
+              display: false,
+            },
           },
         },
       },
     });
 
-    // Cleanup function to destroy the chart when the component unmounts
+    // Cleanup on unmount or re-render
     return () => {
-      myChart.destroy();
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+      }
     };
-  }, [expense]);
+  }, [expense, viewBy]); // Re-run when expenses or view mode changes
 
   return (
-    <div className="w-full max-w-xl mx-auto p-6 bg-gray-900 rounded-2xl shadow-xl border border-gray-700">
-      <h2 className="text-2xl font-bold mb-6 text-center text-white">
-        Spending Breakdown
-      </h2>
-      <div style={{ width: "100%", height: "300px" }}>
+    <div className="w-full bg-white rounded-2xl border border-zinc-200 p-8">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h2 className="text-xl font-semibold text-zinc-900 tracking-tight">
+            Analysis
+          </h2>
+          <p className="text-sm text-zinc-500 mt-1">
+            Visualize your spending
+          </p>
+        </div>
+
+        {/* Toggle Switch */}
+        <div className="flex p-1 bg-zinc-100 rounded-xl">
+          <button
+            onClick={() => setViewBy("category")}
+            className={`px-4 py-2 text-xs font-medium rounded-lg transition-all ${
+              viewBy === "category"
+                ? "bg-white text-zinc-900 shadow-sm"
+                : "text-zinc-500 hover:text-zinc-900"
+            }`}
+          >
+            Category
+          </button>
+          <button
+            onClick={() => setViewBy("payment")}
+            className={`px-4 py-2 text-xs font-medium rounded-lg transition-all ${
+              viewBy === "payment"
+                ? "bg-white text-zinc-900 shadow-sm"
+                : "text-zinc-500 hover:text-zinc-900"
+            }`}
+          >
+            Payment
+          </button>
+        </div>
+      </div>
+
+      <div className="relative h-64 w-full">
         <canvas ref={canvasRef}></canvas>
       </div>
     </div>

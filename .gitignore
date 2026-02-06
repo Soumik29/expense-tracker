@@ -24,3 +24,13 @@ dist-ssr
 *.sln
 *.sw?
 
+# TypeScript build artifacts
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Compiled JavaScript outputs in src directories
+src/**/*.js
+src/**/*.js.map
+!src/**/*.config.js
+!src/**/vite.config.js
+!src/**/eslint.config.js

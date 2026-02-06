@@ -1,15 +1,17 @@
 import { createContext } from "react";
-export interface User{
+export interface User {
   id: number;
   username: string;
-  name: string;
-  createAt: string;
+  email: string;
 }
 
 interface AuthContextType {
-  user: User | null; // You can replace `any` with a proper User type once you define it
+  user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
+  logout: () => Promise<void>;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);
