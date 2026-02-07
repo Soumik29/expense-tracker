@@ -65,19 +65,19 @@ const SearchFilter = ({
   } = filterActions;
 
   return (
-    <div className="bg-white rounded-2xl border border-zinc-200 p-6 space-y-4">
+    <div className="bg-white dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 p-6 space-y-4 transition-colors duration-200">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <FunnelIcon className="w-5 h-5 text-zinc-500" />
-          <h2 className="text-lg font-semibold text-zinc-900">
+          <FunnelIcon className="w-5 h-5 text-zinc-500 dark:text-zinc-400" />
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
             Search & Filter
           </h2>
         </div>
         {hasActiveFilters && (
           <button
             onClick={resetFilters}
-            className="flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900 transition-colors"
+            className="flex items-center gap-1 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
           >
             <XMarkIcon className="w-4 h-4" />
             Clear all
@@ -87,18 +87,18 @@ const SearchFilter = ({
 
       {/* Search Input */}
       <div className="relative">
-        <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
+        <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 dark:text-zinc-500" />
         <input
           type="text"
           placeholder="Search by description or category..."
           value={filters.searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
+          className="w-full pl-12 pr-4 py-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent transition-all"
         />
         {filters.searchQuery && (
           <button
             onClick={() => setSearchQuery("")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
           >
             <XMarkIcon className="w-5 h-5" />
           </button>
@@ -112,7 +112,7 @@ const SearchFilter = ({
           <select
             value={filters.category}
             onChange={(e) => setCategory(e.target.value as Category | "all")}
-            className="appearance-none pl-4 pr-10 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent cursor-pointer"
+            className="appearance-none pl-4 pr-10 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent cursor-pointer"
           >
             <option value="all">All Categories</option>
             {categories.map((cat) => (
@@ -131,7 +131,7 @@ const SearchFilter = ({
             onChange={(e) =>
               setPaymentMethod(e.target.value as PaymentMethod | "all")
             }
-            className="appearance-none pl-4 pr-10 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent cursor-pointer"
+            className="appearance-none pl-4 pr-10 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent cursor-pointer"
           >
             <option value="all">All Payment Methods</option>
             {paymentMethods.map((method) => (
@@ -157,7 +157,7 @@ const SearchFilter = ({
               const val = e.target.value;
               setIsRecurring(val === "all" ? "all" : val === "true");
             }}
-            className="appearance-none pl-4 pr-10 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent cursor-pointer"
+            className="appearance-none pl-4 pr-10 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent cursor-pointer"
           >
             <option value="all">All Types</option>
             <option value="true">Recurring Only</option>
@@ -178,8 +178,8 @@ const SearchFilter = ({
           onClick={() => setShowAdvanced(!showAdvanced)}
           className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
             showAdvanced
-              ? "bg-zinc-900 text-white"
-              : "bg-zinc-50 text-zinc-700 border border-zinc-200 hover:bg-zinc-100"
+              ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
+              : "bg-zinc-50 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700"
           }`}
         >
           {showAdvanced ? "Hide Advanced" : "More Filters"}
@@ -188,15 +188,15 @@ const SearchFilter = ({
 
       {/* Advanced Filters */}
       {showAdvanced && (
-        <div className="pt-4 border-t border-zinc-200 space-y-4">
+        <div className="pt-4 border-t border-zinc-200 dark:border-zinc-700 space-y-4">
           {/* Amount Range */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-700">
+            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Amount Range
             </label>
             <div className="flex gap-3 items-center">
               <div className="relative flex-1">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 text-sm">
                   ₹
                 </span>
                 <input
@@ -209,12 +209,12 @@ const SearchFilter = ({
                       filters.amountRange.max,
                     )
                   }
-                  className="w-full pl-8 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent"
+                  className="w-full pl-8 pr-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent"
                 />
               </div>
-              <span className="text-zinc-400">to</span>
+              <span className="text-zinc-400 dark:text-zinc-500">to</span>
               <div className="relative flex-1">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 text-sm">
                   ₹
                 </span>
                 <input
@@ -227,7 +227,7 @@ const SearchFilter = ({
                       e.target.value === "" ? "" : Number(e.target.value),
                     )
                   }
-                  className="w-full pl-8 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent"
+                  className="w-full pl-8 pr-4 py-2.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent"
                 />
               </div>
             </div>
@@ -237,11 +237,16 @@ const SearchFilter = ({
 
       {/* Results Count */}
       {hasActiveFilters && (
-        <div className="pt-3 border-t border-zinc-200">
-          <p className="text-sm text-zinc-500">
+        <div className="pt-3 border-t border-zinc-200 dark:border-zinc-700">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Showing{" "}
-            <span className="font-semibold text-zinc-900">{resultCount}</span>{" "}
-            of <span className="font-semibold text-zinc-900">{totalCount}</span>{" "}
+            <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+              {resultCount}
+            </span>{" "}
+            of{" "}
+            <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+              {totalCount}
+            </span>{" "}
             expenses
           </p>
         </div>

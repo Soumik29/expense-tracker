@@ -12,6 +12,7 @@ import HandleGrouping from "./HandleGrouping";
 import ExpenseChart from "./ExpenseChart";
 import { useAuth } from "../utils/useAuth";
 import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
+import ThemeToggle from "./ThemeToggle";
 
 const ExpenseTracker = () => {
   const { user, logout } = useAuth();
@@ -48,14 +49,14 @@ const ExpenseTracker = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 transition-colors duration-200">
       {/* Header/Navbar */}
-      <header className="bg-white border-b border-zinc-200 px-8 py-6">
+      <header className="bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 px-8 py-6 transition-colors duration-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-zinc-900 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-zinc-900 dark:bg-zinc-100 rounded-xl flex items-center justify-center">
               <svg
-                className="w-5 h-5 text-white"
+                className="w-5 h-5 text-white dark:text-zinc-900"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -68,24 +69,27 @@ const ExpenseTracker = () => {
                 />
               </svg>
             </div>
-            <h1 className="text-xl font-semibold text-zinc-900 tracking-tight">
+            <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">
               Expense Tracker
             </h1>
           </div>
 
           <div className="flex items-center gap-6">
+            <ThemeToggle />
             {user && (
               <div className="flex items-center gap-4">
                 {user.username && (
                   <>
                     <div className="hidden sm:block text-right">
-                      <p className="text-sm font-medium text-zinc-900">
+                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                         {user.username}
                       </p>
-                      <p className="text-xs text-zinc-500">{user.email}</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                        {user.email}
+                      </p>
                     </div>
-                    <div className="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center">
-                      <span className="text-white font-medium text-sm">
+                    <div className="w-10 h-10 bg-zinc-900 dark:bg-zinc-100 rounded-full flex items-center justify-center">
+                      <span className="text-white dark:text-zinc-900 font-medium text-sm">
                         {user.username.charAt(0).toUpperCase()}
                       </span>
                     </div>
@@ -93,7 +97,7 @@ const ExpenseTracker = () => {
                 )}
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 text-zinc-600 rounded-xl transition-all duration-200 cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 dark:hover:bg-zinc-100 dark:hover:text-zinc-900 dark:hover:border-zinc-100 text-zinc-600 dark:text-zinc-300 rounded-xl transition-all duration-200 cursor-pointer"
                   title="Logout"
                 >
                   <ArrowRightStartOnRectangleIcon className="w-4 h-4" />
