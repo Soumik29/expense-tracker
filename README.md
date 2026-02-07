@@ -187,15 +187,26 @@ expense-tracker/
 
 ---
 
-## � Deployment
+## 🚀 Deployment
 
-Want to deploy this app for free? Check out the comprehensive deployment guide:
+Want to deploy this app for free? We have comprehensive deployment guides for different hosting strategies:
 
-📖 **[Deployment Guide](./DEPLOYMENT_GUIDE.md)** - Step-by-step instructions for deploying to:
+### Option 1: All-in-One Free Hosting (Recommended for Beginners)
 
-- **Vercel** (Frontend)
-- **Render** (Backend)
-- **PlanetScale** (MySQL Database)
+📖 **[Railway Deployment Guide](./RAILWAY_DEPLOYMENT_GUIDE.md)** - Deploy everything (frontend, backend, database & Docker) in one place:
+
+- **Railway** - Host frontend, backend, MySQL database, and Docker containers all in one dashboard
+- **$5 free credit/month** - Perfect for personal projects and prototypes
+- **Simple setup** - Everything in one place, no complex configuration
+
+### Option 2: Unlimited Free Tier (Best for Production)
+
+📖 **[Multi-Platform Deployment Guide](./DEPLOYMENT_GUIDE.md)** - Split deployment across specialized platforms:
+
+- **Vercel** (Frontend) - Unlimited bandwidth
+- **Render** (Backend) - 750 hours/month
+- **PlanetScale** (MySQL Database) - 5GB storage
+- **More scalable** - Better for high-traffic applications
 
 ---
 
@@ -206,7 +217,8 @@ For detailed feature documentation, see:
 - [Bug Fix Report](./BUGFIX_REPORT.md) - Architecture improvements and bug fixes
 - [Search & Filter Feature](./SEARCH_FILTER_FEATURE.md) - Implementation tutorial
 - [Date Range Filter](./DATE_RANGE_FILTER_FEATURE.md) - Date presets implementation
-- [Deployment Guide](./DEPLOYMENT_GUIDE.md) - Free hosting deployment tutorial
+- [Railway Deployment Guide](./RAILWAY_DEPLOYMENT_GUIDE.md) - All-in-one free hosting (Recommended)
+- [Multi-Platform Deployment Guide](./DEPLOYMENT_GUIDE.md) - Unlimited free tier deployment
 
 ---
 
