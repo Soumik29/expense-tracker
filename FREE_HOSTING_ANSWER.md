@@ -31,7 +31,7 @@
 
 ### Detailed Guides
 
-- **[Railway Deployment Guide](./RAILWAY_DEPLOYMENT_GUIDE.md)** - Complete step-by-step instructions (30 min setup)
+- **[Railway Deployment Guide](./RAILWAY_DEPLOYMENT_GUIDE.md)** - Complete step-by-step instructions (~35 min setup)
 - **[Hosting Comparison](./HOSTING_COMPARISON.md)** - Railway vs other platforms
 - **[Multi-Platform Guide](./DEPLOYMENT_GUIDE.md)** - Alternative unlimited free option
 
@@ -41,7 +41,7 @@
 2. **Native Docker** - Automatically detects and deploys Dockerfiles
 3. **Service Communication** - Internal networking between services
 4. **GitHub Integration** - Auto-deploy on push
-5. **Simple Setup** - ~30 minutes from start to finish
+5. **Simple Setup** - ~35 minutes from start to finish
 
 ### Cost
 
@@ -67,7 +67,7 @@ See [Multi-Platform Deployment Guide](./DEPLOYMENT_GUIDE.md) for details.
 
 🏆 **Railway is the winner** - It's the only platform that hosts frontend, backend, database, and Docker all in one place with a generous free tier.
 
-📖 **Next Step:** Follow the [Railway Deployment Guide](./RAILWAY_DEPLOYMENT_GUIDE.md) to deploy your expense tracker in ~30 minutes.
+📖 **Next Step:** Follow the [Railway Deployment Guide](./RAILWAY_DEPLOYMENT_GUIDE.md) to deploy your expense tracker in ~35 minutes.
 
 ---
 

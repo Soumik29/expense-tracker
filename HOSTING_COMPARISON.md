@@ -30,7 +30,7 @@ Railway is the best all-in-one free hosting platform that supports:
 - ✅ Native Docker support
 - ✅ Easy service communication (internal networking)
 - ✅ Auto-deploy from GitHub
-- ✅ Simple setup (30 minutes)
+- ✅ Simple setup (~35 minutes)
 - ✅ Great for prototypes and learning
 
 **Cons:**
@@ -79,7 +79,7 @@ Railway is the best all-in-one free hosting platform that supports:
 | Feature | Railway | Multi-Platform |
 |---------|---------|----------------|
 | **Number of Services** | 1 platform | 3 platforms |
-| **Setup Time** | 30 minutes | 60+ minutes |
+| **Setup Time** | ~35 minutes | 60+ minutes |
 | **Complexity** | ⭐ Easy | ⭐⭐⭐ Moderate |
 | **Frontend Hosting** | Railway | Vercel |
 | **Backend Hosting** | Railway | Render |
@@ -381,7 +381,7 @@ For the specific question: **"Host everything in one free platform"**
 1. Read the [Railway Deployment Guide](./RAILWAY_DEPLOYMENT_GUIDE.md)
 2. Sign up at [railway.app](https://railway.app)
 3. Follow the step-by-step instructions
-4. Deploy in ~30 minutes
+4. Deploy in ~35 minutes
 
 ---
 

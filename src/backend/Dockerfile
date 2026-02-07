@@ -30,9 +30,12 @@ COPY package*.json ./
 COPY --from=builder /app/prisma ./prisma
 
 # Install production dependencies only
+# Note: We install prod deps separately to reduce final image size
+# This excludes devDependencies like TypeScript, which were only needed for building
 RUN npm ci --omit=dev
 
 # Copy Prisma client from builder (already generated)
+# Copying the generated client avoids running prisma generate again in production
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
