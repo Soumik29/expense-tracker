@@ -124,7 +124,7 @@ class AuthController {
       const refreshToken = req.cookies.refreshToken;
 
       if (!userId) {
-        return Send.unauthorized(res, "User ID not found");
+        return Send.unauthorized(res, null, "User ID not found");
       }
 
       const user = await prisma.user.findUnique({
@@ -132,11 +132,11 @@ class AuthController {
       });
 
       if (!user || !user.refreshToken) {
-        return Send.unauthorized(res, "Refresh token not found");
+        return Send.unauthorized(res, null, "Refresh token not found");
       }
 
       if (user.refreshToken !== refreshToken) {
-        return Send.unauthorized(res, { message: "Invalid refresh token" });
+        return Send.unauthorized(res, null, "Invalid refresh token");
       }
 
       const newAccessToken = sign({ userId: user.id }, sec, {
