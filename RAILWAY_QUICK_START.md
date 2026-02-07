@@ -85,8 +85,9 @@ Use this checklist to deploy your Expense Tracker to Railway in ~35-40 minutes.
 - [ ] Click on the new service (rename it to "Frontend")
 - [ ] Go to **"Settings"** tab
 - [ ] Leave **Root Directory** blank (uses root)
-- [ ] Set **Build Command** = `npm install && npm run build`
-- [ ] Set **Start Command** = `npm run preview` or leave default
+- [ ] The `railway.json` in the root will automatically configure:
+  - Build Command: `npm install && npm run build`
+  - Start Command: `npm run preview -- --host 0.0.0.0`
 - [ ] Go to **"Variables"** tab
 - [ ] Add environment variable:
   - [ ] `VITE_API_URL` = `${{Backend.url}}/api`
@@ -180,10 +181,11 @@ If something doesn't work, check these:
 
 ### Frontend Issues
 
-- [ ] Build Command is `npm install && npm run build`
-- [ ] Root Directory is empty (root)
+- [ ] Build Command is configured in `railway.json` (root)
+- [ ] Root Directory is empty (root) or not specified
 - [ ] VITE_API_URL includes `/api` suffix
 - [ ] VITE_API_URL uses service reference: `${{Backend.url}}/api`
+- [ ] Preview server is listening on correct port (Railway sets PORT env var)
 - [ ] Check browser console for errors
 - [ ] Check logs: Click service → **"Logs"** tab
 
