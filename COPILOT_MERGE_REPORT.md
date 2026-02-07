@@ -121,7 +121,7 @@ email: z.string().email("Invalid email format");
 
 **What was wrong:** The refresh token endpoint path was incorrect.
 
-**What Copilot did:** Fixed the path from `/auth/refreshToken` to `/auth/refresh`.
+**What Copilot did:** Fixed the path from `/auth/refreshToken` to `/auth/refresh-token` to match the backend `/refresh-token` route.
 
 ---
 
