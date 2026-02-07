@@ -52,8 +52,8 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-2xl border border-zinc-200 p-8">
-        <h2 className="text-xl font-semibold text-zinc-900 mb-8 tracking-tight">
+      <div className="bg-white dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 p-8 transition-colors duration-200">
+        <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-8 tracking-tight">
           Add New Expense
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -61,14 +61,14 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
           <div>
             <label
               htmlFor="category"
-              className="block text-sm font-medium text-zinc-700 mb-2"
+              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2"
             >
               Category
             </label>
             <select
               id="category"
               name="Expense Category"
-              className="w-full bg-white border border-zinc-200 text-zinc-900 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
+              className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent transition-all"
               value={category}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                 setCategory(e.target.value as Category)
@@ -88,13 +88,13 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
           <div>
             <label
               htmlFor="amount"
-              className="block text-sm font-medium text-zinc-700 mb-2"
+              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2"
             >
               Amount
             </label>
             <input
               type="number"
-              className="w-full bg-white border border-zinc-200 text-zinc-900 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
+              className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent transition-all"
               id="amount"
               name="Expense Amount"
               step="0.01"
@@ -110,13 +110,13 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
           <div>
             <label
               htmlFor="desc"
-              className="block text-sm font-medium text-zinc-700 mb-2"
+              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2"
             >
               Description
             </label>
             <textarea
               id="desc"
-              className="w-full bg-white border border-zinc-200 text-zinc-900 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all resize-none"
+              className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent transition-all resize-none"
               name="Expense Description"
               rows={3}
               value={desc}
@@ -131,7 +131,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
           <div>
             <label
               htmlFor="date"
-              className="block text-sm font-medium text-zinc-700 mb-2"
+              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2"
             >
               Date
             </label>
@@ -139,7 +139,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
               type="date"
               id="date"
               name="Expense Date"
-              className="w-full bg-white border border-zinc-200 text-zinc-900 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
+              className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent transition-all"
               value={date}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setDate(e.target.value)
@@ -151,13 +151,13 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
           <div>
             <label
               htmlFor="paymentMethod"
-              className="block text-sm font-medium text-zinc-700 mb-2"
+              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2"
             >
               Payment Method
             </label>
             <select
               id="paymentMethod"
-              className="w-full bg-white border border-zinc-200 text-zinc-900 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
+              className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent transition-all"
               value={paymentMethod}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                 setPaymentMethod(e.target.value as PaymentMethod)
@@ -175,7 +175,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
               type="checkbox"
               id="isRecurring"
               name="Expense Date"
-              className="w-5 h-5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 focus:ring-2 cursor-pointer"
+              className="w-5 h-5 rounded border-zinc-300 dark:border-zinc-600 text-zinc-900 dark:text-zinc-100 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:ring-2 cursor-pointer"
               checked={isRecurring}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setIsRecurring(e.target.checked)
@@ -183,7 +183,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
             />
             <label
               htmlFor="isRecurring"
-              className="text-sm font-medium text-zinc-700 cursor-pointer"
+              className="text-sm font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer"
             >
               Recurring Expense
             </label>
@@ -191,12 +191,12 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
           <div className="flex gap-4 pt-4">
             <button
               type="submit"
-              className="flex-1 bg-zinc-900 text-white font-medium py-3 px-6 rounded-xl hover:bg-zinc-800 transition-all focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2"
+              className="flex-1 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-medium py-3 px-6 rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:ring-offset-2 dark:focus:ring-offset-zinc-800"
             >
               Add Expense
             </button>
             <button
-              className="px-6 py-3 bg-white border border-zinc-200 text-zinc-700 font-medium rounded-xl hover:bg-zinc-50 transition-all focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2"
+              className="px-6 py-3 bg-white dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 font-medium rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-all focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:ring-offset-2 dark:focus:ring-offset-zinc-800"
               onClick={handleReset}
             >
               <FontAwesomeIcon icon={faRotateRight} />
@@ -205,7 +205,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
         </form>
         {showToast && (
           <div
-            className="flex items-center gap-3 mt-6 p-4 bg-zinc-900 text-white rounded-xl"
+            className="flex items-center gap-3 mt-6 p-4 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl"
             role="alert"
           >
             <svg

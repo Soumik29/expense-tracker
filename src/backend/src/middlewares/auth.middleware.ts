@@ -7,7 +7,7 @@ const { verify } = jwt;
 export interface DecodedToken {
   userId: number;
 }
-const secret: string = authConfig.secret as string;
+
 class AuthMiddleware {
   static authenticateUser = (
     req: Request,
@@ -19,6 +19,7 @@ class AuthMiddleware {
       return Send.unauthorized(res, null);
     }
     try {
+      const secret = authConfig.secret as string;
       const decodedToken = verify(token, secret) as DecodedToken;
       (req as AuthenticatedRequest).userId = decodedToken.userId;
       next();
@@ -41,7 +42,10 @@ class AuthMiddleware {
 
     try {
       const refreshTokenSecret = authConfig.refreshToken as string;
-      const decodedToken = verify(refreshToken, refreshTokenSecret) as DecodedToken;
+      const decodedToken = verify(
+        refreshToken,
+        refreshTokenSecret,
+      ) as DecodedToken;
       (req as AuthenticatedRequest).userId = decodedToken.userId;
       next();
     } catch (err) {

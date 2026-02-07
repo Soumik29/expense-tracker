@@ -8,12 +8,18 @@ import { z } from "zod";
 import jwt, { type SignOptions } from "jsonwebtoken";
 import authConfig from "@config/auth.config.js";
 
-const sec = authConfig.secret as string;
-const refreshSec = authConfig.refreshToken as string;
 const { sign } = jwt;
+
+// Helper to get secrets at runtime (after dotenv loads)
+const getSecrets = () => ({
+  access: authConfig.secret as string,
+  refresh: authConfig.refreshToken as string,
+});
+
 class AuthController {
   static login = async (req: Request, res: Response) => {
     const { email, password } = req.body as z.infer<typeof authSchema.login>;
+    const { access: sec, refresh: refreshSec } = getSecrets();
     try {
       const user = await prisma.user.findUnique({
         where: { email },
@@ -120,6 +126,7 @@ class AuthController {
 
   static refreshToken = async (req: Request, res: Response) => {
     try {
+      const { access: sec } = getSecrets();
       const userId = (req as AuthenticatedRequest).userId;
       const refreshToken = req.cookies.refreshToken;
 
