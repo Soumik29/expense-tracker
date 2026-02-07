@@ -9,6 +9,7 @@ import jwt, { type SignOptions } from "jsonwebtoken";
 import authConfig from "@config/auth.config.js";
 
 const sec = authConfig.secret as string;
+const refreshSec = authConfig.refreshToken as string;
 const { sign } = jwt;
 class AuthController {
   static login = async (req: Request, res: Response) => {
@@ -29,8 +30,7 @@ class AuthController {
         expiresIn: authConfig.secret_expries_in,
       } as SignOptions);
 
-      const refreshTokenSecret = authConfig.refreshToken as string;
-      const refreshToken = sign({ userId: user.id }, refreshTokenSecret, {
+      const refreshToken = sign({ userId: user.id }, refreshSec, {
         expiresIn: authConfig.refreshToken_expries_in,
       } as SignOptions);
       await prisma.user.update({
@@ -123,16 +123,20 @@ class AuthController {
       const userId = (req as AuthenticatedRequest).userId;
       const refreshToken = req.cookies.refreshToken;
 
+      if (!userId) {
+        return Send.unauthorized(res, null, "User ID not found");
+      }
+
       const user = await prisma.user.findUnique({
         where: { id: userId },
       });
 
       if (!user || !user.refreshToken) {
-        return Send.unauthorized(res, "Refresh token not found");
+        return Send.unauthorized(res, null, "Refresh token not found");
       }
 
       if (user.refreshToken !== refreshToken) {
-        return Send.unauthorized(res, { message: "Invalid refresh token" });
+        return Send.unauthorized(res, null, "Invalid refresh token");
       }
 
       const newAccessToken = sign({ userId: user.id }, sec, {
