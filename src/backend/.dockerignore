@@ -25,9 +25,6 @@ Thumbs.db
 # Documentation
 *.md
 
-# Docker
-.dockerignore
-
 # Testing
 coverage
 .nyc_output
@@ -39,9 +36,6 @@ nodemon.json
 # Prisma
 prisma/migrations/*.sql
 !prisma/migrations/migration_lock.toml
-
-# Build artifacts (will be rebuilt)
-dist
 
 # Misc
 .eslintcache

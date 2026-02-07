@@ -34,8 +34,6 @@ Thumbs.db
 !README.md
 
 # Docker
-Dockerfile
-.dockerignore
 docker-compose.yaml
 
 # Testing
