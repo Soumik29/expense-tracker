@@ -265,6 +265,8 @@ Copilot acted like a code reviewer and made the codebase:
 ## Commit History
 
 ```
+042bdc6 - fix: resolve JWT SignOptions type errors and userId undefined check (Claude fix)
+d89cd24 - docs: add Copilot merge report documenting automated improvements
 31cfa63 - Merge pull request #24 from Soumik29/input
 1883f63 - Merge pull request #25 from Soumik29/copilot/sub-pr-24
 79a3809 - refactor: improve type safety with AuthenticatedRequest interface
@@ -275,4 +277,86 @@ d66a6e6 - fix: resolve all lint errors and TypeScript issues for CI (our changes
 
 ---
 
-_This report documents the automated improvements made by GitHub Copilot during the merge process on February 6, 2026._
+## Additional Fix: JWT SignOptions Error (Claude - February 6, 2026)
+
+After the merge, there were TypeScript errors in `auth.controller.ts`. Here's what was fixed:
+
+### The Problem
+
+TypeScript was showing errors like:
+
+```
+No overload matches this call.
+Type 'string' is not assignable to type 'number | StringValue | undefined'.
+```
+
+This happened because the `jsonwebtoken` library updated its types. The `expiresIn` option now expects a specific type, not just any string.
+
+### What Was Fixed
+
+**File:** `src/backend/src/controllers/auth.controller.ts`
+
+#### 1. Imported SignOptions Type
+
+```typescript
+// Before
+import jwt from "jsonwebtoken";
+
+// After
+import jwt, { type SignOptions } from "jsonwebtoken";
+```
+
+**Why:** We need to tell TypeScript exactly what type our options object is.
+
+#### 2. Added Separate Secret for Refresh Tokens
+
+```typescript
+// Before
+const sec = authConfig.secret as string;
+
+// After
+const sec = authConfig.secret as string;
+const refreshSec = authConfig.refreshToken as string;
+```
+
+**Why:** Access tokens and refresh tokens should use different secrets. If one is compromised, the other is still safe.
+
+#### 3. Cast Options as SignOptions
+
+```typescript
+// Before (TypeScript error)
+const accessToken = sign({ userId: user.id }, sec, {
+  expiresIn: authConfig.secret_expries_in as string,
+});
+
+// After (No error)
+const accessToken = sign({ userId: user.id }, sec, {
+  expiresIn: authConfig.secret_expries_in,
+} as SignOptions);
+```
+
+**Why:** Casting as `SignOptions` tells TypeScript "trust me, this is a valid JWT options object."
+
+#### 4. Added userId Validation Check
+
+```typescript
+// Before (could crash if userId is undefined)
+const user = await prisma.user.findUnique({
+  where: { id: userId }, // userId might be undefined!
+});
+
+// After (safe)
+if (!userId) {
+  return Send.unauthorized(res, "User ID not found");
+}
+
+const user = await prisma.user.findUnique({
+  where: { id: userId }, // userId is guaranteed to exist
+});
+```
+
+**Why:** If someone calls the refresh token endpoint without being logged in, `userId` would be undefined, causing a database error. Now we check first.
+
+---
+
+_This report documents the automated improvements made by GitHub Copilot during the merge process on February 6, 2026, plus additional fixes by Claude._
