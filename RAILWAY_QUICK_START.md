@@ -1,6 +1,6 @@
 # Railway Quick Start Checklist
 
-Use this checklist to deploy your Expense Tracker to Railway in ~35 minutes.
+Use this checklist to deploy your Expense Tracker to Railway in ~35-40 minutes.
 
 ## ☑️ Before You Start
 
