@@ -199,6 +199,8 @@ Want to deploy this app for free? We have comprehensive deployment guides for di
 - **$5 free credit/month** - Perfect for personal projects and prototypes
 - **Simple setup** - Everything in one place, no complex configuration
 
+🚀 **Quick Start:** [Railway Quick Start Checklist](./RAILWAY_QUICK_START.md) - Step-by-step checklist (~30 minutes)
+
 ### Option 2: Unlimited Free Tier (Best for Production)
 
 📖 **[Multi-Platform Deployment Guide](./DEPLOYMENT_GUIDE.md)** - Split deployment across specialized platforms:
