@@ -1,6 +1,7 @@
 import Send from "@utils/response.utils.js";
 import { prisma } from "../db.js";
 import type { Request, Response } from "express";
+import type { AuthenticatedRequest } from "../types/express.js";
 import authSchema from "../validations/auth.schema.js";
 import bcrypt from "bcrypt";
 import { z } from "zod";
@@ -12,18 +13,17 @@ const refreshSec = authConfig.refreshToken as string;
 const { sign } = jwt;
 class AuthController {
   static login = async (req: Request, res: Response) => {
-    console.log(req);
     const { email, password } = req.body as z.infer<typeof authSchema.login>;
     try {
       const user = await prisma.user.findUnique({
         where: { email },
       });
       if (!user) {
-        return Send.error(res, null, "Invalid Credentials");
+        return Send.unauthorized(res, null, "Invalid Credentials");
       }
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        return Send.error(res, null, "Incorrect Password");
+        return Send.unauthorized(res, null, "Incorrect Password");
       }
 
       const accessToken = sign({ userId: user.id }, sec, {
@@ -102,8 +102,7 @@ class AuthController {
 
   static logout = async (req: Request, res: Response) => {
     try {
-      const userId = (req as Request & { user?: { userId: number } }).user
-        ?.userId;
+      const userId = (req as AuthenticatedRequest).userId;
       if (userId) {
         await prisma.user.update({
           where: { id: userId },
@@ -121,7 +120,7 @@ class AuthController {
 
   static refreshToken = async (req: Request, res: Response) => {
     try {
-      const userId = (req as Request & { userId?: number }).userId;
+      const userId = (req as AuthenticatedRequest).userId;
       const refreshToken = req.cookies.refreshToken;
 
       if (!userId) {

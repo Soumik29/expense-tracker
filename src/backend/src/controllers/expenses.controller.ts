@@ -1,23 +1,12 @@
 import Send from "@utils/response.utils.js";
 import { prisma } from "../db.js";
 import type { Request, Response } from "express";
-
-// Extended request type with userId attached by auth middleware
-interface AuthenticatedRequest extends Request {
-  userId?: number | { userId: number };
-  user?: { userId: number };
-}
+import type { AuthenticatedRequest } from "../types/express.js";
 
 // Helper to get User ID from request (since middleware attaches it)
 const getUserId = (req: Request): number | null => {
   const authReq = req as AuthenticatedRequest;
-  const direct = authReq.userId;
-  if (typeof direct === "number") return direct;
-  if (typeof direct === "object" && typeof direct?.userId === "number")
-    return direct.userId;
-  const fromUser = authReq.user?.userId;
-  if (typeof fromUser === "number") return fromUser;
-  return null;
+  return authReq.userId ?? null;
 };
 
 class ExpenseController {

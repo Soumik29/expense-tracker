@@ -1,18 +1,7 @@
 import { useState } from "react";
-import type { newExpense } from "../types";
+import type { newExpense, Category, PaymentMethod } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
-export type ExpenseCategory =
-  | "Food"
-  | "Groceries"
-  | "Mobile_Bill"
-  | "Travel"
-  | "Shopping"
-  | "Games"
-  | "Subscription"
-  | "EMI";
-
-export type PaymentMethod = "CASH" | "CREDIT_CARD" | "DEBIT_CARD" | "UPI";
 
 type expenseProps = {
   onAddExpense: (expense: newExpense) => void;
@@ -22,7 +11,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [desc, setDesc] = useState("");
-  const [category, setCategory] = useState<ExpenseCategory>("Food");
+  const [category, setCategory] = useState<Category>("Food");
   const [showToast, setShowToast] = useState<boolean>(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH");
@@ -82,7 +71,7 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
               className="w-full bg-white border border-zinc-200 text-zinc-900 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
               value={category}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                setCategory(e.target.value as ExpenseCategory)
+                setCategory(e.target.value as Category)
               }
             >
               <option value="Food">Food</option>

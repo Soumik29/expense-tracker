@@ -213,11 +213,11 @@ Vercel should auto-detect Vite. Verify these settings:
 
 Click **"Environment Variables"** and add:
 
-| Key            | Value                                           |
-| -------------- | ----------------------------------------------- |
-| `VITE_API_URL` | `https://expense-tracker-api-xxxx.onrender.com` |
+| Key            | Value                                                  |
+| -------------- | ------------------------------------------------------ |
+| `VITE_API_URL` | `https://expense-tracker-api-xxxx.onrender.com/api`   |
 
-**Important:** Replace with your actual Render URL from Step 2.4.
+**Important:** Replace with your actual Render URL from Step 2.4, **including the `/api` suffix** (for example: `https://your-service-name.onrender.com/api`). The frontend builds requests like `/auth/login` and `/expenses` relative to this base URL, so `VITE_API_URL` must point to the `/api` prefix.
 
 ### Step 3.5: Deploy
 
@@ -235,7 +235,7 @@ Go back to Render and update the `FRONTEND_URL` environment variable with your V
 
 ### Update vercel.json API Rewrite
 
-Edit `vercel.json` in your repository and update the rewrite destination:
+**Important:** Before deploying, edit `vercel.json` in your repository and update the rewrite destination URL from the placeholder to your actual Render backend URL:
 
 ```json
 {
@@ -247,6 +247,8 @@ Edit `vercel.json` in your repository and update the rewrite destination:
   ]
 }
 ```
+
+Replace `https://your-backend-url.onrender.com` with your actual Render URL from Step 2.4. This configuration proxies API calls from your frontend to the backend.
 
 Push the change to trigger a new Vercel deployment.
 
