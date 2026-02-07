@@ -6,8 +6,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies (including dev deps for build)
+RUN npm ci
 
 # Copy source code
 COPY . .
@@ -29,11 +29,15 @@ COPY package*.json ./
 # Copy Prisma schema
 COPY --from=builder /app/prisma ./prisma
 
+# Install production dependencies only
+RUN npm ci --omit=dev
+
+# Copy Prisma client from builder (already generated)
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
 # Copy built application
 COPY --from=builder /app/dist ./dist
-
-# Copy node_modules with Prisma client
-COPY --from=builder /app/node_modules ./node_modules
 
 # Expose port
 EXPOSE 3000
