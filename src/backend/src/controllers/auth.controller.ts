@@ -4,10 +4,11 @@ import type { Request, Response } from "express";
 import authSchema from "../validations/auth.schema.js";
 import bcrypt from "bcrypt";
 import { z } from "zod";
-import jwt from "jsonwebtoken";
+import jwt, { type SignOptions } from "jsonwebtoken";
 import authConfig from "@config/auth.config.js";
 
 const sec = authConfig.secret as string;
+const refreshSec = authConfig.refreshToken as string;
 const { sign } = jwt;
 class AuthController {
   static login = async (req: Request, res: Response) => {
@@ -26,12 +27,12 @@ class AuthController {
       }
 
       const accessToken = sign({ userId: user.id }, sec, {
-        expiresIn: authConfig.secret_expries_in as string,
-      });
+        expiresIn: authConfig.secret_expries_in,
+      } as SignOptions);
 
-      const refreshToken = sign({ userId: user.id }, sec, {
-        expiresIn: authConfig.refreshToken_expries_in as string,
-      });
+      const refreshToken = sign({ userId: user.id }, refreshSec, {
+        expiresIn: authConfig.refreshToken_expries_in,
+      } as SignOptions);
       await prisma.user.update({
         where: { email },
         data: { refreshToken },
@@ -123,6 +124,10 @@ class AuthController {
       const userId = (req as Request & { userId?: number }).userId;
       const refreshToken = req.cookies.refreshToken;
 
+      if (!userId) {
+        return Send.unauthorized(res, "User ID not found");
+      }
+
       const user = await prisma.user.findUnique({
         where: { id: userId },
       });
@@ -136,8 +141,8 @@ class AuthController {
       }
 
       const newAccessToken = sign({ userId: user.id }, sec, {
-        expiresIn: authConfig.secret_expries_in as string,
-      });
+        expiresIn: authConfig.secret_expries_in,
+      } as SignOptions);
 
       res.cookie("accessToken", newAccessToken, {
         httpOnly: true,
