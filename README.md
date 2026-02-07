@@ -2,7 +2,7 @@
 
 A full-stack expense tracking application built with React, TypeScript, Node.js, and MySQL. Track your daily expenses with powerful filtering, beautiful charts, and secure user authentication.
 
-![ExpenseTracker Logo](https://github.com/Soumik29/expense-tracker/blob/input/src/assets/Logo/ExpenseTrackerLogo.png)
+![ExpenseTracker Logo](https://github.com/Soumik29/expense-tracker/blob/main/src/assets/Logo/ExpenseTrackerLogo.png)
 
 ---
 
