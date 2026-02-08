@@ -1,18 +1,71 @@
 services:
+  # MySQL Database
   db:
-    image: mysql:latest
+    image: mysql:8.0
     restart: always
-    container_name: expense-backend
+    container_name: expense-db
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      # DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@expense-backend:3306/${MYSQL_DATABASE}"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-expense_tracker}
+      MYSQL_USER: ${MYSQL_USER:-expense_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-expense_password}
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Backend API (Express + Prisma)
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+    container_name: expense-backend
+    restart: always
+    environment:
+      PORT: 3000
+      DATABASE_URL: mysql://${MYSQL_USER:-expense_user}:${MYSQL_PASSWORD:-expense_password}@db:3306/${MYSQL_DATABASE:-expense_tracker}
+      AUTH_SECRET: ${AUTH_SECRET:-your-super-secret-jwt-key-change-in-production}
+      AUTH_SECRET_EXPIRES_IN: ${AUTH_SECRET_EXPIRES_IN:-15m}
+      AUTH_REFRESH_SECRET: ${AUTH_REFRESH_SECRET:-your-refresh-secret-key}
+      AUTH_REFRESH_SECRET_EXPIRES_IN: ${AUTH_REFRESH_SECRET_EXPIRES_IN:-7d}
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Frontend (React + Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: expense-frontend
+    restart: always
+    environment:
+      PORT: 80
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
 
 volumes:
   db_data:
