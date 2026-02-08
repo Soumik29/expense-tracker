@@ -2,6 +2,8 @@
 
 Use this checklist to deploy your Expense Tracker to Railway in ~35-40 minutes.
 
+**Deployment Type:** Docker-based separate services (MySQL + Backend + Frontend)
+
 ## ☑️ Before You Start
 
 - [ ] Repository pushed to GitHub
@@ -40,14 +42,15 @@ Use this checklist to deploy your Expense Tracker to Railway in ~35-40 minutes.
 - [ ] Click on the new service (rename it to "Backend")
 - [ ] Go to **"Settings"** tab
 - [ ] Set **Root Directory** = `src/backend`
-- [ ] Set **Build Command** = `npm install && npx prisma generate && npm run build`
-- [ ] Set **Start Command** = `npm run start`
+- [ ] Railway auto-detects `railway.json` → uses **Docker** deployment
 - [ ] Go to **"Variables"** tab
 - [ ] Add environment variables:
   - [ ] `NODE_ENV` = `production`
   - [ ] `DATABASE_URL` = `${{MySQL.DATABASE_URL}}`
-  - [ ] `JWT_SECRET` = (generate random: use password generator)
-  - [ ] `JWT_REFRESH_SECRET` = (generate random: different from JWT_SECRET)
+  - [ ] `AUTH_SECRET` = (generate random 64 chars)
+  - [ ] `AUTH_SECRET_EXPIRES_IN` = `15m`
+  - [ ] `AUTH_REFRESH_SECRET` = (generate random 64 chars, different)
+  - [ ] `AUTH_REFRESH_SECRET_EXPIRES_IN` = `7d`
   - [ ] `PORT` = `3000`
 - [ ] Click **"Deploy"** (or it auto-deploys)
 - [ ] Wait for build to complete (~5 minutes)
@@ -85,12 +88,10 @@ Use this checklist to deploy your Expense Tracker to Railway in ~35-40 minutes.
 - [ ] Click on the new service (rename it to "Frontend")
 - [ ] Go to **"Settings"** tab
 - [ ] Leave **Root Directory** blank (uses root)
-- [ ] The `railway.json` in the root will automatically configure:
-  - Build Command: `npm install && npm run build`
-  - Start Command: `npm run preview -- --host 0.0.0.0`
+- [ ] Railway auto-detects `railway.json` → uses **Docker** with `Dockerfile.railway`
 - [ ] Go to **"Variables"** tab
 - [ ] Add environment variable:
-  - [ ] `VITE_API_URL` = `${{Backend.url}}/api`
+  - [ ] `BACKEND_URL` = `${{Backend.RAILWAY_PUBLIC_DOMAIN}}` (or the full URL like `https://backend-xxx.up.railway.app`)
 - [ ] Click **"Deploy"** (or it auto-deploys)
 - [ ] Wait for build to complete (~3 minutes)
 - [ ] Copy the public URL (e.g., `https://frontend-xxx.up.railway.app`)
@@ -258,22 +259,23 @@ If you're stuck, check these resources:
 
 ## ⏱️ Estimated Time Breakdown
 
-| Step | Time | Status |
-|------|------|--------|
-| Setup Account | 5 min | ⬜ |
-| Add MySQL | 5 min | ⬜ |
-| Deploy Backend | 10 min | ⬜ |
-| Init Database | 5 min | ⬜ |
-| Deploy Frontend | 5 min | ⬜ |
-| Connect Services | 2 min | ⬜ |
-| Test Deployment | 5 min | ⬜ |
-| **Total** | **~37 min** | |
+| Step             | Time        | Status |
+| ---------------- | ----------- | ------ |
+| Setup Account    | 5 min       | ⬜     |
+| Add MySQL        | 5 min       | ⬜     |
+| Deploy Backend   | 10 min      | ⬜     |
+| Init Database    | 5 min       | ⬜     |
+| Deploy Frontend  | 5 min       | ⬜     |
+| Connect Services | 2 min       | ⬜     |
+| Test Deployment  | 5 min       | ⬜     |
+| **Total**        | **~37 min** |        |
 
 ---
 
 **Happy Deploying! 🚀**
 
 Once complete, your expense tracker will be live at:
+
 - Frontend: `https://your-app.up.railway.app`
 - Backend: `https://your-api.up.railway.app`
 
