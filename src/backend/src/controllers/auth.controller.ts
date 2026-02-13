@@ -44,18 +44,15 @@ class AuthController {
         data: { refreshToken },
       });
 
-      res.cookie("accessToken", accessToken, {
+      const isProduction = process.env.NODE_ENV === "production";
+      const cookieOptions = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: isProduction,
         maxAge: 24 * 60 * 60 * 1000,
-        sameSite: "lax",
-      });
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: "lax",
-      });
+        sameSite: isProduction ? ("none" as const) : ("lax" as const),
+      };
+      res.cookie("accessToken", accessToken, cookieOptions);
+      res.cookie("refreshToken", refreshToken, cookieOptions);
 
       return Send.success(res, {
         id: user.id,
@@ -115,8 +112,14 @@ class AuthController {
           data: { refreshToken: null },
         });
       }
-      res.clearCookie("accessToken");
-      res.clearCookie("refreshToken");
+      const isProduction = process.env.NODE_ENV === "production";
+      const cookieOptions = {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? ("none" as const) : ("lax" as const),
+      };
+      res.clearCookie("accessToken", cookieOptions);
+      res.clearCookie("refreshToken", cookieOptions);
       return Send.success(res, null, "Logged out Successfully!");
     } catch (error) {
       console.error("Logout Failed:", error);
@@ -150,11 +153,12 @@ class AuthController {
         expiresIn: authConfig.secret_expries_in,
       } as SignOptions);
 
+      const isProduction = process.env.NODE_ENV === "production";
       res.cookie("accessToken", newAccessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: isProduction,
         maxAge: 15 * 60 * 1000, //15 minutes
-        sameSite: "lax",
+        sameSite: isProduction ? ("none" as const) : ("lax" as const),
       });
 
       return Send.success(res, {
