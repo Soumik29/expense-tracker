@@ -61,7 +61,7 @@ class App {
 
   public start() {
     const { port } = appConfig;
-    const host = appConfig.host ?? "localhost";
+    const host = appConfig.host ?? "0.0.0.0";
     this.app.listen(port, host, () => {
       console.log(`Server is running on http://${host}:${port}`);
     });

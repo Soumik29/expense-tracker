@@ -1,6 +1,6 @@
 const appConfig = {
     host: process.env.HOST,
-    port: Number(process.env.PORT)
+    port: Number(process.env.PORT) || 3000
 };
 
 export default appConfig;
