@@ -39,11 +39,11 @@ class AuthController {
       const refreshToken = sign({ userId: user.id }, refreshSec, {
         expiresIn: authConfig.refreshToken_expries_in,
       } as SignOptions);
+      const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
       await prisma.user.update({
         where: { email },
-        data: { refreshToken },
+        data: { refreshToken: hashedRefreshToken },
       });
-
       const isProduction = process.env.NODE_ENV === "production";
       const cookieOptions = {
         httpOnly: true,
@@ -144,8 +144,8 @@ class AuthController {
       if (!user || !user.refreshToken) {
         return Send.unauthorized(res, null, "Refresh token not found");
       }
-
-      if (user.refreshToken !== refreshToken) {
+      const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
+      if (!isValid) {
         return Send.unauthorized(res, null, "Invalid refresh token");
       }
 
