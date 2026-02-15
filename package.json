@@ -29,7 +29,8 @@
     "dotenv": "^17.2.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-router-dom": "^7.13.0"
+    "react-router-dom": "^7.13.0",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
     "@cubejs-client/core": "^0.31.0",

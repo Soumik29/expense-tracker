@@ -13,6 +13,7 @@ import ExpenseChart from "./ExpenseChart";
 import { useAuth } from "../utils/useAuth";
 import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
 import ThemeToggle from "./ThemeToggle";
+import ReceiptScanner from "./ReceiptScanner";
 
 const ExpenseTracker = () => {
   const { user, logout } = useAuth();
@@ -161,6 +162,7 @@ const ExpenseTracker = () => {
             />
           ) : null}
           <ExpenseChart expense={filteredExpenses} />
+        <ReceiptScanner/>
         </div>
       </main>
     </div>
