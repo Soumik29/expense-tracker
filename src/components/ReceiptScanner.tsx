@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import Tesseract from "tesseract.js";
+import { parseReceipt } from "../utils/receiptParser"; //Import the new logic
 
-export default function ReceiptScanner() {
+interface ReceiptScannerProps {
+  onScanComplete?: (amount: number) => void;
+}
+
+export default function ReceiptScanner({onScanComplete}: ReceiptScannerProps) {
   const [image, setImage] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [rawText, setRawText] = useState("");
+  const [scannedData, setScannedData] = useState<{total: number | null; rawText: string} | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -14,6 +19,7 @@ export default function ReceiptScanner() {
       setImage(file);
       const url = URL.createObjectURL(file);
       setPreviewURL(url);
+      setScannedData(null);
     }
   };
 
@@ -29,13 +35,12 @@ export default function ReceiptScanner() {
     if (!image) return;
 
     setLoading(true);
-    setRawText("");
+    
 
     try {
-      const result = await Tesseract.recognize(image, "eng", {
-        logger: (m) => console.log(m),
-      });
-      setRawText(result.data.text);
+      const result = await Tesseract.recognize(image, "eng");
+      const parsed = parseReceipt(result.data.text);
+      setScannedData(parsed);
     } catch (error) {
       console.error("Scanning failed: ", error);
       alert("Failed to scan receipt.");
@@ -75,12 +80,32 @@ export default function ReceiptScanner() {
         </div>
       )}
 
-      {rawText && (
-        <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-900 rounded text-xs font-mono overflow-auto max-h-40 border border-gray-200 dark:border-gray-700">
-          <p className="font-bold text-gray-500 mb-1">Raw Output:</p>
-          <pre className="whitespace-pre-wrap dark:text-gray-300">
-            {rawText}
-          </pre>
+      {scannedData && (
+        <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+          <h4 className="font-bold text-green-800 dark:text-green-300 mb-2">Scan Results</h4>
+          
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-gray-600 dark:text-gray-300">Detected Total:</span>
+            <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+              {scannedData.total ? `$${scannedData.total.toFixed(2)}` : 'Not found'}
+            </span>
+          </div>
+
+          {scannedData.total && onScanComplete && (
+            <button
+              onClick={() => onScanComplete(scannedData.total!)}
+              className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium transition-colors"
+            >
+              Use This Amount
+            </button>
+          )}
+
+          <details className="mt-4">
+            <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">Show Raw Text</summary>
+            <pre className="mt-2 text-[10px] text-gray-500 whitespace-pre-wrap h-24 overflow-y-auto bg-gray-100 p-2 rounded">
+              {scannedData.rawText}
+            </pre>
+          </details>
         </div>
       )}
     </div>

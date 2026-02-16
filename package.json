@@ -13,6 +13,7 @@
     "docker:down": "docker-compose down",
     "start": "npm run docker:up && npx wait-on tcp:3306 -t 30000 && npm run dev:full",
     "build": "tsc -b && vite build",
+    "test": "vitest",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -50,6 +51,7 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2",
+    "vitest": "^4.0.18",
     "wait-on": "^9.0.3"
   }
 }

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import type { newExpense, Category, PaymentMethod } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
+import { faRotateRight, faCamera } from "@fortawesome/free-solid-svg-icons";
+import ReceiptScanner from "./ReceiptScanner";
 
 type expenseProps = {
   onAddExpense: (expense: newExpense) => void;
@@ -15,9 +16,18 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
   const [showToast, setShowToast] = useState<boolean>(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH");
+
+  const [showScanner, setShowScanner] = useState(false);
+
   const amt = Number(amount);
   const isValid = amount.trim() !== "" && !Number.isNaN(amt) && date !== "";
-  // console.log(isValid);
+
+  const handleScanComplete = (scannedAmount: number) => {
+    setAmount(scannedAmount.toString());
+    setShowScanner(false);
+    if (!desc) setDesc("Scanned Receipt");
+  };
+
   const handleSubmit = (e: React.FormEvent<Element>) => {
     e.preventDefault();
     if (!isValid) {
@@ -56,6 +66,26 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
         <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-8 tracking-tight">
           Add New Expense
         </h2>
+
+        <button
+          type="button"
+          onClick={() => setShowScanner(!showScanner)}
+          className={`p-2 rounded-lg transition-colors ${
+            showScanner
+              ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+              : "bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300"
+          }`}
+          title="Scan Receipt"
+        >
+          <FontAwesomeIcon icon={faCamera} />
+        </button>
+
+        {showScanner && (
+          <div className="mb-6 p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-700">
+            <ReceiptScanner onScanComplete={handleScanComplete} />
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/**Category Data */}
           <div>
