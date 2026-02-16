@@ -47,4 +47,31 @@ describe('Receipt Parser Logic', () => {
     const result = parseReceipt(rawText);
     expect(result.total).toBe(33.00);
   });
+
+  it('correctly handles European number formats (1.200,50)', () => {
+    const rawText = `
+      REWE Markt
+      Summe    1.200,50
+    `;
+    const result = parseReceipt(rawText);
+    expect(result.total).toBe(1200.50);
+  });
+
+  it('correctly handles US number formats (1,200.50)', () => {
+    const rawText = `
+      Best Buy
+      Total    1,200.50
+    `;
+    const result = parseReceipt(rawText);
+    expect(result.total).toBe(1200.50);
+  });
+  
+  it('handles mixed separators correctly', () => {
+     // This ensures we don't confuse "1,000" (1000) with "1,00" (1)
+     const rawText = "Total 1,000.00"; 
+     expect(parseReceipt(rawText).total).toBe(1000.00);
+     
+     const rawTextEU = "Summe 1.000,00"; 
+     expect(parseReceipt(rawTextEU).total).toBe(1000.00);
+  });
 });

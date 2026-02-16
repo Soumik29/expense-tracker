@@ -18,7 +18,7 @@ During the implementation, several web dev concepts were covered:
  1. File Access:
     - Input files are accessed via event.target.files
     - Even if multiple is not set, this is always a FileList (array-like), so we access the first item with .files?.[0]
-    - Security Note: The `acccept="image/*"` attribute is just a UI hint. Real validation must happen on the backend.
+    - Security Note: The `accept="image/*"` attribute is just a UI hint. Real validation must happen on the backend.
  2. Image Previews (Object URLs):
     - Browsers cannot display a raw File object directly in an <img> tag.
     - We use URL.createObjectURL(file) to create a temporary blob URL (e.g., blob:http://localhost...)

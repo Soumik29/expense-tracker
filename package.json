@@ -13,7 +13,7 @@
     "docker:down": "docker-compose down",
     "start": "npm run docker:up && npx wait-on tcp:3306 -t 30000 && npm run dev:full",
     "build": "tsc -b && vite build",
-    "test": "vitest",
+    "test": "vitest --environment jsdom --globals",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -36,6 +36,8 @@
   "devDependencies": {
     "@cubejs-client/core": "^0.31.0",
     "@eslint/js": "^9.33.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^25.2.1",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
@@ -46,6 +48,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "jsdom": "^28.1.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.12",
     "typescript": "~5.8.3",
