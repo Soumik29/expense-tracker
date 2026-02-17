@@ -3,7 +3,7 @@ export const parseReceipt = (text: string) => {
   let extractedTotal: number | null = null;
   
   // Regex matches both formats: 1,200.50 OR 1.200,50
-  const priceRegex = /[$€£]?\s*?(\d{1,3}(?:[.,]\d{3})*[.,]\d{2})/g;
+  const priceRegex = /[$€£]?\s*(\d{1,3}(?:[.,]\d{3})*[.,]\d{2})/g;
 
   const totalKeywords = ['total', 'amount', 'due', 'balance', 'grand total'];
   const potentialPrices: number[] = [];
