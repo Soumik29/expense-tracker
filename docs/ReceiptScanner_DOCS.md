@@ -28,7 +28,7 @@ During the implementation, several web dev concepts were covered:
     - Tesseract downloads language data (like eng.traineddata) on the first run.
     - The output is "unstructured" text-it reads everything (logos, headers, footers) without knowing what is important.
 ## Current Implementation
-File: src/components/REceiptScanner.tsx
+File: src/components/ReceiptScanner.tsx
 
 This component handles file selection, preview, and raw text extraction.
 ```Typescript
