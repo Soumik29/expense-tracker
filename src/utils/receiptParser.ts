@@ -3,16 +3,18 @@ export const parseReceipt = (text: string) => {
   let extractedTotal: number | null = null;
   
   // Regex matches both formats: 1,200.50 OR 1.200,50
-  const priceRegex = /[$€£]?\s?(\d{1,3}(?:[.,]\d{3})*[.,]\d{2})/g;
+  const priceRegex = /[$€£]?\s*(\d{1,3}(?:[.,]\d{3})*[.,]\d{2})/g;
 
   const totalKeywords = ['total', 'amount', 'due', 'balance', 'grand total'];
+
+  const subtotalRegex = /sub\s*[-]?\s*total/i;
+
   const potentialPrices: number[] = [];
 
   // Helper to convert "1.200,50" or "1,200.50" to a standard JS float
   const parsePrice = (priceStr: string): number => {
     // 1. Remove currency symbols and whitespace, keep digits, dots, and commas
     let clean = priceStr.replace(/[^\d.,]/g, '');
-
     // 2. Detect format: If the last separator is a comma (e.g., 12,00), it's European
     if (clean.match(/,\d{2}$/)) {
       // European: Remove all dots (thousands), replace comma with dot (decimal)
@@ -35,11 +37,21 @@ export const parseReceipt = (text: string) => {
       }
     });
   }
-
   // Pass 2: Context Awareness (Look for "Total" keywords)
-  for (let i = 0; i < lines.length; i++) {
+  for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i].toLowerCase();
-    
+    // GUARD 1: Strict Subtotal Skip
+    // Use regex to catch "sub total", "sub-total", etc.
+    if(subtotalRegex.test(line)){
+      continue;
+    }
+    // GUARD 2: Smart Tax Skip
+    // If line mentions "tax" or "vat", ONLY skip it if it DOESN'T say "Total".
+    // This allows "Total (incl. tax)" to pass, but skips "Tax: $5.00".
+    if ((line.includes('tax') || line.includes('vat')) && !line.includes('total')) {
+      continue;
+    }
+
     if (totalKeywords.some(keyword => line.includes(keyword))) {
       const lineMatches = lines[i].match(priceRegex);
       if (lineMatches) {
