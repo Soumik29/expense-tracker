@@ -74,4 +74,41 @@ describe('Receipt Parser Logic', () => {
      const rawTextEU = "Summe 1.000,00"; 
      expect(parseReceipt(rawTextEU).total).toBe(1000.00);
   });
+
+  it('correctly handles "Total (incl. tax)" lines', () => {
+    // Current code FAILS this because it skips any line with "tax"
+    const rawText = `
+      Burger King
+      Burger 5.00
+      Total (incl. tax) 5.50
+    `;
+    const result = parseReceipt(rawText);
+    expect(result.total).toBe(5.50);
+  });
+
+  it('prioritizes Grand Total over earlier Total lines', () => {
+    // Verifies bottom-up scanning
+    const rawText = `
+      Item A  10.00
+      Total items: 2
+      Subtotal 10.00
+      Tax 1.00
+      Grand Total 11.00
+      Thank you
+    `;
+    const result = parseReceipt(rawText);
+    expect(result.total).toBe(11.00);
+  });
+
+  it('ignores spaced "Sub Total" variants', () => {
+    // Current code FAILS this because "Sub Total" != "subtotal"
+    const rawText = `
+      Item 1    10.00
+      Sub Total 10.00
+      Tax        1.00
+      Total     11.00
+    `;
+    const result = parseReceipt(rawText);
+    expect(result.total).toBe(11.00);
+  });
 });
