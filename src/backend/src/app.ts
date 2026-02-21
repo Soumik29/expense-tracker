@@ -6,6 +6,7 @@ import appConfig from "@config/app.config.js";
 import userRoutes from "@routes/user.routes.js";
 // FIX 1: Import the Router, not the Controller
 import expenseRoutes from "@routes/expense.routes.js";
+import chatRoutes from "@routes/chat.routes.js";
 
 class App {
   private app: Express;
@@ -57,6 +58,7 @@ class App {
 
     // FIX 2: Register the router at the correct PLURAL path
     this.app.use("/api/expenses", expenseRoutes);
+    this.app.use("/api/chat", chatRoutes);
   }
 
   public start() {
