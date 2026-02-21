@@ -1,5 +1,10 @@
+import dotenv from "dotenv";
+import path from "path";
+dotenv.config({path: path.resolve(process.cwd(), "../../.env")});
 import { prisma } from "./db.js";
 import RagService from "./services/rag.service.js";
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function seedVectors() {
   console.log("Fetching all expenses from MySQL...");
@@ -18,6 +23,7 @@ async function seedVectors() {
         await RagService.indexExpense(expense);
         successCount++;
         process.stdout.write(`\rSuccessfully indexed: ${successCount}/${expenses.length}`);
+        await delay(4500);
       } catch (err) {
         console.error(`\nFailed to index expense ID ${expense.id}:`, err);
         errorCount++;
