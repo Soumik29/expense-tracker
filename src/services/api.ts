@@ -3,6 +3,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 interface ApiResponse<T> {
   success: boolean;
+  ok?: boolean,
   data?: T;
   message?: string;
 }
@@ -76,6 +77,28 @@ class ApiService {
     return this.request<T>(endpoint, { method: "DELETE" });
   }
 }
+
+export const askFinancialAssistant = async (question: string): Promise<string> => {
+  // We expect the backend to return { success: true, data: { answer: string } }
+  try{
+
+    const response = await api.post<{ answer: string }>("/chat", { question });
+    
+    if (response.data && response.data.answer) {
+      return response.data.answer;
+    }
+
+    if (typeof response.data === "string"){
+      return response.data;
+    }
+
+    throw new Error(response.message || "The AI response was empty.");
+  
+  } catch (error) {
+    console.error("Chat API Error: ", error);
+    throw error;
+  }
+};
 
 export const api = new ApiService(API_BASE_URL);
 export default api;

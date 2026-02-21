@@ -2,6 +2,7 @@ import Send from "@utils/response.utils.js";
 import { prisma } from "../db.js";
 import type { Request, Response } from "express";
 import type { AuthenticatedRequest } from "../types/express.js";
+import RagService from "../services/rag.service.js";
 
 // Helper to get User ID from request (since middleware attaches it)
 const getUserId = (req: Request): number | null => {
@@ -62,6 +63,12 @@ class ExpenseController {
         },
       });
 
+      try{
+        await RagService.indexExpense(createExpense);
+      } catch(aiError){
+        console.error("Failed to create expense for AI: ", aiError);
+      }
+
       // Frontend expects { data: { expense: ... } }
       return Send.success(res, { expense: createExpense });
     } catch (error) {
@@ -94,6 +101,11 @@ class ExpenseController {
         where: { id: Number(expenseId) },
       });
 
+      try{
+        await RagService.deleteIndexedExpense(Number(expenseId));
+      }catch(aiError){
+        console.error("Failed to delete indexed expense for AI:", aiError);
+      }
       return res.status(204).send(); // 204 No Content is standard for delete
     } catch (error) {
       console.error("Failed to delete expense:", error);
@@ -140,6 +152,12 @@ class ExpenseController {
           paymentMethod: paymentMethod || "CASH",
         },
       });
+
+      try{
+        await RagService.indexExpense(updatedExpense);
+      } catch (aiError){
+        console.error("Failed to update expense for AI: ", aiError);
+      }
 
       return Send.success(res, { expense: updatedExpense });
     } catch (error) {
