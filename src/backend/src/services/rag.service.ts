@@ -14,9 +14,14 @@ const pinecone = new PineconeClient({
 
 // Target the custom index you created on the Pinecone website
 const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX!);
+const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 
+if(!apiKey){
+  throw new Error("Missing GOOGLE_API_KEY in environment variables");
+}
 // Use Google's free embedding model (outputs 768 dimensions)
 const embeddings = new GoogleGenerativeAIEmbeddings({
+  apiKey: apiKey,
   model: "gemini-embedding-001"
   // @ts-expect-ignore - We use this flag just in case your local LangChain TypeScript definitions haven't caught up to this new feature yet 
 });
