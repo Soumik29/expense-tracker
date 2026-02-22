@@ -29,7 +29,7 @@ const embeddings = new GoogleGenerativeAIEmbeddings({
 // Use Groq's lightning-fast Llama 3 hosting
 const model = new ChatGroq({
   apiKey: process.env.GROQ_API_KEY!,
-  model: "llama3-8b-8192",
+  model: "llama-3.1-8b-instant",
   temperature: 0.2,
 });
 
