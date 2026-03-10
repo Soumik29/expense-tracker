@@ -275,6 +275,144 @@ const {
 {income.length > 0 && <TotalIncome incomes={income} />}
 ```
 
+### 3.5 Income Filtering & Charts
+
+To give incomes feature parity with expenses, we added **income-specific filtering** and a dedicated **income chart**.
+
+#### 3.5.1 Income filter hook
+
+File: `src/utils/useIncomeFilter.tsx`
+
+This is a sibling of `useFilter`, tuned to the `Income` and `IncomeCategory` types:
+
+```ts
+export interface IncomeFilterState {
+  searchQuery: string;
+  category: IncomeCategory | "all";
+  paymentMethod: PaymentMethod | "all";
+  dateRange: { start: string; end: string };
+  amountRange: { min: number | ""; max: number | "" };
+  isRecurring: boolean | "all";
+}
+
+const useIncomeFilter = (incomes: Income[]) => {
+  const [filters, setFilters] = useState<IncomeFilterState>(initialFilterState);
+
+  // ...same pattern as useFilter: setSearchQuery, setCategory, setPaymentMethod, etc.
+
+  const filteredIncomes = useMemo(() => {
+    return incomes.filter((income) => {
+      // text search on description + category
+      // category, payment, date range, amount range, recurring filters
+      return true or false;
+    });
+  }, [incomes, filters]);
+
+  return { filters, filteredIncomes, /* actions */ };
+};
+```
+
+#### 3.5.2 Reusing `SearchFilter` for incomes
+
+Instead of creating a second filter UI, we adapt `useIncomeFilter` to the existing `SearchFilter` props in `ExpenseTracker.tsx`:
+
+```ts
+import useFilter, { type FilterActions, type FilterState } from "../utils/useFilter";
+import useIncomeFilter from "../utils/useIncomeFilter";
+
+const {
+  filters: incomeFiltersRaw,
+  filteredIncomes,
+  setSearchQuery: setIncomeSearchQuery,
+  setCategory: setIncomeCategory,
+  setPaymentMethod: setIncomePaymentMethod,
+  setDateRange: setIncomeDateRange,
+  setAmountRange: setIncomeAmountRange,
+  setIsRecurring: setIncomeIsRecurring,
+  resetFilters: resetIncomeFilters,
+  hasActiveFilters: hasActiveIncomeFilters,
+} = useIncomeFilter(income);
+
+const incomeFilters = incomeFiltersRaw as unknown as FilterState;
+const incomeFilterActions: FilterActions = {
+  setSearchQuery: setIncomeSearchQuery,
+  setCategory: setIncomeCategory as unknown as FilterActions["setCategory"],
+  setPaymentMethod: setIncomePaymentMethod,
+  setDateRange: setIncomeDateRange,
+  setAmountRange: setIncomeAmountRange,
+  setIsRecurring: setIncomeIsRecurring,
+  resetFilters: resetIncomeFilters,
+  hasActiveFilters: hasActiveIncomeFilters,
+};
+```
+
+Then render a **second** `SearchFilter` in the header:
+
+```tsx
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  {/* Expense filters */}
+  <SearchFilter
+    filters={filters}
+    filterActions={{ /* expense filter actions */ }}
+    resultCount={filteredExpenses.length}
+    totalCount={expense.length}
+  />
+
+  {/* Income filters */}
+  <SearchFilter
+    filters={incomeFilters}
+    filterActions={incomeFilterActions}
+    resultCount={filteredIncomes.length}
+    totalCount={income.length}
+  />
+</div>
+```
+
+The incomes list and total now consume **filtered** data:
+
+```tsx
+<IncomeList incomes={filteredIncomes} onDeleteIncome={deleteIncome} />
+{filteredIncomes.length > 0 && <TotalIncome incomes={filteredIncomes} />}
+```
+
+#### 3.5.3 Income chart
+
+File: `src/components/IncomeChart.tsx`
+
+This component is the income analogue to `ExpenseChart`, built on `chart.js`:
+
+```ts
+const IncomeChart = ({ incomes }: { incomes: Income[] }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
+  const [viewBy, setViewBy] = useState<"category" | "payment">("category");
+
+  useEffect(() => {
+    // aggregate by category or payment method
+    // build bar chart with green theme
+  }, [incomes, viewBy]);
+
+  return (
+    <div className="w-full bg-white rounded-2xl border border-zinc-200 p-8">
+      {/* header + Category/Payment toggle */}
+      <canvas ref={canvasRef}></canvas>
+    </div>
+  );
+};
+```
+
+In `ExpenseTracker.tsx` we now show **both** charts, each driven by its filtered data:
+
+```tsx
+<ExpenseChart expense={filteredExpenses} />
+<IncomeChart incomes={filteredIncomes} />
+```
+
+This keeps the UX symmetric: users can filter and visualize both **spending** and **income streams** by category or payment method.*** End Patch
+```} ***!
+*** End Patchත්ත```} ***!
+*** End Patch```} ***!
+
 ---
 
 ## 4. AI / RAG Integration for Incomes
