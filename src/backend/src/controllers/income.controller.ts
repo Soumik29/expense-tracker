@@ -2,6 +2,19 @@ import Send from "@utils/response.utils.js";
 import { prisma } from "../db.js";
 import type { Request, Response } from "express";
 import type { AuthenticatedRequest } from "../types/express.js";
+import RagService from "../services/rag.service.js";
+
+type PrismaIncomeDelegate = {
+  findMany: (args: unknown) => Promise<unknown[]>;
+  create: (args: unknown) => Promise<unknown>;
+  findUnique: (args: unknown) => Promise<unknown | null>;
+  delete: (args: unknown) => Promise<unknown>;
+  update: (args: unknown) => Promise<unknown>;
+};
+
+type PrismaWithIncome = typeof prisma & { income: PrismaIncomeDelegate };
+
+const prismaWithIncome: PrismaWithIncome = prisma as PrismaWithIncome;
 
 // Helper to get User ID from request (since middleware attaches it)
 const getUserId = (req: Request): number | null => {
@@ -16,7 +29,7 @@ class IncomeController {
       const userId = getUserId(req);
       if (!userId) return Send.unauthorized(res, null);
 
-      const incomes = await prisma.income.findMany({
+      const incomes = await prismaWithIncome.income.findMany({
         where: { userId },
         orderBy: { date: "desc" },
       });
@@ -49,7 +62,7 @@ class IncomeController {
         });
       }
 
-      const createdIncome = await prisma.income.create({
+      const createdIncome = await prismaWithIncome.income.create({
         data: {
           category,
           amount: Number(amount),
@@ -60,6 +73,12 @@ class IncomeController {
           paymentMethod: paymentMethod || "CASH",
         },
       });
+
+      try {
+        await RagService.indexIncome(createdIncome);
+      } catch (aiError) {
+        console.error("Failed to create income for AI: ", aiError);
+      }
 
       return Send.success(res, { income: createdIncome });
     } catch (error) {
@@ -76,7 +95,7 @@ class IncomeController {
 
       if (!userId) return Send.unauthorized(res, null);
 
-      const income = await prisma.income.findUnique({
+      const income = await prismaWithIncome.income.findUnique({
         where: { id: Number(incomeId) },
       });
 
@@ -88,9 +107,15 @@ class IncomeController {
         );
       }
 
-      await prisma.income.delete({
+      await prismaWithIncome.income.delete({
         where: { id: Number(incomeId) },
       });
+
+      try {
+        await RagService.deleteIndexedIncome(Number(incomeId));
+      } catch (aiError) {
+        console.error("Failed to delete indexed income for AI:", aiError);
+      }
 
       return res.status(204).send();
     } catch (error) {
@@ -115,7 +140,7 @@ class IncomeController {
 
       if (!userId) return Send.unauthorized(res, null);
 
-      const existing = await prisma.income.findUnique({
+      const existing = await prismaWithIncome.income.findUnique({
         where: { id: Number(incomeId) },
       });
 
@@ -127,7 +152,7 @@ class IncomeController {
         );
       }
 
-      const updatedIncome = await prisma.income.update({
+      const updatedIncome = await prismaWithIncome.income.update({
         where: { id: Number(incomeId) },
         data: {
           amount: Number(amount),
@@ -138,6 +163,12 @@ class IncomeController {
           paymentMethod: paymentMethod || "CASH",
         },
       });
+
+      try {
+        await RagService.indexIncome(updatedIncome);
+      } catch (aiError) {
+        console.error("Failed to update income for AI: ", aiError);
+      }
 
       return Send.success(res, { income: updatedIncome });
     } catch (error) {
