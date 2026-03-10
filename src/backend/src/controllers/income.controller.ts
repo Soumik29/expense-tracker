@@ -4,6 +4,18 @@ import type { Request, Response } from "express";
 import type { AuthenticatedRequest } from "../types/express.js";
 import RagService from "../services/rag.service.js";
 
+type PrismaIncomeDelegate = {
+  findMany: (args: unknown) => Promise<unknown[]>;
+  create: (args: unknown) => Promise<unknown>;
+  findUnique: (args: unknown) => Promise<unknown | null>;
+  delete: (args: unknown) => Promise<unknown>;
+  update: (args: unknown) => Promise<unknown>;
+};
+
+type PrismaWithIncome = typeof prisma & { income: PrismaIncomeDelegate };
+
+const prismaWithIncome: PrismaWithIncome = prisma as PrismaWithIncome;
+
 // Helper to get User ID from request (since middleware attaches it)
 const getUserId = (req: Request): number | null => {
   const authReq = req as AuthenticatedRequest;
@@ -17,7 +29,7 @@ class IncomeController {
       const userId = getUserId(req);
       if (!userId) return Send.unauthorized(res, null);
 
-      const incomes = await (prisma as any).income.findMany({
+      const incomes = await prismaWithIncome.income.findMany({
         where: { userId },
         orderBy: { date: "desc" },
       });
@@ -50,7 +62,7 @@ class IncomeController {
         });
       }
 
-      const createdIncome = await (prisma as any).income.create({
+      const createdIncome = await prismaWithIncome.income.create({
         data: {
           category,
           amount: Number(amount),
@@ -83,7 +95,7 @@ class IncomeController {
 
       if (!userId) return Send.unauthorized(res, null);
 
-      const income = await (prisma as any).income.findUnique({
+      const income = await prismaWithIncome.income.findUnique({
         where: { id: Number(incomeId) },
       });
 
@@ -95,7 +107,7 @@ class IncomeController {
         );
       }
 
-      await (prisma as any).income.delete({
+      await prismaWithIncome.income.delete({
         where: { id: Number(incomeId) },
       });
 
@@ -128,7 +140,7 @@ class IncomeController {
 
       if (!userId) return Send.unauthorized(res, null);
 
-      const existing = await (prisma as any).income.findUnique({
+      const existing = await prismaWithIncome.income.findUnique({
         where: { id: Number(incomeId) },
       });
 
@@ -140,7 +152,7 @@ class IncomeController {
         );
       }
 
-      const updatedIncome = await (prisma as any).income.update({
+      const updatedIncome = await prismaWithIncome.income.update({
         where: { id: Number(incomeId) },
         data: {
           amount: Number(amount),
