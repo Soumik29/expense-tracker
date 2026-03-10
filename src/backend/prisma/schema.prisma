@@ -19,6 +19,18 @@ model Expense{
   paymentMethod   PaymentMethod   @default(CASH)
 }
 
+model Income{
+  id              Int             @id         @default(autoincrement())
+  amount          Decimal         @db.Decimal(10, 2)
+  date            DateTime
+  category        IncomeCategory
+  description     String?
+  userId          Int
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isRecurring     Boolean         @default(false)
+  paymentMethod   PaymentMethod   @default(CASH)
+}
+
 model User{
   id           Int        @id @default(autoincrement())
   username     String     @unique
@@ -28,6 +40,7 @@ model User{
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   expenses     Expense[]
+  incomes      Income[]
 }
 
 enum Category{
@@ -46,5 +59,13 @@ enum PaymentMethod{
   CREDIT_CARD
   DEBIT_CARD
   UPI
+}
+
+enum IncomeCategory{
+  Salary
+  Freelance
+  Investment
+  Gift
+  Other
 }
 
