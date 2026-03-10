@@ -6,7 +6,7 @@ import SearchFilter from "./SearchFilter";
 import useCrud from "../utils/useCrud";
 import useAccordion from "../utils/useAccordion";
 import useModal from "../utils/useModal";
-import useFilter from "../utils/useFilter";
+import useFilter, { type FilterActions, type FilterState } from "../utils/useFilter";
 import HandleGrouping from "./HandleGrouping";
 import ExpenseChart from "./ExpenseChart";
 import { useAuth } from "../utils/useAuth";
@@ -18,6 +18,8 @@ import useIncomeCrud from "../utils/useIncomeCrud";
 import AddIncomeForm from "./AddIncomeForm";
 import IncomeList from "./IncomeList";
 import TotalIncome from "./TotalIncome";
+import useIncomeFilter from "../utils/useIncomeFilter";
+import IncomeChart from "./IncomeChart";
 
 const ExpenseTracker = () => {
   const { user, logout } = useAuth();
@@ -42,6 +44,32 @@ const ExpenseTracker = () => {
     resetFilters,
     hasActiveFilters,
   } = useFilter(expense);
+
+  const {
+    filters: incomeFiltersRaw,
+    filteredIncomes,
+    setSearchQuery: setIncomeSearchQuery,
+    setCategory: setIncomeCategory,
+    setPaymentMethod: setIncomePaymentMethod,
+    setDateRange: setIncomeDateRange,
+    setAmountRange: setIncomeAmountRange,
+    setIsRecurring: setIncomeIsRecurring,
+    resetFilters: resetIncomeFilters,
+    hasActiveFilters: hasActiveIncomeFilters,
+  } = useIncomeFilter(income);
+
+  // Adapt income-specific filter state/actions to the generic SearchFilter props
+  const incomeFilters = incomeFiltersRaw as unknown as FilterState;
+  const incomeFilterActions: FilterActions = {
+    setSearchQuery: setIncomeSearchQuery,
+    setCategory: setIncomeCategory as unknown as FilterActions["setCategory"],
+    setPaymentMethod: setIncomePaymentMethod,
+    setDateRange: setIncomeDateRange,
+    setAmountRange: setIncomeAmountRange,
+    setIsRecurring: setIncomeIsRecurring,
+    resetFilters: resetIncomeFilters,
+    hasActiveFilters: hasActiveIncomeFilters,
+  };
 
   // Accordion hook - groups the filtered expenses
   const {
@@ -126,21 +154,29 @@ const ExpenseTracker = () => {
       <main className="max-w-7xl mx-auto px-8 py-12">
         {/* Search and Filter Section */}
         <div className="mb-8">
-          <SearchFilter
-            filters={filters}
-            filterActions={{
-              setSearchQuery,
-              setCategory,
-              setPaymentMethod,
-              setDateRange,
-              setAmountRange,
-              setIsRecurring,
-              resetFilters,
-              hasActiveFilters,
-            }}
-            resultCount={filteredExpenses.length}
-            totalCount={expense.length}
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <SearchFilter
+              filters={filters}
+              filterActions={{
+                setSearchQuery,
+                setCategory,
+                setPaymentMethod,
+                setDateRange,
+                setAmountRange,
+                setIsRecurring,
+                resetFilters,
+                hasActiveFilters,
+              }}
+              resultCount={filteredExpenses.length}
+              totalCount={expense.length}
+            />
+            <SearchFilter
+              filters={incomeFilters}
+              filterActions={incomeFilterActions}
+              resultCount={filteredIncomes.length}
+              totalCount={income.length}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-12 items-start">
@@ -167,8 +203,8 @@ const ExpenseTracker = () => {
               <TotalExpense totalExp={expensesToTotal} />
             ) : null}
 
-            <IncomeList incomes={income} onDeleteIncome={deleteIncome} />
-            {income.length > 0 && <TotalIncome incomes={income} />}
+            <IncomeList incomes={filteredIncomes} onDeleteIncome={deleteIncome} />
+            {filteredIncomes.length > 0 && <TotalIncome incomes={filteredIncomes} />}
           </div>
 
           {editExpense ? (
@@ -181,6 +217,7 @@ const ExpenseTracker = () => {
           ) : null}
 
           <ExpenseChart expense={filteredExpenses} />
+          <IncomeChart incomes={filteredIncomes} />
           <ReceiptScanner />
           <FinancialAssistant />
         </div>
