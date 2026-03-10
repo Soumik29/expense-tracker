@@ -4,8 +4,8 @@ import cors from "cors";
 import authRoutes from "@routes/auth.routes.js";
 import appConfig from "@config/app.config.js";
 import userRoutes from "@routes/user.routes.js";
-// FIX 1: Import the Router, not the Controller
 import expenseRoutes from "@routes/expense.routes.js";
+import incomeRoutes from "@routes/income.routes.js";
 import chatRoutes from "@routes/chat.routes.js";
 
 class App {
@@ -55,9 +55,8 @@ class App {
 
     this.app.use("/api/auth", authRoutes);
     this.app.use("/api/user", userRoutes);
-
-    // FIX 2: Register the router at the correct PLURAL path
     this.app.use("/api/expenses", expenseRoutes);
+    this.app.use("/api/incomes", incomeRoutes);
     this.app.use("/api/chat", chatRoutes);
   }
 

@@ -3,7 +3,6 @@ import TotalExpense from "./TotalExpense";
 import AddExpenseForm from "./AddExpenseForm";
 import ModalFormExpense from "./ModalFormExpense";
 import SearchFilter from "./SearchFilter";
-// import Chart from "chart.js/auto";
 import useCrud from "../utils/useCrud";
 import useAccordion from "../utils/useAccordion";
 import useModal from "../utils/useModal";
@@ -15,10 +14,20 @@ import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
 import ThemeToggle from "./ThemeToggle";
 import ReceiptScanner from "./ReceiptScanner";
 import FinancialAssistant from "./FinancialAssistant";
+import useIncomeCrud from "../utils/useIncomeCrud";
+import AddIncomeForm from "./AddIncomeForm";
+import IncomeList from "./IncomeList";
+import TotalIncome from "./TotalIncome";
 
 const ExpenseTracker = () => {
   const { user, logout } = useAuth();
   const { expense, addExpense, deleteExpense, updateExpenses } = useCrud();
+  const {
+    income,
+    addIncome,
+    deleteIncome,
+    // updateIncome, // reserved for future editing support
+  } = useIncomeCrud();
 
   // Filter hook - filters the raw expenses
   const {
@@ -134,14 +143,18 @@ const ExpenseTracker = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          <AddExpenseForm onAddExpense={addExpense} />
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-12 items-start">
+          <div className="space-y-10">
+            <AddExpenseForm onAddExpense={addExpense} />
+            <AddIncomeForm onAddIncome={addIncome} />
+          </div>
+
           <div className="space-y-6">
             <HandleGrouping
               groupMode={groupMode}
               handleGrouping={handleGrouping}
             />
-            <div className="overflow-y-auto max-h-[500px]">
+            <div className="overflow-y-auto max-h-[320px]">
               <ExpenseCard
                 expenseList={groupedExpenses}
                 onDeleteExpense={deleteExpense}
@@ -153,7 +166,11 @@ const ExpenseTracker = () => {
             {filteredExpenses.length !== 0 ? (
               <TotalExpense totalExp={expensesToTotal} />
             ) : null}
+
+            <IncomeList incomes={income} onDeleteIncome={deleteIncome} />
+            {income.length > 0 && <TotalIncome incomes={income} />}
           </div>
+
           {editExpense ? (
             <ModalFormExpense
               open={isOpen}
@@ -162,9 +179,10 @@ const ExpenseTracker = () => {
               onUpdateExpense={updateExpenses}
             />
           ) : null}
+
           <ExpenseChart expense={filteredExpenses} />
-        <ReceiptScanner/>
-        <FinancialAssistant />
+          <ReceiptScanner />
+          <FinancialAssistant />
         </div>
       </main>
     </div>

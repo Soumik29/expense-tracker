@@ -10,6 +10,13 @@ export type Category =
   | "EMI";
 export type PaymentMethod = "CASH" | "CREDIT_CARD" | "DEBIT_CARD" | "UPI";
 
+export type IncomeCategory =
+  | "Salary"
+  | "Freelance"
+  | "Investment"
+  | "Gift"
+  | "Other";
+
 export type Expense = {
   id: number;
   category: Category;
@@ -22,3 +29,16 @@ export type Expense = {
 };
 
 export type newExpense = Omit<Expense, "id">;
+
+export type Income = {
+  id: number;
+  category: IncomeCategory;
+  amount: number;
+  description: string;
+  date: string;
+  isRecurring: boolean;
+  paymentMethod: PaymentMethod;
+  userId?: number;
+};
+
+export type newIncome = Omit<Income, "id">;
