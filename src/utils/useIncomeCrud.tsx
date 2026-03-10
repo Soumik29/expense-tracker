@@ -13,7 +13,7 @@ const useIncomeCrud = () => {
         setLoading(true);
         const incomes = await incomeService.getAll();
         setIncome(
-          incomes.map((inc) => ({
+          incomes.map((inc: Income) => ({
             ...inc,
             date:
               typeof inc.date === "string"
