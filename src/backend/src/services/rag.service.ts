@@ -67,10 +67,16 @@ class RagService {
    * Retrieves relevant expenses from Pinecone and asks Groq the user's question.
    */
   static async askFinancialAssistant(userId: number, question: string) {
-    const vectorStore = await PineconeStore.fromExistingIndex(embeddings, { pineconeIndex });
-    
+    const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
+      pineconeIndex,
+      textKey: "text",
+    });
+
     // Retrieve top 5 expenses, strictly filtering by userId for security
-    const results = await vectorStore.similaritySearch(question, 5, { userId: userId });
+    // Pinecone requires explicit $eq for metadata filters
+    const results = await vectorStore.similaritySearch(question, 5, {
+      userId: { $eq: userId },
+    });
     
     if (results.length === 0) {
       return "I couldn't find any relevant expenses to answer your question.";
