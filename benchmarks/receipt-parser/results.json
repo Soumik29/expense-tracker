@@ -1,0 +1,352 @@
+{
+  "generatedAt": "2026-07-07T21:34:36.991Z",
+  "accuracy": 93.54838709677419,
+  "passCount": 29,
+  "totalCases": 31,
+  "byTag": {
+    "standard": {
+      "pass": 13,
+      "total": 13
+    },
+    "real-world-merchant": {
+      "pass": 10,
+      "total": 10
+    },
+    "international": {
+      "pass": 3,
+      "total": 3
+    },
+    "fallback": {
+      "pass": 3,
+      "total": 3
+    },
+    "discount": {
+      "pass": 1,
+      "total": 1
+    },
+    "tax-handling": {
+      "pass": 3,
+      "total": 3
+    },
+    "subtotal-handling": {
+      "pass": 3,
+      "total": 3
+    },
+    "ocr-noise": {
+      "pass": 3,
+      "total": 4
+    },
+    "known-limitation": {
+      "pass": 2,
+      "total": 4
+    },
+    "distractor": {
+      "pass": 2,
+      "total": 2
+    },
+    "currency-format": {
+      "pass": 4,
+      "total": 4
+    }
+  },
+  "results": [
+    {
+      "label": "Starbucks - simple total",
+      "tags": [
+        "standard",
+        "real-world-merchant"
+      ],
+      "expectedTotal": 8.2,
+      "actual": 8.2,
+      "pass": true
+    },
+    {
+      "label": "Walmart grocery - tabbed items",
+      "tags": [
+        "standard",
+        "real-world-merchant"
+      ],
+      "expectedTotal": 12.79,
+      "actual": 12.79,
+      "pass": true
+    },
+    {
+      "label": "Uber ride receipt",
+      "tags": [
+        "standard",
+        "real-world-merchant"
+      ],
+      "expectedTotal": 23.45,
+      "actual": 23.45,
+      "pass": true
+    },
+    {
+      "label": "Shell gas station",
+      "tags": [
+        "standard",
+        "real-world-merchant"
+      ],
+      "expectedTotal": 42.1,
+      "actual": 42.1,
+      "pass": true
+    },
+    {
+      "label": "CVS pharmacy co-pay",
+      "tags": [
+        "standard",
+        "real-world-merchant"
+      ],
+      "expectedTotal": 8.99,
+      "actual": 8.99,
+      "pass": true
+    },
+    {
+      "label": "Restaurant with tip added",
+      "tags": [
+        "standard",
+        "real-world-merchant"
+      ],
+      "expectedTotal": 26.89,
+      "actual": 26.89,
+      "pass": true
+    },
+    {
+      "label": "Hotel folio",
+      "tags": [
+        "standard",
+        "real-world-merchant"
+      ],
+      "expectedTotal": 322.28,
+      "actual": 322.28,
+      "pass": true
+    },
+    {
+      "label": "E-commerce order confirmation",
+      "tags": [
+        "standard",
+        "real-world-merchant"
+      ],
+      "expectedTotal": 32.09,
+      "actual": 32.09,
+      "pass": true
+    },
+    {
+      "label": "REWE German supermarket (Summe, no English keyword)",
+      "tags": [
+        "international",
+        "fallback"
+      ],
+      "expectedTotal": 4.28,
+      "actual": 4.28,
+      "pass": true
+    },
+    {
+      "label": "Airport parking - Amount Due keyword",
+      "tags": [
+        "standard"
+      ],
+      "expectedTotal": 19.5,
+      "actual": 19.5,
+      "pass": true
+    },
+    {
+      "label": "Coffee shop with coupon discount",
+      "tags": [
+        "discount",
+        "real-world-merchant"
+      ],
+      "expectedTotal": 3.5,
+      "actual": 3.5,
+      "pass": true
+    },
+    {
+      "label": "Electronics store - multiple tax lines",
+      "tags": [
+        "standard",
+        "tax-handling"
+      ],
+      "expectedTotal": 14.16,
+      "actual": 14.16,
+      "pass": true
+    },
+    {
+      "label": "Grocery store - Balance keyword",
+      "tags": [
+        "standard"
+      ],
+      "expectedTotal": 9.48,
+      "actual": 9.48,
+      "pass": true
+    },
+    {
+      "label": "Receipt with only a Subtotal line, no Total at all",
+      "tags": [
+        "fallback",
+        "subtotal-handling"
+      ],
+      "expectedTotal": 4,
+      "actual": 4,
+      "pass": true
+    },
+    {
+      "label": "OCR noise: currency glued to keyword, no space",
+      "tags": [
+        "ocr-noise",
+        "real-world-merchant"
+      ],
+      "expectedTotal": 45,
+      "actual": 45,
+      "pass": true
+    },
+    {
+      "label": "OCR noise: 'Total' keyword broken by stray spaces",
+      "tags": [
+        "ocr-noise",
+        "known-limitation"
+      ],
+      "expectedTotal": 3.25,
+      "actual": 3.25,
+      "pass": true
+    },
+    {
+      "label": "Whole-dollar total with no cents printed",
+      "tags": [
+        "ocr-noise",
+        "known-limitation"
+      ],
+      "expectedTotal": 45,
+      "actual": null,
+      "pass": false
+    },
+    {
+      "label": "Three-decimal currency (Kuwaiti Dinar style)",
+      "tags": [
+        "international",
+        "known-limitation"
+      ],
+      "expectedTotal": 8,
+      "actual": 8,
+      "pass": true
+    },
+    {
+      "label": "All-caps TOTAL with OCR garbage characters",
+      "tags": [
+        "ocr-noise"
+      ],
+      "expectedTotal": 1.5,
+      "actual": 1.5,
+      "pass": true
+    },
+    {
+      "label": "'Total Items' count line before the real total",
+      "tags": [
+        "standard",
+        "distractor"
+      ],
+      "expectedTotal": 7,
+      "actual": 7,
+      "pass": true
+    },
+    {
+      "label": "Refund receipt with negative total",
+      "tags": [
+        "known-limitation"
+      ],
+      "expectedTotal": -15,
+      "actual": 15,
+      "pass": false
+    },
+    {
+      "label": "Minimal receipt - bare number only",
+      "tags": [
+        "fallback"
+      ],
+      "expectedTotal": 12.99,
+      "actual": 12.99,
+      "pass": true
+    },
+    {
+      "label": "Euro symbol receipt",
+      "tags": [
+        "currency-format"
+      ],
+      "expectedTotal": 4.3,
+      "actual": 4.3,
+      "pass": true
+    },
+    {
+      "label": "Pound sterling receipt",
+      "tags": [
+        "currency-format"
+      ],
+      "expectedTotal": 4.7,
+      "actual": 4.7,
+      "pass": true
+    },
+    {
+      "label": "Large US total with thousands separator",
+      "tags": [
+        "currency-format"
+      ],
+      "expectedTotal": 2137.9,
+      "actual": 2137.9,
+      "pass": true
+    },
+    {
+      "label": "Large European total with thousands separator",
+      "tags": [
+        "currency-format",
+        "international"
+      ],
+      "expectedTotal": 2033.9,
+      "actual": 2033.9,
+      "pass": true
+    },
+    {
+      "label": "Grand Total overrides earlier partial total",
+      "tags": [
+        "standard",
+        "subtotal-handling"
+      ],
+      "expectedTotal": 15.2,
+      "actual": 15.2,
+      "pass": true
+    },
+    {
+      "label": "'Sub Total' spaced variant correctly skipped",
+      "tags": [
+        "subtotal-handling"
+      ],
+      "expectedTotal": 4.35,
+      "actual": 4.35,
+      "pass": true
+    },
+    {
+      "label": "'Total (incl. tax)' single line",
+      "tags": [
+        "tax-handling"
+      ],
+      "expectedTotal": 8.5,
+      "actual": 8.5,
+      "pass": true
+    },
+    {
+      "label": "Date and phone number distractors",
+      "tags": [
+        "distractor"
+      ],
+      "expectedTotal": 45,
+      "actual": 45,
+      "pass": true
+    },
+    {
+      "label": "Receipt with VAT-only line correctly skipped",
+      "tags": [
+        "tax-handling"
+      ],
+      "expectedTotal": 3.2,
+      "actual": 3.2,
+      "pass": true
+    }
+  ]
+}

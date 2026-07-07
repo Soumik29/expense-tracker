@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon --exec tsx ./src/index.ts",
     "build": "tsc && tsc-alias",
-    "start": "node ./dist/index.js"
+    "start": "node ./dist/index.js",
+    "bench:rag": "tsx ./src/rag-benchmark.ts"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +30,7 @@
     "chromadb": "^3.3.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "dotenv-expand": "^13.0.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "langchain": "^1.2.25",
