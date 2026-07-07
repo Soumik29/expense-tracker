@@ -41,6 +41,12 @@ const EXPENSE_SEED = [
   { amount: 300.0, category: "EMI", daysAgo: 20, description: "Car loan EMI payment", paymentMethod: "UPI", isRecurring: true },
   { amount: 35.0, category: "Food", daysAgo: 25, description: "Lunch with coworkers", paymentMethod: "CASH", isRecurring: false },
   { amount: 500.0, category: "Travel", daysAgo: 30, description: "Hotel booking for vacation", paymentMethod: "CREDIT_CARD", isRecurring: false },
+  // Adversarial case: an OLD expense whose description echoes "latest/most recent"
+  // phrasing, so it ranks highly in semantic search for a recency question even
+  // though it is not actually the newest record. Regression test for the bug
+  // where the assistant answered "latest expense" from semantic search instead
+  // of the recency-sorted DB query.
+  { amount: 999.99, category: "Shopping", daysAgo: 45, description: "My latest and most recent big purchase - a brand new iPhone", paymentMethod: "CREDIT_CARD", isRecurring: false },
 ] as const;
 
 const INCOME_SEED = [
@@ -57,11 +63,17 @@ type Check = string[]; // OR-matched synonyms; a question passes a check if ANY 
 type BenchQuestion = {
   question: string;
   checks: Check[]; // ALL checks must match (AND of groups, OR within group)
+  mustNotInclude?: string[]; // fail if the answer contains any of these
   notes: string;
 };
 
 const QUESTIONS: BenchQuestion[] = [
-  { question: "What was my most recent expense?", checks: [["45", "45.00"], ["sushi", "food", "dinner"]], notes: "Recency lookup, expense side." },
+  {
+    question: "What was my most recent expense?",
+    checks: [["45", "45.00"], ["sushi", "food", "dinner"]],
+    mustNotInclude: ["999.99", "iphone"],
+    notes: "Recency lookup, expense side. An older $999.99 'latest iPhone purchase' expense is seeded specifically to bait semantic search into being cited instead of the true latest record.",
+  },
   { question: "What was my most recent income?", checks: [["4000", "4,000"], ["salary", "july"]], notes: "Recency lookup, income side." },
   { question: "How much did I spend on my flight to Chicago?", checks: [["250"]], notes: "Specific-record recall via semantic search." },
   { question: "What did I spend on Netflix?", checks: [["12.99", "12.9"], ["netflix"]], notes: "Specific-record recall." },
@@ -182,7 +194,10 @@ async function main() {
       error = (err as Error).message;
     }
     const latencyMs = performance.now() - start;
-    const pass = !error && q.checks.every((group) => containsAny(answer, group));
+    const pass =
+      !error &&
+      q.checks.every((group) => containsAny(answer, group)) &&
+      !(q.mustNotInclude && containsAny(answer, q.mustNotInclude));
     results.push({ question: q.question, answer, pass, latencyMs, notes: q.notes, error });
     console.log(`  [${pass ? "PASS" : "FAIL"}] (${latencyMs.toFixed(0)}ms) ${q.question}`);
   }
