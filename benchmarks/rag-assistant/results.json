@@ -1,102 +1,116 @@
 {
-  "generatedAt": "2026-07-07T22:40:23.842Z",
+  "generatedAt": "2026-07-08T03:16:27.747Z",
   "accuracy": 100,
-  "passCount": 13,
-  "totalQuestions": 13,
-  "avgLatencyMs": 1740.6909846153833,
-  "minLatencyMs": 198.01609999999346,
-  "maxLatencyMs": 8496.089800000002,
+  "passCount": 15,
+  "totalQuestions": 15,
+  "avgLatencyMs": 3646.736680000002,
+  "minLatencyMs": 565.3274000000092,
+  "maxLatencyMs": 12549.970499999996,
   "results": [
     {
       "question": "What was my most recent expense?",
-      "answer": "Your most recent expense was $45 on Food at Sushi Palace on 2026-07-07.",
+      "answer": "**Most recent expense**\n\n- **Date:** 2026‑07‑07  \n- **Amount:** $45  \n- **Category:** Food  \n- **Payment method:** CREDIT_CARD  \n- **Description:** Dinner at Sushi Palace",
       "pass": true,
-      "latencyMs": 274.2917999999918,
+      "latencyMs": 794.8006999999925,
       "notes": "Recency lookup, expense side. An older $999.99 'latest iPhone purchase' expense is seeded specifically to bait semantic search into being cited instead of the true latest record."
     },
     {
       "question": "What was my most recent income?",
-      "answer": "Your most recent income was $4000 from Salary on 2026-07-07.",
+      "answer": "Your most recent income was a **$4,000 Salary** received on **2026‑07‑07** via UPI.",
       "pass": true,
-      "latencyMs": 198.01609999999346,
+      "latencyMs": 960.4310000000114,
       "notes": "Recency lookup, income side."
     },
     {
       "question": "How much did I spend on my flight to Chicago?",
-      "answer": "You spent $250 on your flight to Chicago.",
+      "answer": "You spent **$250** on your flight to Chicago.",
       "pass": true,
-      "latencyMs": 4392.602500000008,
+      "latencyMs": 2555.6391000000003,
       "notes": "Specific-record recall via semantic search."
     },
     {
       "question": "What did I spend on Netflix?",
-      "answer": "You spent $12.99 on Netflix on 2026-06-23.",
+      "answer": "You had a single Netflix transaction:\n\n- **Date:** 2026‑06‑23  \n- **Amount:** $12.99  \n- **Category:** Subscription  \n- **Payment method:** CREDIT_CARD  \n- **Description:** Netflix subscription  \n\nThat’s the only Netflix‑related spend in your records.",
       "pass": true,
-      "latencyMs": 630.7240999999922,
+      "latencyMs": 1764.5669000000053,
       "notes": "Specific-record recall."
     },
     {
       "question": "How much is my car loan EMI payment?",
-      "answer": "Your car loan EMI payment was $300.",
+      "answer": "Your car loan EMI payment totals **$300.00** (across one transaction).",
       "pass": true,
-      "latencyMs": 617.4621999999945,
+      "latencyMs": 674.6246000000101,
       "notes": "Specific-record recall."
     },
     {
       "question": "Did I receive any gift money recently?",
-      "answer": "Yes, you received a gift of $50 on 2026-06-29 from your parents.",
+      "answer": "Yes – you received a gift of **$50** on **2026‑06‑29**.",
       "pass": true,
-      "latencyMs": 451.9956999999995,
+      "latencyMs": 1009.8862999999983,
       "notes": "Semantic category match."
     },
     {
       "question": "What payment method did I use for my grocery shopping?",
-      "answer": "You used a DEBIT_CARD for your grocery shopping.",
+      "answer": "You used a **DEBIT_CARD** for your grocery shopping.",
       "pass": true,
-      "latencyMs": 407.94890000000305,
+      "latencyMs": 1326.3997999999992,
       "notes": "Attribute recall, not just amount."
     },
     {
-      "question": "How much was my June salary?",
-      "answer": "To find your June salary, I'll look for the transaction with the description \"June salary deposit\" in the Additional Relevant Records section. \n\nOn 2026-06-04, I earned $3900 from Salary. Payment method: UPI. Description: June salary deposit.\n\nYour June salary was $3900.",
+      "question": "How much was my salary in June 2026?",
+      "answer": "Your salary for June 2026 totaled **$3,900.00**.",
       "pass": true,
-      "latencyMs": 576.425900000002,
-      "notes": "Disambiguates from the more recent July salary via semantic search."
+      "latencyMs": 565.3274000000092,
+      "notes": "Exact-sum lookup for a specific month/year, disambiguated from the more recent salary deposit — requires passing startDate/endDate to getCategoryTotal."
     },
     {
       "question": "What did I buy running shoes for?",
-      "answer": "You bought running shoes for $89.99 on 2026-06-30. The description for this transaction is \"New running shoes.\"",
+      "answer": "You bought the running shoes on **2026‑06‑30** for **$89.99**.",
       "pass": true,
-      "latencyMs": 608.7592000000004,
+      "latencyMs": 1762.7740999999805,
       "notes": "Specific-record recall."
     },
     {
       "question": "Is my phone bill a recurring expense?",
-      "answer": "Yes, your phone bill is a recurring expense, as indicated by the description \"Monthly phone bill\" in the transaction record on 2026-07-05.",
+      "answer": "I only found a single entry for a phone bill:\n\n- **2026‑07‑05** – $60 on **Mobile_Bill** (Monthly phone bill)\n\nSince there’s no other record of a phone bill in the data, it doesn’t appear to be a recurring expense. If you expect more frequent phone‑bill entries, you might want to double‑check your transaction history for earlier dates.",
       "pass": true,
-      "latencyMs": 615.3056999999972,
+      "latencyMs": 7429.787300000025,
       "notes": "Yes/no fact recall."
     },
     {
       "question": "How much cashback reward did I get?",
-      "answer": "You earned $100 from Other as a cashback reward on 2026-05-28.",
+      "answer": "You earned **$100** in cashback rewards.",
       "pass": true,
-      "latencyMs": 819.2433000000019,
+      "latencyMs": 6012.14439999999,
       "notes": "Specific-record recall."
     },
     {
       "question": "What did I spend money on for entertainment or games?",
-      "answer": "You spent $15 on Games on 2026-06-27, and the most recent transaction related to entertainment or games is $45 on Food on 2026-07-07 (although this is not strictly for entertainment or games), but the other transaction is $15 on Games on 2026-06-27.",
+      "answer": "Here’s what you spent on for entertainment or games:\n\n| Date | Category | Amount | Payment Method | Description |\n|------|----------|--------|----------------|-------------|\n| 2026‑06‑27 | **Games** | $15.00 | CREDIT_CARD | Steam game purchase |\n| 2026‑06‑23 | **Subscription** | $12.99 | CREDIT_CARD | Netflix subscription |\n\nThese are the only transactions that match “entertainment” or “games” in your recent history. If you’re looking for something else (e.g., a specific store or a different type of entertainment), let me know and I can search again.",
       "pass": true,
-      "latencyMs": 8496.089800000002,
+      "latencyMs": 6364.599300000002,
       "notes": "Semantic category match, ambiguous phrasing."
     },
     {
       "question": "How much did I spend on rent last year?",
-      "answer": "I don't know.",
+      "answer": "I couldn’t find any transactions labeled “rent” in your history. Could you let me know the exact category name or provide a bit more detail (e.g., the merchant or description) so I can locate the right records?",
       "pass": true,
-      "latencyMs": 4540.117599999998,
+      "latencyMs": 12549.970499999996,
       "notes": "Out-of-context question — the assistant must decline rather than hallucinate a rent expense that was never recorded."
+    },
+    {
+      "question": "How much did I spend on Food in total?",
+      "answer": "You’ve spent a total of **$102.50** on Food across 3 transactions.",
+      "pass": true,
+      "latencyMs": 5762.616099999985,
+      "notes": "True aggregation across 3 Food records ($45 + $35 + $22.50), 2 of which (daysAgo 25 and 60) fall outside the old design's fixed top-5-recent retrieval window. This is the core validation case from AGENTIC_RAG_UPGRADE_PLAN.md: the old single-shot chain could not have answered this correctly even in principle, since it only ever saw a fixed-size context window, never a true SUM."
+    },
+    {
+      "question": "What's my overall balance? Am I positive or negative?",
+      "answer": "Your overall balance is **$6,399.03**.  \n- Total earned: **$8,850.00**  \n- Total spent: **$2,450.97**  \n\nSince the balance is positive, you’re in the red? Actually you’re in the **green**—you have money left over.",
+      "pass": true,
+      "latencyMs": 5167.482700000022,
+      "notes": "Exact balance = total income ($8,850.00) minus total expenses ($2,450.97), via the getBalance tool — another aggregation the old design could not do."
     }
   ]
 }

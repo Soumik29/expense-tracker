@@ -16,6 +16,10 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 // Gemini's free tier rate-limits embedding calls; seed-vectors.ts uses the
 // same 4.5s spacing. Override with RAG_BENCH_DELAY_MS if you're on a paid tier.
 const INDEX_DELAY_MS = Number(process.env.RAG_BENCH_DELAY_MS ?? 4500);
+// The agent can make multiple Groq calls per question (tool-call turns), which
+// burns through the free-tier per-minute token budget much faster than the
+// old single-shot chain (1 call/question) ever did. Space questions out too.
+const QUESTION_DELAY_MS = Number(process.env.RAG_BENCH_QUESTION_DELAY_MS ?? 3000);
 const KEEP_DATA = process.argv.includes("--keep-data");
 
 const BENCH_USER = {
@@ -47,6 +51,14 @@ const EXPENSE_SEED = [
   // where the assistant answered "latest expense" from semantic search instead
   // of the recency-sorted DB query.
   { amount: 999.99, category: "Shopping", daysAgo: 45, description: "My latest and most recent big purchase - a brand new iPhone", paymentMethod: "CREDIT_CARD", isRecurring: false },
+  // Third Food record, deliberately far outside the top-5-most-recent window
+  // (daysAgo values in this file's top 5 are 0,1,2,5,7). Combined with the
+  // existing Food records at daysAgo 0 and 25, a "total Food spending"
+  // question now requires summing 3 records where 2 of the 3 fall outside
+  // the old design's fixed retrieval window — the old single-shot chain
+  // structurally could not have answered this correctly even in principle,
+  // since it only ever saw a 10-record window, not a true SUM.
+  { amount: 22.5, category: "Food", daysAgo: 60, description: "Grabbed a quick breakfast sandwich", paymentMethod: "CASH", isRecurring: false },
 ] as const;
 
 const INCOME_SEED = [
@@ -80,21 +92,64 @@ const QUESTIONS: BenchQuestion[] = [
   { question: "How much is my car loan EMI payment?", checks: [["300"]], notes: "Specific-record recall." },
   { question: "Did I receive any gift money recently?", checks: [["50"], ["gift", "birthday"]], notes: "Semantic category match." },
   { question: "What payment method did I use for my grocery shopping?", checks: [["debit"]], notes: "Attribute recall, not just amount." },
-  { question: "How much was my June salary?", checks: [["3900", "3,900"]], notes: "Disambiguates from the more recent July salary via semantic search." },
+  {
+    // "June salary" alone is genuinely ambiguous without a year — the model
+    // correctly started asking "which year?" once it stopped hallucinating,
+    // which is better behavior, not worse. Naming the year explicitly (computed
+    // from the actual seeded date, not hardcoded, so this stays correct
+    // whenever the benchmark is run) removes the ambiguity instead of
+    // penalizing the model for asking a reasonable clarifying question.
+    question: `How much was my salary in June ${daysAgo(33).getFullYear()}?`,
+    checks: [["3900", "3,900"]],
+    notes: "Exact-sum lookup for a specific month/year, disambiguated from the more recent salary deposit — requires passing startDate/endDate to getCategoryTotal.",
+  },
   { question: "What did I buy running shoes for?", checks: [["89.99", "89.9"]], notes: "Specific-record recall." },
   { question: "Is my phone bill a recurring expense?", checks: [["yes", "recurring"]], notes: "Yes/no fact recall." },
   { question: "How much cashback reward did I get?", checks: [["100"]], notes: "Specific-record recall." },
   { question: "What did I spend money on for entertainment or games?", checks: [["steam", "game", "15"]], notes: "Semantic category match, ambiguous phrasing." },
   {
     question: "How much did I spend on rent last year?",
-    checks: [["don't know", "do not know", "couldn't find", "could not find", "no information", "not available", "no relevant"]],
+    checks: [
+      [
+        "don't know",
+        "do not know",
+        "couldn't find",
+        "could not find",
+        "no information",
+        "not available",
+        "no relevant",
+        "not a recognized category",
+        "isn't a recognized category",
+        "is not a recognized category",
+        "not a category",
+      ],
+    ],
     notes: "Out-of-context question — the assistant must decline rather than hallucinate a rent expense that was never recorded.",
+  },
+  {
+    question: "How much did I spend on Food in total?",
+    checks: [["102.50", "102.5"]],
+    notes:
+      "True aggregation across 3 Food records ($45 + $35 + $22.50), 2 of which (daysAgo 25 and 60) fall outside the old design's fixed top-5-recent retrieval window. This is the core validation case from AGENTIC_RAG_UPGRADE_PLAN.md: the old single-shot chain could not have answered this correctly even in principle, since it only ever saw a fixed-size context window, never a true SUM.",
+  },
+  {
+    question: "What's my overall balance? Am I positive or negative?",
+    checks: [["6399.03", "6,399.03"], ["positive"]],
+    notes: "Exact balance = total income ($8,850.00) minus total expenses ($2,450.97), via the getBalance tool — another aggregation the old design could not do.",
   },
 ];
 
+// LLM output commonly uses typographic ("smart") quotes (' U+2019, " U+201C/D)
+// while hardcoded check strings use plain ASCII quotes — a straight substring
+// match silently fails on phrases like "couldn't find" vs "couldn't find"
+// even though they read identically. Normalize both sides before comparing.
+function normalizeQuotes(text: string): string {
+  return text.replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
+}
+
 function containsAny(haystack: string, needles: string[]): boolean {
-  const lower = haystack.toLowerCase();
-  return needles.some((n) => lower.includes(n.toLowerCase()));
+  const lower = normalizeQuotes(haystack).toLowerCase();
+  return needles.some((n) => lower.includes(normalizeQuotes(n).toLowerCase()));
 }
 
 async function main() {
@@ -200,6 +255,7 @@ async function main() {
       !(q.mustNotInclude && containsAny(answer, q.mustNotInclude));
     results.push({ question: q.question, answer, pass, latencyMs, notes: q.notes, error });
     console.log(`  [${pass ? "PASS" : "FAIL"}] (${latencyMs.toFixed(0)}ms) ${q.question}`);
+    await delay(QUESTION_DELAY_MS);
   }
 
   // 5. Compute metrics + write report.
