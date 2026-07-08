@@ -78,11 +78,28 @@ class ApiService {
   }
 }
 
-export const askFinancialAssistant = async (question: string): Promise<string> => {
+export interface ChatHistoryMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+// Cap how much prior conversation gets sent per request — bounds token
+// usage/cost for the tool-calling agent, which already makes multiple model
+// calls per question. Also enforced again server-side regardless of what the
+// client sends.
+const MAX_HISTORY_MESSAGES = 10;
+
+export const askFinancialAssistant = async (
+  question: string,
+  history: ChatHistoryMessage[] = [],
+): Promise<string> => {
   // We expect the backend to return { success: true, data: { answer: string } }
   try{
 
-    const response = await api.post<{ answer: string }>("/chat", { question });
+    const response = await api.post<{ answer: string }>("/chat", {
+      question,
+      history: history.slice(-MAX_HISTORY_MESSAGES),
+    });
     
     if (response.data && response.data.answer) {
       return response.data.answer;

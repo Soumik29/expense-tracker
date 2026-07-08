@@ -33,7 +33,10 @@ export default function FinancialAssistant() {
     setIsLoading(true);
 
     try {
-      const answer = await askFinancialAssistant(userMessage);
+      // `messages` here is the state from before this turn's user message was
+      // appended (React batches the setMessages above), which is exactly the
+      // prior conversation history — the new question is passed separately.
+      const answer = await askFinancialAssistant(userMessage, messages);
       setMessages((prev) => [...prev, { role: "assistant", content: answer }]);
     } catch (error) {
       setMessages((prev) => [

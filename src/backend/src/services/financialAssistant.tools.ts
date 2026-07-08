@@ -150,6 +150,62 @@ export function createFinancialAssistantTools(
     },
   );
 
+  const getSpendingBreakdown = tool(
+    async ({
+      type,
+      startDate,
+      endDate,
+    }: {
+      type: "expense" | "income";
+      startDate?: string | null;
+      endDate?: string | null;
+    }) => {
+      const dateFilter = buildDateFilter(startDate, endDate);
+      const where: Record<string, unknown> = { userId };
+      if (Object.keys(dateFilter).length > 0) where.date = dateFilter;
+
+      // A single composable building block, not a narrow "compare two
+      // periods" tool: the agent can call this once for a trend/ranking
+      // question, or twice (once per period) and compare the results itself
+      // for "how did this month compare to last month"-style questions.
+      const groups =
+        type === "expense"
+          ? await prisma.expense.groupBy({
+              by: ["category"],
+              where: where as never,
+              _sum: { amount: true },
+              _count: true,
+              orderBy: { _sum: { amount: "desc" } },
+            })
+          : await prisma.income.groupBy({
+              by: ["category"],
+              where: where as never,
+              _sum: { amount: true },
+              _count: true,
+              orderBy: { _sum: { amount: "desc" } },
+            });
+
+      if (groups.length === 0) {
+        return `No ${type} records found${startDate || endDate ? ` between ${startDate ?? "the beginning"} and ${endDate ?? "now"}` : ""}.`;
+      }
+
+      const lines = groups.map(
+        (g) => `${g.category}: $${Number(g._sum.amount ?? 0).toFixed(2)} across ${g._count} transaction(s)`,
+      );
+      return `${type === "expense" ? "Spending" : "Income"} breakdown by category${startDate || endDate ? ` (${startDate ?? "the beginning"} to ${endDate ?? "now"})` : ""}, sorted highest to lowest:\n${lines.join("\n")}`;
+    },
+    {
+      name: "getSpendingBreakdown",
+      description:
+        "Get exact totals grouped by category for either expenses or income, optionally within a date range, sorted from highest to lowest. Use this for 'what do I spend the most on', 'break down my spending', or ranking/trend questions. For 'compare this month to last month'-style questions, call this tool twice — once per period — and compare the results yourself.",
+      schema: z.object({
+        type: z.enum(["expense", "income"]).describe("Whether to break down expenses or income"),
+        startDate: z.string().nullable().optional().describe("ISO date YYYY-MM-DD, inclusive lower bound, or null/omitted if not specified"),
+        endDate: z.string().nullable().optional().describe("ISO date YYYY-MM-DD, inclusive upper bound, or null/omitted if not specified"),
+      }),
+    },
+  );
+
   const searchTransactions = tool(
     async ({ query }: { query: string }) => {
       const vectorStore = await PineconeStore.fromExistingIndex(clients.embeddings, {
@@ -168,12 +224,12 @@ export function createFinancialAssistantTools(
     {
       name: "searchTransactions",
       description:
-        "Semantically search the user's transaction history for records related to a topic, merchant, or description when no exact category/date filter applies — e.g. 'what did I buy at that electronics store'. Do NOT use this for totals/sums or recency questions; use getCategoryTotal, getBalance, or getRecentTransactions instead.",
+        "Semantically search the user's transaction history for records related to a topic, merchant, or description when no exact category/date filter applies — e.g. 'what did I buy at that electronics store'. Do NOT use this for totals/sums, recency, or ranking/trend questions; use getCategoryTotal, getBalance, getRecentTransactions, or getSpendingBreakdown instead.",
       schema: z.object({
         query: z.string().describe("A natural-language description of what to search for"),
       }),
     },
   );
 
-  return [getRecentTransactions, getCategoryTotal, getBalance, searchTransactions];
+  return [getRecentTransactions, getCategoryTotal, getBalance, getSpendingBreakdown, searchTransactions];
 }
