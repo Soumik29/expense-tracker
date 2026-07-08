@@ -1,45 +1,35 @@
-import IncomeController from "@controllers/income.controller.js";
+import BudgetController from "@controllers/budget.controller.js";
 import BaseRouter, { type RouteConfig } from "./router.js";
 import AuthMiddleware from "@middlewares/auth.middleware.js";
 import ValidateMiddleware from "@middlewares/validation.middleware.js";
 import transactionSchema from "../validations/transaction.schema.js";
 
-class IncomeRouter extends BaseRouter {
+class BudgetRouter extends BaseRouter {
   protected routes(): RouteConfig[] {
     return [
       {
         method: "get",
         path: "/",
         middlewares: [AuthMiddleware.authenticateUser],
-        handler: IncomeController.getIncomes,
+        handler: BudgetController.getBudgets,
       },
       {
         method: "post",
         path: "/",
         middlewares: [
           AuthMiddleware.authenticateUser,
-          ValidateMiddleware.validateBody(transactionSchema.income),
+          ValidateMiddleware.validateBody(transactionSchema.budget),
         ],
-        handler: IncomeController.createIncome,
-      },
-      {
-        method: "put",
-        path: "/:incomeId",
-        middlewares: [
-          AuthMiddleware.authenticateUser,
-          ValidateMiddleware.validateBody(transactionSchema.income),
-        ],
-        handler: IncomeController.updateIncome,
+        handler: BudgetController.upsertBudget,
       },
       {
         method: "delete",
-        path: "/:incomeId",
+        path: "/:category",
         middlewares: [AuthMiddleware.authenticateUser],
-        handler: IncomeController.deleteIncome,
+        handler: BudgetController.deleteBudget,
       },
     ];
   }
 }
 
-export default new IncomeRouter().router;
-
+export default new BudgetRouter().router;

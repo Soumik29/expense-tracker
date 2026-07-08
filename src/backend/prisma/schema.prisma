@@ -9,14 +9,17 @@ datasource db {
 
 model Expense{
   id              Int             @id         @default(autoincrement())
-  amount          Decimal         @db.Decimal(10, 2)    
-  date            DateTime       
-  category        Category       
-  description     String?
+  amount          Decimal         @db.Decimal(10, 2)
+  date            DateTime
+  category        Category
+  description     String?         @db.VarChar(500)
   userId          Int
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   isRecurring     Boolean         @default(false)
   paymentMethod   PaymentMethod   @default(CASH)
+  // For recurring templates: the date of the last auto-generated occurrence.
+  // Null means no occurrence has been generated yet.
+  lastRecurredAt  DateTime?
 }
 
 model Income{
@@ -24,11 +27,26 @@ model Income{
   amount          Decimal         @db.Decimal(10, 2)
   date            DateTime
   category        IncomeCategory
-  description     String?
+  description     String?         @db.VarChar(500)
   userId          Int
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   isRecurring     Boolean         @default(false)
   paymentMethod   PaymentMethod   @default(CASH)
+  lastRecurredAt  DateTime?
+}
+
+// Monthly spending limit per category. One budget per (user, category);
+// the same limit applies to every calendar month.
+model Budget{
+  id              Int             @id         @default(autoincrement())
+  category        Category
+  amount          Decimal         @db.Decimal(10, 2)
+  userId          Int
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@unique([userId, category])
 }
 
 model User{
@@ -41,6 +59,7 @@ model User{
   updatedAt    DateTime   @updatedAt
   expenses     Expense[]
   incomes      Income[]
+  budgets      Budget[]
 }
 
 enum Category{

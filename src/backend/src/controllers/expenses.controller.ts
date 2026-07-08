@@ -10,6 +10,13 @@ const getUserId = (req: Request): number | null => {
   return authReq.userId ?? null;
 };
 
+// Safety net behind the zod layer: if a value still exceeds a column limit
+// (Prisma error P2000), tell the client what happened instead of a 500.
+const isValueTooLongError = (error: unknown): boolean =>
+  typeof error === "object" &&
+  error !== null &&
+  (error as { code?: string }).code === "P2000";
+
 class ExpenseController {
   // 1. GET ALL EXPENSES
   static getExpenses = async (req: Request, res: Response) => {
@@ -73,6 +80,9 @@ class ExpenseController {
       return Send.success(res, { expense: createExpense });
     } catch (error) {
       console.error("Failed to create expense: ", error);
+      if (isValueTooLongError(error)) {
+        return Send.badRequest(res, null, "One of the values is too long");
+      }
       return Send.error(res, null, "Failed to create expense");
     }
   };
@@ -162,7 +172,10 @@ class ExpenseController {
       return Send.success(res, { expense: updatedExpense });
     } catch (error) {
       console.error("Failed to update expense:", error);
-      return Send.error(res, null);
+      if (isValueTooLongError(error)) {
+        return Send.badRequest(res, null, "One of the values is too long");
+      }
+      return Send.error(res, null, "Failed to update expense");
     }
   };
 }

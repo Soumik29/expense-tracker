@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon --exec tsx ./src/index.ts",
     "build": "tsc && tsc-alias",
-    "start": "node ./dist/index.js",
+    "start": "npx prisma db push && node ./dist/index.js",
+    "start:no-db-push": "node ./dist/index.js",
     "bench:rag": "tsx ./src/rag-benchmark.ts"
   },
   "keywords": [],
