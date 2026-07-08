@@ -1,11 +1,9 @@
 import { ChatGroq } from "@langchain/groq";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
-import { PineconeStore } from "@langchain/pinecone";
 import { Pinecone as PineconeClient } from "@pinecone-database/pinecone";
-import { StringOutputParser } from "@langchain/core/output_parsers";
-import { PromptTemplate } from "@langchain/core/prompts";
+import { createAgent } from "langchain";
 import type { Expense } from "@prisma/client";
-import { prisma } from "../db.js";
+import { createFinancialAssistantTools } from "./financialAssistant.tools.js";
 
 type IncomeRecord = {
   id: number;
@@ -42,9 +40,18 @@ function getClients() {
 
   if (!model) {
     if (!process.env.GROQ_API_KEY) throw new Error("Missing GROQ_API_KEY");
+    // llama-3.1-8b-instant (used by the old single-shot chain) and
+    // llama-3.3-70b-versatile both proved unreliable as tool-calling agent
+    // drivers on Groq: both models frequently emitted malformed pythonic-tag
+    // tool calls (`<function=NAME{args}</function>`, missing the `>` after
+    // the function name) that Groq's parser rejected outright, regardless of
+    // `parallel_tool_calls`. openai/gpt-oss-20b uses OpenAI's native JSON
+    // tool-calling convention instead of Llama's pythonic-tag format, and its
+    // profile (node_modules/@langchain/groq/dist/profiles.js) confirms
+    // toolCalling + structuredOutput support.
     model = new ChatGroq({
       apiKey: process.env.GROQ_API_KEY,
-      model: "llama-3.1-8b-instant",
+      model: "openai/gpt-oss-20b",
       temperature: 0.2,
     });
   }
@@ -120,88 +127,53 @@ class RagService {
   static async askFinancialAssistant(userId: number, question: string) {
     const { pineconeIndex: idx, embeddings: emb, model: llm } = getClients();
 
-    // Always fetch the 5 most recent expenses and incomes directly from the
-    // database so the LLM has accurate recency data. Semantic search alone
-    // cannot answer "latest / most recent" questions correctly because it
-    // ranks by meaning similarity, not by date. `id: "desc"` is a tiebreaker
-    // for same-day entries, since MySQL doesn't guarantee ordering among rows
-    // with an identical `date` value otherwise.
-    const [recentExpenses, recentIncomes] = await Promise.all([
-      prisma.expense.findMany({
-        where: { userId },
-        orderBy: [{ date: "desc" }, { id: "desc" }],
-        take: 5,
-      }),
-      prisma.income.findMany({
-        where: { userId },
-        orderBy: [{ date: "desc" }, { id: "desc" }],
-        take: 5,
-      }),
-    ]);
+    // Tools close over `userId` — the LLM never controls it — and each tool's
+    // description tells the model when to call it (e.g. getRecentTransactions
+    // for "latest/most recent" questions, getCategoryTotal for exact sums).
+    // The model decides which tool(s) to call per-question instead of
+    // application code pre-fetching a fixed context window every time.
+    const tools = createFinancialAssistantTools(userId, { pineconeIndex: idx, embeddings: emb });
 
-    // If the question is explicitly about recency, skip semantic search
-    // entirely instead of relying on the LLM to prefer the recent-transactions
-    // block over it. Semantic search embeds the literal question text, which
-    // shares no meaningful similarity with "recency" as a concept — an older
-    // but topically-similar-sounding record can easily outrank the true
-    // latest one and get answered from instead.
-    const isRecencyQuestion = /\b(latest|most recent|last|newest)\b/i.test(question);
+    // Most observed tool-call failures were malformed pythonic-tag generations
+    // (`<function=NAME{args}</function>`, missing the `>` after the function
+    // name) — a known Llama/Groq quirk that shows up specifically around
+    // parallel tool-call generation. Forcing sequential single-tool-calls per
+    // turn avoids that code path. `parallel_tool_calls` is a Groq call option,
+    // not a constructor field, so it's applied via `.withConfig()`.
+    const modelWithConfig = llm.withConfig({ parallel_tool_calls: false });
 
-    let results: Awaited<ReturnType<typeof PineconeStore.prototype.similaritySearch>> = [];
-    if (!isRecencyQuestion) {
-      const vectorStore = await PineconeStore.fromExistingIndex(emb, {
-        pineconeIndex: idx,
-        textKey: "text",
-      });
+    const agent = createAgent({
+      model: modelWithConfig,
+      tools,
+      systemPrompt:
+        "You are a helpful financial assistant analyzing a user's income and expense tracker data. " +
+        "Always answer by calling the appropriate tool(s) first — never guess, estimate, or answer from " +
+        "memory. If no tool returns relevant information, say you don't know rather than making something up. " +
+        "When a question references a specific month, year, or date range, always pass matching startDate " +
+        "and endDate arguments to getCategoryTotal or getBalance — do not rely on their default (all-time) " +
+        "range when the user asked about a specific period. " +
+        "If the user mentions a category or topic you don't recognize, try searchTransactions with their " +
+        "wording FIRST before asking them to clarify — only ask for clarification if that search also " +
+        "returns nothing relevant.",
+    });
 
-      // Retrieve top 5 semantically similar records
-      results = await vectorStore.similaritySearch(question, 5, {
-        userId: { $eq: userId },
-      });
-    }
-
-    const recentExpenseText = recentExpenses.map(
-      (e) =>
-        `On ${e.date.toISOString().split("T")[0]}, I spent $${e.amount} on ${e.category}. Payment method: ${e.paymentMethod}.${e.description ? ` Description: ${e.description}.` : ""}`,
+    // Cap recursion well below the LangGraph default of 25: a well-behaved
+    // answer needs at most 1-2 tool calls plus a final synthesis turn. If the
+    // model is stuck looping without converging, fail fast instead of
+    // grinding through 25 steps of Groq calls (which is both slow and can
+    // exhaust the per-minute token budget on its own). 8 was too tight — it
+    // was hit by a legitimate multi-tool-call chain on one benchmark run
+    // (see AGENTIC_RAG_PLAYBOOK_STEP4_TUNING.md); 12 gives a bit more room
+    // while still failing far faster than the default.
+    const result = await agent.invoke(
+      { messages: [{ role: "user", content: question }] },
+      { recursionLimit: 12 },
     );
 
-    const recentIncomeText = recentIncomes.map(
-      (i) =>
-        `On ${i.date.toISOString().split("T")[0]}, I earned $${i.amount} from ${i.category}. Payment method: ${i.paymentMethod}.${i.description ? ` Description: ${i.description}.` : ""}`,
-    );
+    const lastMessage = result.messages[result.messages.length - 1];
+    const content = lastMessage?.content;
 
-    const semanticContext = results.map((r) => r.pageContent).join("\n");
-    const recentContext = [...recentExpenseText, ...recentIncomeText].join("\n");
-
-    if (!semanticContext && !recentContext) {
-      return "I couldn't find any relevant expenses or incomes to answer your question.";
-    }
-
-    // The "Most Recent Transactions" block is placed last, immediately before
-    // the question, since LLMs tend to weight text nearer the end of the
-    // prompt more heavily — this reinforces the instruction below instead of
-    // competing against it.
-    const context = `Additional Relevant Records:
-${semanticContext}
-
-Most Recent Transactions (sorted by date, newest first):
-${recentContext}`;
-
-    const prompt = PromptTemplate.fromTemplate(`
-      You are a helpful financial assistant analyzing a user's income and expense tracker data.
-      Answer the user's question using ONLY the provided context. If the answer is not in the context, say you don't know.
-      When the user asks about their "latest", "most recent", or "last" expense or income, you MUST use the "Most Recent Transactions" section, which is sorted newest-first — ignore any other section for those questions.
-
-      Context (User's Expenses and Incomes):
-      {context}
-
-      Question: {question}
-      Answer:
-    `);
-
-    const chain = prompt.pipe(llm).pipe(new StringOutputParser());
-
-    return await chain.invoke({ context, question });
+    return typeof content === "string" ? content : "I couldn't generate an answer to that question.";
   }
 }
 
