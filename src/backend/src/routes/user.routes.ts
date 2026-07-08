@@ -12,6 +12,13 @@ class UserRoutes extends BaseRouter{
                 ],
                 handler: UserController.getUser
             },
+            {method: "delete",
+                path: "/",
+                middlewares: [
+                    AuthMiddleware.authenticateUser
+                ],
+                handler: UserController.deleteAccount
+            },
         ]
     }
 }
