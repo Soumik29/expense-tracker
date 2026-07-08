@@ -9,6 +9,7 @@ import incomeRoutes from "@routes/income.routes.js";
 import chatRoutes from "@routes/chat.routes.js";
 import budgetRoutes from "@routes/budget.routes.js";
 import RecurringService from "./services/recurring.service.js";
+import ensureSchema from "@utils/schema-bootstrap.js";
 
 class App {
   private app: Express;
@@ -63,7 +64,18 @@ class App {
     this.app.use("/api/budgets", budgetRoutes);
   }
 
-  public start() {
+  public async start() {
+    // Bring the database schema up to date before serving traffic —
+    // required where deploys can't run the Prisma CLI (see schema-bootstrap).
+    try {
+      await ensureSchema();
+    } catch (error) {
+      console.error(
+        "[schema] Bootstrap failed — continuing with existing schema:",
+        error,
+      );
+    }
+
     const { port } = appConfig;
     const host = appConfig.host ?? "0.0.0.0";
     this.app.listen(port, host, () => {
