@@ -186,18 +186,18 @@ End-to-end against the running local API with a fresh test user
 
 ### Deploying this to a hosted environment (Railway/Render/etc.)
 
-The code changes ship with a normal deploy, but the **database column change
-must be applied to that environment's database** too. This project manages the
-schema with `db push` (the migrations folder predates the Income model), so
-run once against the production `DATABASE_URL`:
+**No manual step needed (as of 2026-07-08).** The backend now brings the
+database schema up to date automatically at startup via
+`src/backend/src/utils/schema-bootstrap.ts` — it checks `information_schema`
+and applies only the missing DDL before the server accepts traffic. This was
+added because the live Render service starts `node dist/index.js` directly
+(dashboard config), bypassing `package.json`, so neither the CLI nor the
+start-script `prisma db push` runs there.
 
-```bash
-cd src/backend
-npx prisma db push
-```
-
-Widening `VARCHAR(191)` → `VARCHAR(500)` is non-destructive; existing rows are
-untouched.
+Verified live on 2026-07-08: a 480-character description stored on the
+production API at `expense-tracker-nf1e.onrender.com`, a 600-character one was
+rejected with a 422. Widening `VARCHAR(191)` → `VARCHAR(500)` is
+non-destructive; existing rows are untouched.
 
 ---
 
