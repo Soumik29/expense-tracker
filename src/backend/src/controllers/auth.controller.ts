@@ -17,9 +17,42 @@ const getSecrets = () => ({
 });
 
 class AuthController {
+  // Shared by login and register — both end with "issue a valid session for
+  // this user." Previously only login did this, so a freshly-registered user
+  // was shown the dashboard as if authenticated while their session cookies
+  // were never actually set, and every subsequent API call 401'd until they
+  // explicitly logged in.
+  private static issueSession = async (
+    res: Response,
+    user: { id: number; email: string; username: string },
+  ) => {
+    const { access: sec, refresh: refreshSec } = getSecrets();
+
+    const accessToken = sign({ userId: user.id }, sec, {
+      expiresIn: authConfig.secret_expries_in,
+    } as SignOptions);
+
+    const refreshToken = sign({ userId: user.id }, refreshSec, {
+      expiresIn: authConfig.refreshToken_expries_in,
+    } as SignOptions);
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await prisma.user.update({
+      where: { email: user.email },
+      data: { refreshToken: hashedRefreshToken },
+    });
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: isProduction ? ("none" as const) : ("lax" as const),
+    };
+    res.cookie("accessToken", accessToken, cookieOptions);
+    res.cookie("refreshToken", refreshToken, cookieOptions);
+  };
+
   static login = async (req: Request, res: Response) => {
     const { email, password } = req.body as z.infer<typeof authSchema.login>;
-    const { access: sec, refresh: refreshSec } = getSecrets();
     try {
       const user = await prisma.user.findUnique({
         where: { email },
@@ -32,27 +65,7 @@ class AuthController {
         return Send.unauthorized(res, null, "Incorrect Password");
       }
 
-      const accessToken = sign({ userId: user.id }, sec, {
-        expiresIn: authConfig.secret_expries_in,
-      } as SignOptions);
-
-      const refreshToken = sign({ userId: user.id }, refreshSec, {
-        expiresIn: authConfig.refreshToken_expries_in,
-      } as SignOptions);
-      const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-      await prisma.user.update({
-        where: { email },
-        data: { refreshToken: hashedRefreshToken },
-      });
-      const isProduction = process.env.NODE_ENV === "production";
-      const cookieOptions = {
-        httpOnly: true,
-        secure: isProduction,
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: isProduction ? ("none" as const) : ("lax" as const),
-      };
-      res.cookie("accessToken", accessToken, cookieOptions);
-      res.cookie("refreshToken", refreshToken, cookieOptions);
+      await AuthController.issueSession(res, user);
 
       return Send.success(res, {
         id: user.id,
@@ -74,7 +87,6 @@ class AuthController {
       const existingUser = await prisma.user.findUnique({
         where: { email },
       });
-      // console.log(existingUser);
       if (existingUser) {
         return Send.error(res, null, "Email is already in use.");
       }
@@ -88,6 +100,9 @@ class AuthController {
           password: hashedPassword,
         },
       });
+
+      await AuthController.issueSession(res, newUser);
+
       return Send.success(
         res,
         {
