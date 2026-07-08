@@ -124,7 +124,11 @@ class RagService {
     await idx.deleteOne({ id: `income:${incomeId}` });
   }
 
-  static async askFinancialAssistant(userId: number, question: string) {
+  static async askFinancialAssistant(
+    userId: number,
+    question: string,
+    history: { role: "user" | "assistant"; content: string }[] = [],
+  ) {
     const { pineconeIndex: idx, embeddings: emb, model: llm } = getClients();
 
     // Tools close over `userId` — the LLM never controls it — and each tool's
@@ -146,9 +150,14 @@ class RagService {
       model: modelWithConfig,
       tools,
       systemPrompt:
-        "You are a helpful financial assistant analyzing a user's income and expense tracker data. " +
-        "Always answer by calling the appropriate tool(s) first — never guess, estimate, or answer from " +
-        "memory. If no tool returns relevant information, say you don't know rather than making something up. " +
+        "You are a helpful, general-purpose AI assistant built into a personal expense tracker app. " +
+        "You can chat about anything the user asks — general knowledge, advice, writing help, casual " +
+        "conversation, whatever they need. " +
+        "However, when the user asks about THEIR OWN expenses, income, spending, or balance, you MUST use " +
+        "the provided financial tools to get exact numbers — never guess, estimate, or answer a financial " +
+        "question from memory, since financial answers must be accurate. If no tool returns relevant " +
+        "financial information for a money-related question, say you don't know rather than making " +
+        "something up. " +
         "When a question references a specific month, year, or date range, always pass matching startDate " +
         "and endDate arguments to getCategoryTotal or getBalance — do not rely on their default (all-time) " +
         "range when the user asked about a specific period. " +
@@ -165,8 +174,15 @@ class RagService {
     // was hit by a legitimate multi-tool-call chain on one benchmark run
     // (see AGENTIC_RAG_PLAYBOOK_STEP4_TUNING.md); 12 gives a bit more room
     // while still failing far faster than the default.
+    // Cap history server-side too, regardless of what the client sends — the
+    // frontend already trims to the last 10 messages, but this endpoint
+    // shouldn't trust that. Bounds token usage/cost for an agent that already
+    // makes multiple model calls per question.
+    const MAX_HISTORY_MESSAGES = 10;
+    const trimmedHistory = history.slice(-MAX_HISTORY_MESSAGES);
+
     const result = await agent.invoke(
-      { messages: [{ role: "user", content: question }] },
+      { messages: [...trimmedHistory, { role: "user", content: question }] },
       { recursionLimit: 12 },
     );
 

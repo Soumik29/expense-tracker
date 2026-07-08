@@ -11,12 +11,21 @@ class ChatController{
 
             if (!userId) return Send.unauthorized(res, null);
 
-            const {question} = req.body;
+            const {question, history} = req.body;
             if (!question) {
                 return Send.badRequest(res, {message: "Question is required"});
             }
 
-            const answer = await RagService.askFinancialAssistant(userId, question);
+            // Trust nothing from the client beyond shape — RagService caps
+            // length again server-side regardless of what's sent here.
+            const safeHistory = Array.isArray(history)
+                ? history.filter(
+                    (m): m is {role: "user" | "assistant"; content: string} =>
+                        m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string",
+                  )
+                : [];
+
+            const answer = await RagService.askFinancialAssistant(userId, question, safeHistory);
             return Send.success(res, {answer});
         }catch(error){
             console.error("AI Assistant Error:", error);
