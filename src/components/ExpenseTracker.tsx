@@ -20,6 +20,8 @@ import IncomeList from "./IncomeList";
 import TotalIncome from "./TotalIncome";
 import useIncomeFilter from "../utils/useIncomeFilter";
 import IncomeChart from "./IncomeChart";
+import useBudgets from "../utils/useBudgets";
+import BudgetManager from "./BudgetManager";
 
 const ExpenseTracker = () => {
   const { user, logout } = useAuth();
@@ -30,6 +32,7 @@ const ExpenseTracker = () => {
     deleteIncome,
     // updateIncome, // reserved for future editing support
   } = useIncomeCrud();
+  const { budgets, saveBudget, removeBudget } = useBudgets();
 
   // Filter hook - filters the raw expenses
   const {
@@ -182,6 +185,12 @@ const ExpenseTracker = () => {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-12 items-start">
           <div className="space-y-10">
             <AddExpenseForm onAddExpense={addExpense} />
+            <BudgetManager
+              budgets={budgets}
+              expenses={expense}
+              onSaveBudget={saveBudget}
+              onRemoveBudget={removeBudget}
+            />
             <AddIncomeForm onAddIncome={addIncome} />
           </div>
 

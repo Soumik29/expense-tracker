@@ -249,7 +249,10 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
               htmlFor="isRecurring"
               className="text-sm font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer"
             >
-              Recurring Expense
+              Recurring Expense{" "}
+              <span className="text-zinc-400 dark:text-zinc-500 font-normal">
+                (auto-repeats monthly)
+              </span>
             </label>
           </div>
           <div className="flex gap-4 pt-4">

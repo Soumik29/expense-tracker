@@ -221,11 +221,10 @@ what a production-grade personal finance app would add next.
    API, especially the auth endpoints.
 
 ### Product features
-6. **Budgets**: per-category monthly budgets with progress bars and
-   over-budget alerts — the single most requested "real tracker" feature.
-7. **Recurring transactions that actually recur**: `isRecurring` is stored
-   but nothing generates the next occurrence. Add a scheduler (cron) that
-   materializes recurring expenses/incomes monthly.
+6. ~~**Budgets**: per-category monthly budgets with progress bars and
+   over-budget alerts~~ — ✅ **done**, see `BUDGETS_AND_RECURRING_TRANSACTIONS.md`.
+7. ~~**Recurring transactions that actually recur**~~ — ✅ **done**, see
+   `BUDGETS_AND_RECURRING_TRANSACTIONS.md`.
 8. **Income editing UI**: the backend `PUT /api/incomes/:id` exists, but the
    frontend has no edit dialog for income (`updateIncome` is commented out in
    `ExpenseTracker.tsx`).

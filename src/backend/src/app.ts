@@ -7,6 +7,8 @@ import userRoutes from "@routes/user.routes.js";
 import expenseRoutes from "@routes/expense.routes.js";
 import incomeRoutes from "@routes/income.routes.js";
 import chatRoutes from "@routes/chat.routes.js";
+import budgetRoutes from "@routes/budget.routes.js";
+import RecurringService from "./services/recurring.service.js";
 
 class App {
   private app: Express;
@@ -58,6 +60,7 @@ class App {
     this.app.use("/api/expenses", expenseRoutes);
     this.app.use("/api/incomes", incomeRoutes);
     this.app.use("/api/chat", chatRoutes);
+    this.app.use("/api/budgets", budgetRoutes);
   }
 
   public start() {
@@ -65,6 +68,7 @@ class App {
     const host = appConfig.host ?? "0.0.0.0";
     this.app.listen(port, host, () => {
       console.log(`Server is running on http://${host}:${port}`);
+      RecurringService.startScheduler();
     });
   }
 }

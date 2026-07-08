@@ -82,12 +82,20 @@ const income = z.object({
   paymentMethod: paymentMethodSchema,
 });
 
+// Monthly spending limit for one expense category.
+const budget = z.object({
+  category: expenseCategorySchema,
+  amount: amountSchema,
+});
+
 export type ExpenseInput = z.infer<typeof expense>;
 export type IncomeInput = z.infer<typeof income>;
+export type BudgetInput = z.infer<typeof budget>;
 
 const transactionSchema = {
   expense,
   income,
+  budget,
 };
 
 export default transactionSchema;

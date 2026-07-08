@@ -198,7 +198,10 @@ const AddIncomeForm = ({ onAddIncome }: IncomeFormProps) => {
               htmlFor="income-isRecurring"
               className="text-sm font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer"
             >
-              Recurring Income
+              Recurring Income{" "}
+              <span className="text-zinc-400 dark:text-zinc-500 font-normal">
+                (auto-repeats monthly)
+              </span>
             </label>
           </div>
 
