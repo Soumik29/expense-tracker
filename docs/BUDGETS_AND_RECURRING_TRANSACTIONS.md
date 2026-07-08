@@ -151,9 +151,12 @@ Against the running local API (test user, all records cleaned up after):
 
 ### Deployment note
 
-As with the previous change, run `npx prisma db push` from `src/backend` once
-against the production database when deploying — it adds the `Budget` table
-and the two `lastRecurredAt` columns (both non-destructive).
+**No manual migration needed.** The in-app schema bootstrap
+(`src/backend/src/utils/schema-bootstrap.ts`, see
+`EXPENSE_CREATION_FIX_AND_VALIDATION.md`) creates the `Budget` table and the
+`lastRecurredAt` columns automatically at startup. Verified live on
+2026-07-08: budget create/list/delete worked on the production Render API
+right after deploy.
 
 ---
 
