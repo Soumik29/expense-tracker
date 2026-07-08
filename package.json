@@ -31,7 +31,9 @@
     "dotenv": "^17.2.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^7.13.0",
+    "remark-gfm": "^4.0.1",
     "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
