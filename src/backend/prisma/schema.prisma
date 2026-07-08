@@ -11,8 +11,8 @@ model Expense{
   id              Int             @id         @default(autoincrement())
   amount          Decimal         @db.Decimal(10, 2)    
   date            DateTime       
-  category        Category       
-  description     String?
+  category        Category
+  description     String?         @db.VarChar(500)
   userId          Int
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   isRecurring     Boolean         @default(false)
@@ -24,7 +24,7 @@ model Income{
   amount          Decimal         @db.Decimal(10, 2)
   date            DateTime
   category        IncomeCategory
-  description     String?
+  description     String?         @db.VarChar(500)
   userId          Int
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   isRecurring     Boolean         @default(false)

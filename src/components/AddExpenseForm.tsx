@@ -1,11 +1,12 @@
 import { useState } from "react";
 import type { newExpense, Category, PaymentMethod } from "../types";
+import { MAX_DESCRIPTION_LENGTH } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateRight, faCamera } from "@fortawesome/free-solid-svg-icons";
 import ReceiptScanner from "./ReceiptScanner";
 
 type expenseProps = {
-  onAddExpense: (expense: newExpense) => void;
+  onAddExpense: (expense: newExpense) => Promise<{ success: boolean } | void>;
 };
 
 const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
@@ -14,13 +15,20 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
   const [desc, setDesc] = useState("");
   const [category, setCategory] = useState<Category>("Food");
   const [showToast, setShowToast] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRecurring, setIsRecurring] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH");
 
   const [showScanner, setShowScanner] = useState(false);
 
   const amt = Number(amount);
-  const isValid = amount.trim() !== "" && !Number.isNaN(amt) && date !== "";
+  const isValid =
+    amount.trim() !== "" &&
+    !Number.isNaN(amt) &&
+    amt > 0 &&
+    date !== "" &&
+    desc.length <= MAX_DESCRIPTION_LENGTH;
 
   const handleScanComplete = (scannedAmount: number) => {
     setAmount(scannedAmount.toString());
@@ -28,26 +36,40 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
     if (!desc) setDesc("Scanned Receipt");
   };
 
-  const handleSubmit = (e: React.FormEvent<Element>) => {
+  const handleSubmit = async (e: React.FormEvent<Element>) => {
     e.preventDefault();
-    if (!isValid) {
+    if (!isValid || isSubmitting) {
       return;
     }
     const expenseData = {
       amount: parseFloat(amount),
       date: date,
-      description: desc,
+      description: desc.trim(),
       category: category,
       isRecurring: isRecurring,
       paymentMethod: paymentMethod,
     };
-    onAddExpense(expenseData);
-    setAmount("");
-    setDate(new Date().toISOString().slice(0, 10));
-    setDesc("");
-    setCategory("Food");
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 1500);
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    try {
+      // Only clear the form and show success once the server confirms —
+      // previously the toast fired even when the request failed.
+      await onAddExpense(expenseData);
+      setAmount("");
+      setDate(new Date().toISOString().slice(0, 10));
+      setDesc("");
+      setCategory("Food");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 1500);
+    } catch (err) {
+      setErrorMessage(
+        err instanceof Error
+          ? err.message
+          : "Failed to add expense. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = (e: React.FormEvent<Element>) => {
@@ -138,17 +160,29 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
           </div>
           {/**Description Data*/}
           <div>
-            <label
-              htmlFor="desc"
-              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2"
-            >
-              Description
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label
+                htmlFor="desc"
+                className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              >
+                Description
+              </label>
+              <span
+                className={`text-xs ${
+                  desc.length >= MAX_DESCRIPTION_LENGTH
+                    ? "text-red-500"
+                    : "text-zinc-400 dark:text-zinc-500"
+                }`}
+              >
+                {desc.length}/{MAX_DESCRIPTION_LENGTH}
+              </span>
+            </div>
             <textarea
               id="desc"
               className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent transition-all resize-none"
               name="Expense Description"
               rows={3}
+              maxLength={MAX_DESCRIPTION_LENGTH}
               value={desc}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setDesc(e.target.value)
@@ -221,9 +255,10 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
           <div className="flex gap-4 pt-4">
             <button
               type="submit"
-              className="flex-1 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-medium py-3 px-6 rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:ring-offset-2 dark:focus:ring-offset-zinc-800"
+              disabled={isSubmitting}
+              className="flex-1 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-medium py-3 px-6 rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:ring-offset-2 dark:focus:ring-offset-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Add Expense
+              {isSubmitting ? "Adding..." : "Add Expense"}
             </button>
             <button
               className="px-6 py-3 bg-white dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 font-medium rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-all focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:ring-offset-2 dark:focus:ring-offset-zinc-800"
@@ -233,6 +268,27 @@ const AddExpenseForm = ({ onAddExpense }: expenseProps) => {
             </button>
           </div>
         </form>
+        {errorMessage && (
+          <div
+            className="flex items-center gap-3 mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl"
+            role="alert"
+          >
+            <svg
+              className="w-5 h-5 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span className="text-sm font-medium">{errorMessage}</span>
+          </div>
+        )}
         {showToast && (
           <div
             className="flex items-center gap-3 mt-6 p-4 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl"

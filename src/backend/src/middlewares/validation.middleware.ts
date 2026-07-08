@@ -14,7 +14,9 @@ class ValidateMiddleware {
   static validateBody(schema: ParsableSchema) {
     return (req: Request, res: Response, next: NextFunction) => {
       try {
-        schema.parse(req.body);
+        // Replace the body with the parsed result so downstream handlers see
+        // trimmed strings, coerced types, defaults, and no unknown keys.
+        req.body = schema.parse(req.body);
         next();
       } catch (err) {
         if (err instanceof ZodError) {

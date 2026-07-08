@@ -49,8 +49,16 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
+        // Validation failures (422) carry per-field messages in `errors`;
+        // surface those instead of the generic "Validation error" banner.
+        const fieldErrors = data.errors as Record<string, string[]> | undefined;
+        const firstFieldError = fieldErrors
+          ? Object.values(fieldErrors).flat()[0]
+          : undefined;
         throw new Error(
-          data.message || `Request failed with status ${response.status}`,
+          firstFieldError ||
+            data.message ||
+            `Request failed with status ${response.status}`,
         );
       }
 

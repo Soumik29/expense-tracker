@@ -11,6 +11,7 @@ import {
   Textarea,
 } from "@headlessui/react";
 import type { Expense, Category, PaymentMethod } from "../types";
+import { MAX_DESCRIPTION_LENGTH } from "../types";
 import { useState } from "react";
 
 interface modalClose {
@@ -125,11 +126,25 @@ const ModalFormExpense = ({
 
             {/* Description */}
             <div>
-              <Label className="block text-sm font-medium text-zinc-700 mb-2">
-                Description
-              </Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label className="block text-sm font-medium text-zinc-700">
+                  Description
+                </Label>
+                <span
+                  className={`text-xs ${
+                    (tempExpValues.description?.length ?? 0) >=
+                    MAX_DESCRIPTION_LENGTH
+                      ? "text-red-500"
+                      : "text-zinc-400"
+                  }`}
+                >
+                  {tempExpValues.description?.length ?? 0}/
+                  {MAX_DESCRIPTION_LENGTH}
+                </span>
+              </div>
               <Textarea
                 rows={3}
+                maxLength={MAX_DESCRIPTION_LENGTH}
                 className="w-full rounded-xl border border-zinc-200 bg-white text-zinc-900 px-4 py-3 focus:ring-2 focus:ring-zinc-900 focus:border-transparent focus:outline-none transition-all resize-none"
                 value={tempExpValues.description}
                 onChange={(e) =>

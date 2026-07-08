@@ -1,3 +1,7 @@
+// Keep in sync with the backend zod schema (transaction.schema.ts) and the
+// @db.VarChar(500) columns in schema.prisma.
+export const MAX_DESCRIPTION_LENGTH = 500;
+
 // Category and PaymentMethod types matching Prisma schema
 export type Category =
   | "Food"

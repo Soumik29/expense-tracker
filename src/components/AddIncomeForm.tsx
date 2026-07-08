@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { IncomeCategory, PaymentMethod, newIncome } from "../types";
+import { MAX_DESCRIPTION_LENGTH } from "../types";
 
 type IncomeFormProps = {
   onAddIncome: (income: newIncome) => Promise<{ success: boolean } | void>;
@@ -12,23 +13,32 @@ const AddIncomeForm = ({ onAddIncome }: IncomeFormProps) => {
   const [category, setCategory] = useState<IncomeCategory>("Salary");
   const [isRecurring, setIsRecurring] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const amt = Number(amount);
-  const isValid = amount.trim() !== "" && !Number.isNaN(amt) && date !== "";
+  const isValid =
+    amount.trim() !== "" &&
+    !Number.isNaN(amt) &&
+    amt > 0 &&
+    date !== "" &&
+    desc.length <= MAX_DESCRIPTION_LENGTH;
 
   const handleSubmit = async (e: React.FormEvent<Element>) => {
     e.preventDefault();
-    if (!isValid) return;
+    if (!isValid || isSubmitting) return;
 
     const incomeData: newIncome = {
       amount: parseFloat(amount),
       date,
-      description: desc,
+      description: desc.trim(),
       category,
       isRecurring,
       paymentMethod,
     };
 
+    setIsSubmitting(true);
+    setErrorMessage(null);
     try {
       await onAddIncome(incomeData);
       setAmount("");
@@ -39,7 +49,13 @@ const AddIncomeForm = ({ onAddIncome }: IncomeFormProps) => {
       setIsRecurring(false);
     } catch (err) {
       console.error("Failed to submit income:", err);
-      // Optional: surface a toast or inline error here if you’d like
+      setErrorMessage(
+        err instanceof Error
+          ? err.message
+          : "Failed to add income. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -96,14 +112,26 @@ const AddIncomeForm = ({ onAddIncome }: IncomeFormProps) => {
           </div>
 
           <div>
-            <label
-              htmlFor="income-desc"
-              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2"
-            >
-              Description
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label
+                htmlFor="income-desc"
+                className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              >
+                Description
+              </label>
+              <span
+                className={`text-xs ${
+                  desc.length >= MAX_DESCRIPTION_LENGTH
+                    ? "text-red-500"
+                    : "text-zinc-400 dark:text-zinc-500"
+                }`}
+              >
+                {desc.length}/{MAX_DESCRIPTION_LENGTH}
+              </span>
+            </div>
             <textarea
               id="income-desc"
+              maxLength={MAX_DESCRIPTION_LENGTH}
               className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:border-transparent transition-all resize-none"
               rows={3}
               value={desc}
@@ -176,11 +204,33 @@ const AddIncomeForm = ({ onAddIncome }: IncomeFormProps) => {
 
           <button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-6 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2"
+            disabled={isSubmitting}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-6 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Add Income
+            {isSubmitting ? "Adding..." : "Add Income"}
           </button>
         </form>
+        {errorMessage && (
+          <div
+            className="flex items-center gap-3 mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl"
+            role="alert"
+          >
+            <svg
+              className="w-5 h-5 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span className="text-sm font-medium">{errorMessage}</span>
+          </div>
+        )}
       </div>
     </div>
   );

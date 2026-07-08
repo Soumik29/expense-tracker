@@ -1,6 +1,8 @@
 import IncomeController from "@controllers/income.controller.js";
 import BaseRouter, { type RouteConfig } from "./router.js";
 import AuthMiddleware from "@middlewares/auth.middleware.js";
+import ValidateMiddleware from "@middlewares/validation.middleware.js";
+import transactionSchema from "../validations/transaction.schema.js";
 
 class IncomeRouter extends BaseRouter {
   protected routes(): RouteConfig[] {
@@ -14,13 +16,19 @@ class IncomeRouter extends BaseRouter {
       {
         method: "post",
         path: "/",
-        middlewares: [AuthMiddleware.authenticateUser],
+        middlewares: [
+          AuthMiddleware.authenticateUser,
+          ValidateMiddleware.validateBody(transactionSchema.income),
+        ],
         handler: IncomeController.createIncome,
       },
       {
         method: "put",
         path: "/:incomeId",
-        middlewares: [AuthMiddleware.authenticateUser],
+        middlewares: [
+          AuthMiddleware.authenticateUser,
+          ValidateMiddleware.validateBody(transactionSchema.income),
+        ],
         handler: IncomeController.updateIncome,
       },
       {
